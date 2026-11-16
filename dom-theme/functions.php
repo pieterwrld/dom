@@ -220,7 +220,7 @@ add_filter('acf/settings/load_json', function ($paths) {
 function dom_cart_fragments($fragments) {
     ob_start();
     get_template_part('template-parts/cart-drawer');
-    $fragments['div.drw'] = ob_get_clean();
+    $fragments['aside.drw'] = ob_get_clean();
 
     ob_start();
     echo '<span class="n js-cart-count">' . WC()->cart->get_cart_contents_count() . '</span>';

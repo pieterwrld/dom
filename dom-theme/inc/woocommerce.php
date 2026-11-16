@@ -81,6 +81,50 @@ add_action('wp_ajax_dom_update_cart_qty', 'dom_ajax_update_cart_qty');
 add_action('wp_ajax_nopriv_dom_update_cart_qty', 'dom_ajax_update_cart_qty');
 
 /**
+ * Quick add-to-cart from drawer upsell rails
+ */
+function dom_ajax_add_to_cart() {
+    check_ajax_referer('dom-cart-nonce', 'nonce');
+
+    $product_id = absint($_POST['product_id'] ?? 0);
+    if (!$product_id) {
+        wp_send_json_error();
+    }
+
+    $product = wc_get_product($product_id);
+    if (!$product) {
+        wp_send_json_error();
+    }
+
+    $variation_id = 0;
+    $variation = [];
+
+    if ($product->is_type('variable') && !empty($_POST['size'])) {
+        $size = sanitize_text_field($_POST['size']);
+        $data_store = WC_Data_Store::load('product');
+        foreach ($product->get_variation_attributes() as $attr_name => $values) {
+            $variation['attribute_' . $attr_name] = $size;
+            break;
+        }
+        $variation_id = $data_store->find_matching_product_variation($product, $variation);
+        if (!$variation_id) {
+            wp_send_json_error(['message' => 'Maat niet beschikbaar']);
+        }
+    }
+
+    $added = WC()->cart->add_to_cart($product_id, 1, $variation_id, $variation);
+    if (!$added) {
+        wp_send_json_error();
+    }
+
+    WC()->cart->calculate_totals();
+    $fragments = apply_filters('woocommerce_add_to_cart_fragments', []);
+    wp_send_json_success(['fragments' => $fragments]);
+}
+add_action('wp_ajax_dom_add_to_cart', 'dom_ajax_add_to_cart');
+add_action('wp_ajax_nopriv_dom_add_to_cart', 'dom_ajax_add_to_cart');
+
+/**
  * Products per page
  */
 add_filter('loop_shop_per_page', function () {

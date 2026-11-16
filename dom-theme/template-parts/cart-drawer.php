@@ -4,162 +4,247 @@ defined('ABSPATH') || exit;
 $cart_count = 0;
 $cart_total = 0;
 $cart_items = [];
-$free_shipping_threshold = 200;
-$mystery_shirt_threshold = 350;
+$saved = 0;
+$FREE = 200;
+$GIFT = 350;
 
 if (function_exists('WC') && WC()->cart) {
     $cart_count = WC()->cart->get_cart_contents_count();
     $cart_total = (float) WC()->cart->get_subtotal();
     $cart_items = WC()->cart->get_cart();
+    foreach ($cart_items as $item) {
+        $product = $item['data'];
+        if ($product->is_on_sale()) {
+            $saved += ((float) $product->get_regular_price() - (float) $product->get_price()) * $item['quantity'];
+        }
+    }
 }
 
-$progress_pct = min(100, ($cart_total / $free_shipping_threshold) * 100);
-$mystery_pct = min(100, ($cart_total / $mystery_shirt_threshold) * 100);
-$shipping_unlocked = $cart_total >= $free_shipping_threshold;
-$mystery_unlocked = $cart_total >= $mystery_shirt_threshold;
-$remaining = max(0, $free_shipping_threshold - $cart_total);
-$mystery_remaining = max(0, $mystery_shirt_threshold - $cart_total);
+$bar_pct   = min(100, ($cart_total / $GIFT) * 100);
+$hit200    = $cart_total >= $FREE;
+$hit350    = $cart_total >= $GIFT;
+$rem_free  = max(0, $FREE - $cart_total);
+$rem_gift  = max(0, $GIFT - $cart_total);
+
+$eur = function ($v) {
+    return '€' . number_format($v, 2, ',', '.');
+};
 ?>
 
-<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="drw" id="cart" aria-label="<?php esc_attr_e('Winkelwagen', 'dom-theme'); ?>">
 
-<div class="cart-drawer dom-cart-drawer" id="cartDrawer" aria-label="<?php esc_attr_e('Winkelwagen', 'dom-theme'); ?>" role="dialog">
-    <!-- Header -->
-    <div class="flex items-center justify-between px-5 py-4 border-b border-border">
-        <div class="flex items-center gap-2.5">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            <h2 class="text-sm font-extrabold uppercase tracking-label">Winkelwagen</h2>
-            <?php if ($cart_count > 0) : ?>
-                <span class="w-5 h-5 silver-gradient text-fg text-[10px] font-bold rounded-full flex items-center justify-center"><?php echo $cart_count; ?></span>
+  <!-- Header -->
+  <div class="drw-h">
+    <b>Winkelwagen (<span id="cartN2"><?php echo $cart_count; ?></span>)</b>
+    <button class="ic js-cart-close" aria-label="Sluiten">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+
+  <!-- Shipping ladder -->
+  <div class="ship">
+    <p id="shipMsg">
+      <?php if ($hit350) : ?>
+        Gratis verzending <b>+</b> mystery shirt unlocked
+      <?php elseif ($hit200) : ?>
+        Nog <b><?php echo $eur($rem_gift); ?></b> tot je gratis mystery shirt
+      <?php else : ?>
+        Nog <b><?php echo $eur($rem_free); ?></b> tot gratis verzending
+      <?php endif; ?>
+    </p>
+    <div class="ladder">
+      <i id="shipBar" style="width:<?php echo $bar_pct; ?>%"></i>
+      <span class="mile<?php echo $hit200 ? ' hit' : ''; ?>" id="m200" style="left:57.14%">
+        <span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
+      </span>
+      <span class="mile<?php echo $hit350 ? ' hit' : ''; ?>" id="m350" style="left:100%">
+        <span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
+      </span>
+    </div>
+    <div class="mile-lbls">
+      <span>&euro;0</span>
+      <span id="t200"<?php echo $hit200 ? ' class="hit"' : ''; ?>>&euro;200 verzending</span>
+      <span id="t350"<?php echo $hit350 ? ' class="hit"' : ''; ?>>&euro;350 mystery shirt</span>
+    </div>
+    <div class="gift<?php echo $hit350 ? ' on' : ''; ?>" id="gift">
+      <span class="gi">
+        <svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7S9 2 6.5 4.5 12 7 12 7zM12 7s3-5 5.5-2.5S12 7 12 7z"/></svg>
+      </span>
+      <div><b>Gratis mystery shirt</b></div>
+      <span class="st" id="giftSt"><?php echo $hit350 ? 'Unlocked' : 'Nog ' . $eur($rem_gift); ?></span>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="drw-b">
+    <div class="drw-pad" id="cartItems">
+      <?php if (!empty($cart_items)) :
+        foreach ($cart_items as $cart_item_key => $cart_item) :
+          $product    = $cart_item['data'];
+          $product_id = $cart_item['product_id'];
+          $quantity   = $cart_item['quantity'];
+          $price      = (float) $product->get_price();
+          $was        = $product->is_on_sale() ? (float) $product->get_regular_price() : 0;
+          $line_total = $price * $quantity;
+          $line_was   = $was > 0 ? $was * $quantity : 0;
+          $thumbnail  = get_the_post_thumbnail_url($product_id, 'thumbnail');
+          $name       = $product->get_name();
+
+          $meta = '';
+          if (!empty($cart_item['variation'])) {
+              $parts = [];
+              foreach ($cart_item['variation'] as $attr => $val) {
+                  $label = wc_attribute_label(str_replace('attribute_', '', $attr));
+                  $parts[] = $label . ' ' . $val;
+              }
+              $meta = implode(' · ', $parts);
+          }
+      ?>
+        <div class="ci" data-key="<?php echo esc_attr($cart_item_key); ?>">
+          <a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="thumb">
+            <?php if ($thumbnail) : ?>
+              <img src="<?php echo esc_url($thumbnail); ?>" alt="<?php echo esc_attr($name); ?>" loading="lazy">
             <?php endif; ?>
+          </a>
+          <div>
+            <div class="t"><?php echo esc_html($name); ?></div>
+            <?php if ($meta) : ?>
+              <div class="m"><?php echo esc_html($meta); ?></div>
+            <?php endif; ?>
+            <div class="qty">
+              <button data-a="-" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Minder">&minus;</button>
+              <span><?php echo $quantity; ?></span>
+              <button data-a="+" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Meer">+</button>
+            </div>
+          </div>
+          <div>
+            <div class="p"><?php echo $eur($line_total); ?><?php if ($line_was > 0) : ?><s><?php echo $eur($line_was); ?></s><?php endif; ?></div>
+            <button class="rm" data-rm="<?php echo esc_attr($cart_item_key); ?>">Verwijder</button>
+          </div>
         </div>
-        <button class="dom-cart-close w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface transition-colors" aria-label="Sluiten">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
+      <?php endforeach;
+      else : ?>
+        <div style="padding:40px 0;text-align:center">
+          <p class="cap" style="margin-bottom:16px">Je winkelwagen is nog leeg.</p>
+          <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>" class="btn btn-chrome js-cart-close" style="display:inline-flex">
+            <span>Bekijk shop</span>
+            <span class="arw">&rarr;</span>
+          </a>
+        </div>
+      <?php endif; ?>
     </div>
 
-    <!-- Progress milestones -->
-    <div class="px-5 py-4 bg-bg-off">
-        <div class="relative">
-            <!-- Track -->
-            <div class="h-1.5 bg-border/50 rounded-full overflow-hidden">
-                <div class="h-full silver-gradient rounded-full transition-all duration-700 ease-out" style="width:<?php echo $mystery_pct; ?>%"></div>
-            </div>
-            <!-- Milestone markers -->
-            <div class="relative mt-3 flex justify-between text-[10px]">
-                <div class="flex flex-col items-start gap-1">
-                    <?php if ($shipping_unlocked) : ?>
-                        <span class="flex items-center gap-1 text-success font-bold">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>
-                            Gratis verzending
-                        </span>
-                    <?php else : ?>
-                        <span class="text-muted font-medium">Nog &euro;<?php echo number_format($remaining, 0, ',', '.'); ?></span>
-                        <span class="text-muted/60">Gratis verzending</span>
+    <!-- Tabs -->
+    <div class="ctabs">
+      <div class="ctabs-h">
+        <button class="ctab on" data-p="up">Maak het compleet</button>
+        <button class="ctab" data-p="rec">Aanbevolen voor jou</button>
+        <button class="ctab" data-p="seen">Recent bekeken</button>
+      </div>
+      <div class="cpane on" id="pane-up">
+        <div class="crail" id="upRail">
+          <?php
+          $cat_ids = [];
+          foreach ($cart_items as $ci) {
+              $terms = get_the_terms($ci['product_id'], 'product_cat');
+              if ($terms && !is_wp_error($terms)) {
+                  foreach ($terms as $term) {
+                      $cat_ids[$term->term_id] = true;
+                  }
+              }
+          }
+          $exclude_ids = array_map(function ($ci) { return $ci['product_id']; }, $cart_items);
+          if (!empty($cat_ids)) :
+              $upsell_q = new WP_Query([
+                  'post_type'      => 'product',
+                  'posts_per_page' => 8,
+                  'post__not_in'   => $exclude_ids,
+                  'tax_query'      => [[
+                      'taxonomy' => 'product_cat',
+                      'field'    => 'term_id',
+                      'terms'    => array_keys($cat_ids),
+                  ]],
+                  'orderby' => 'rand',
+              ]);
+              while ($upsell_q->have_posts()) : $upsell_q->the_post();
+                  $up_product = wc_get_product(get_the_ID());
+                  if (!$up_product) continue;
+                  $up_thumb = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
+                  $up_price = (float) $up_product->get_price();
+                  $up_sizes = [];
+                  if ($up_product->is_type('variable')) {
+                      $attrs = $up_product->get_variation_attributes();
+                      foreach ($attrs as $a => $vals) {
+                          $up_sizes = array_merge($up_sizes, $vals);
+                          break;
+                      }
+                  }
+              ?>
+                <div class="cmini">
+                  <a href="<?php the_permalink(); ?>" class="im">
+                    <?php if ($up_thumb) : ?>
+                      <img src="<?php echo esc_url($up_thumb); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
                     <?php endif; ?>
-                </div>
-                <div class="flex flex-col items-end gap-1">
-                    <?php if ($mystery_unlocked) : ?>
-                        <span class="flex items-center gap-1 text-success font-bold">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20,6 9,17 4,12"/></svg>
-                            Mystery shirt!
-                        </span>
+                  </a>
+                  <div class="t"><?php the_title(); ?></div>
+                  <div class="p"><?php echo $eur($up_price); ?></div>
+                  <div class="row2">
+                    <?php if (!empty($up_sizes)) : ?>
+                      <select aria-label="Maat">
+                        <?php foreach ($up_sizes as $sz) : ?>
+                          <option><?php echo esc_html($sz); ?></option>
+                        <?php endforeach; ?>
+                      </select>
                     <?php else : ?>
-                        <span class="text-muted font-medium">Nog &euro;<?php echo number_format($mystery_remaining, 0, ',', '.'); ?></span>
-                        <span class="text-muted/60">Gratis mystery shirt</span>
+                      <span></span>
                     <?php endif; ?>
+                    <button class="add" data-id="<?php echo get_the_ID(); ?>" aria-label="Toevoegen">
+                      <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+                    </button>
+                  </div>
                 </div>
-            </div>
+              <?php endwhile; wp_reset_postdata();
+          endif;
+          ?>
         </div>
+      </div>
+      <div class="cpane" id="pane-rec"><div class="crail" id="recRail"></div></div>
+      <div class="cpane" id="pane-seen"><div class="crail" id="seenRail"></div></div>
     </div>
+  </div>
 
-    <!-- Items -->
-    <div class="flex-1 overflow-y-auto px-5 py-3">
-        <?php if (!empty($cart_items)) :
-            foreach ($cart_items as $cart_item_key => $cart_item) :
-                $product = $cart_item['data'];
-                $product_id = $cart_item['product_id'];
-                $quantity = $cart_item['quantity'];
-                $thumbnail = get_the_post_thumbnail_url($product_id, 'thumbnail');
-                $name = $product->get_name();
-                $price = $product->get_price();
-                $line_total = $price * $quantity;
-                $variation = '';
-                if (!empty($cart_item['variation'])) {
-                    $parts = [];
-                    foreach ($cart_item['variation'] as $attr => $val) {
-                        $parts[] = ucfirst(str_replace('attribute_pa_', '', $attr)) . ': ' . $val;
-                    }
-                    $variation = implode(' / ', $parts);
-                }
-            ?>
-                <div class="flex gap-3.5 py-4 border-b border-border last:border-0" data-cart-item="<?php echo esc_attr($cart_item_key); ?>">
-                    <a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="w-[76px] h-[95px] bg-surface rounded-lg shrink-0 overflow-hidden">
-                        <?php if ($thumbnail) : ?>
-                            <img src="<?php echo esc_url($thumbnail); ?>" alt="<?php echo esc_attr($name); ?>" class="w-full h-full object-cover">
-                        <?php endif; ?>
-                    </a>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start gap-2">
-                            <div class="min-w-0">
-                                <a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="text-sm font-bold truncate block hover:text-muted transition-colors"><?php echo esc_html($name); ?></a>
-                                <?php if ($variation) : ?>
-                                    <div class="text-xs text-muted mt-0.5"><?php echo esc_html($variation); ?></div>
-                                <?php endif; ?>
-                            </div>
-                            <button class="dom-remove-item shrink-0 w-6 h-6 flex items-center justify-center text-muted hover:text-urgency transition-colors" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Verwijderen">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            </button>
-                        </div>
-                        <div class="flex justify-between items-center mt-3">
-                            <div class="inline-flex items-center border border-border rounded-lg overflow-hidden">
-                                <button class="dom-qty-btn w-8 h-8 flex items-center justify-center text-sm hover:bg-surface transition-colors" data-action="decrease" data-key="<?php echo esc_attr($cart_item_key); ?>">&minus;</button>
-                                <span class="w-8 text-center text-xs font-bold"><?php echo $quantity; ?></span>
-                                <button class="dom-qty-btn w-8 h-8 flex items-center justify-center text-sm hover:bg-surface transition-colors" data-action="increase" data-key="<?php echo esc_attr($cart_item_key); ?>">+</button>
-                            </div>
-                            <span class="font-extrabold text-sm tabular-nums">&euro;<?php echo number_format($line_total, 2, ',', '.'); ?></span>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach;
-        else : ?>
-            <div class="flex flex-col items-center justify-center py-16 text-center">
-                <div class="w-16 h-16 rounded-full bg-surface flex items-center justify-center mb-4">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-muted"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                </div>
-                <span class="text-sm font-semibold mb-1">Je winkelwagen is leeg</span>
-                <span class="text-xs text-muted">Voeg items toe om te beginnen</span>
-                <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>" class="dom-cart-close mt-4 px-5 py-2.5 bg-fg text-white text-xs font-bold uppercase tracking-label rounded-lg hover:bg-fg/90 transition-colors">
-                    Bekijk shop
-                </a>
-            </div>
-        <?php endif; ?>
+  <!-- Footer -->
+  <?php if ($cart_count > 0) : ?>
+  <div class="drw-f">
+    <div class="row">
+      <span class="lb">Subtotaal</span>
+      <span class="vv" id="cartTotal"><?php echo $eur($cart_total); ?><?php if ($saved > 0) : ?><small>Je bespaart <?php echo $eur($saved); ?></small><?php endif; ?></span>
     </div>
+    <a href="<?php echo esc_url(wc_get_checkout_url()); ?>" class="btn btn-chrome">
+      <span>Afrekenen</span>
+      <span class="arw">&rarr;</span>
+    </a>
+    <div class="ctrust">
+      <div class="stars">
+        <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+        <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+      </div>
+      <span>4.9 &middot; 200+ klanten geholpen</span>
+    </div>
+    <div class="cpays">
+      <span class="paychip" style="--sd:0s">iDEAL</span>
+      <span class="paychip" style="--sd:.4s">VISA</span>
+      <span class="paychip" style="--sd:.8s">Mastercard</span>
+      <span class="paychip" style="--sd:1.2s">Apple Pay</span>
+      <span class="paychip" style="--sd:1.6s">Klarna</span>
+      <span class="paychip" style="--sd:2s">PayPal</span>
+      <span class="paychip" style="--sd:2.4s">Google Pay</span>
+      <span class="paychip" style="--sd:2.8s">Bancontact</span>
+    </div>
+  </div>
+  <?php endif; ?>
 
-    <?php if ($cart_count > 0) : ?>
-        <!-- Footer -->
-        <div class="border-t border-border px-5 py-4 bg-white">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-sm text-muted">Subtotaal</span>
-                <span class="text-2xl font-black tabular-nums">&euro;<?php echo number_format($cart_total, 2, ',', '.'); ?></span>
-            </div>
-            <a href="<?php echo esc_url(wc_get_checkout_url()); ?>" class="block w-full py-4 bg-fg text-white text-center text-sm font-extrabold uppercase tracking-label rounded-lg hover:bg-fg/90 hover:shadow-lg transition-all active:scale-[0.98]">
-                Afrekenen
-            </a>
-            <div class="flex items-center justify-center gap-5 mt-3 text-[10px] text-muted">
-                <span class="flex items-center gap-1">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Veilig betalen
-                </span>
-                <span class="flex items-center gap-1">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                    Snelle levering
-                </span>
-                <span class="flex items-center gap-1">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-                    14d retour
-                </span>
-            </div>
-        </div>
-    <?php endif; ?>
-</div>
+</aside>
