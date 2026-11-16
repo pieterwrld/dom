@@ -193,6 +193,7 @@ $dom_includes = [
     '/inc/theme-setup.php',
     '/inc/woocommerce.php',
     '/inc/enqueue.php',
+    '/inc/acf-fields.php',
 ];
 
 foreach ($dom_includes as $file) {

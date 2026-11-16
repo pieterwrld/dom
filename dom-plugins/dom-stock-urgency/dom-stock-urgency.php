@@ -50,7 +50,7 @@ class DOM_Stock_Urgency {
 
         if ($qty === 1) {
             return [
-                'text'  => __('Laatste op voorraad', 'dom-stock-urgency'),
+                'text'  => __('Laatste op voorraad — wees er snel bij!', 'dom-stock-urgency'),
                 'level' => 'critical',
             ];
         }
@@ -70,7 +70,7 @@ class DOM_Stock_Urgency {
         }
 
         return [
-            'text'  => __('Op voorraad', 'dom-stock-urgency'),
+            'text'  => __('Op voorraad — voor 17:00 besteld, morgen in huis', 'dom-stock-urgency'),
             'level' => 'ok',
         ];
     }
