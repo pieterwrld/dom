@@ -1,39 +1,42 @@
-<?php
-defined('ABSPATH') || exit;
-
-$usps = [
-    [
-        'icon' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
-        'label' => 'Snelle levering',
-        'sub' => 'Gratis vanaf €200',
-    ],
-    [
-        'icon' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
-        'label' => '14 dagen retour',
-        'sub' => 'Gratis retourneren',
-    ],
-    [
-        'icon' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
-        'label' => 'Veilig betalen',
-        'sub' => 'iDEAL, Visa, Klarna',
-    ],
-    [
-        'icon' => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
-        'label' => '24/7 WhatsApp',
-        'sub' => 'Direct antwoord',
-    ],
-];
-?>
-<div class="grid grid-cols-2 gap-2.5 mb-5">
-    <?php foreach ($usps as $usp) : ?>
-        <div class="flex items-start gap-3 p-4 bg-surface rounded-lg">
-            <div class="w-10 h-10 rounded-full silver-gradient flex items-center justify-center shrink-0 text-fg">
-                <?php echo $usp['icon']; ?>
-            </div>
-            <div>
-                <span class="block text-xs font-bold"><?php echo esc_html($usp['label']); ?></span>
-                <span class="block text-[11px] text-muted mt-0.5"><?php echo esc_html($usp['sub']); ?></span>
-            </div>
-        </div>
-    <?php endforeach; ?>
+<?php defined('ABSPATH') || exit; ?>
+<div class="usp" data-rv="up">
+  <div class="ucard">
+    <div class="uic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 12l2 2 4-4"/>
+        <path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/>
+      </svg>
+    </div>
+    <h4>Kwaliteitsgarantie</h4>
+    <p>Elk product wordt gecontroleerd voor verzending. 100% origineel, altijd.</p>
+  </div>
+  <div class="ucard">
+    <div class="uic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/>
+        <circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>
+      </svg>
+    </div>
+    <h4>Morgen in huis</h4>
+    <p>Voor 17:00 besteld, morgen bezorgd. Gratis verzending vanaf &euro;200.</p>
+  </div>
+  <div class="ucard">
+    <div class="uic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="5" width="20" height="14" rx="2"/>
+        <path d="M2 10h20"/>
+      </svg>
+    </div>
+    <h4>Veilig betalen</h4>
+    <p>iDEAL, creditcard, Klarna, PayPal &mdash; altijd beveiligd en vertrouwd.</p>
+  </div>
+  <div class="ucard">
+    <div class="uic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/>
+      </svg>
+    </div>
+    <h4>24/7 WhatsApp</h4>
+    <p>Vragen over maten, bestellingen of advies? We staan altijd voor je klaar.</p>
+  </div>
 </div>
