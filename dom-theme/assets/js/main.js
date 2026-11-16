@@ -1,11 +1,11 @@
 /**
  * De Outfitman — Core JS
- * Handles: scroll reveals, slider, cart toggle, countdown, sticky ATC
+ * Scroll reveals, slider, cart toggle, countdown, sticky ATC, mobile menu
  */
 (function () {
   'use strict';
 
-  // Scroll reveal
+  // Scroll reveal with stagger
   if ('IntersectionObserver' in window) {
     const obs = new IntersectionObserver(
       (entries) => {
@@ -16,14 +16,27 @@
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
     );
     document.querySelectorAll('.reveal').forEach((el) => obs.observe(el));
+
+    const heroObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            heroObs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.hero-reveal').forEach((el) => heroObs.observe(el));
   } else {
-    document.querySelectorAll('.reveal').forEach((el) => el.classList.add('visible'));
+    document.querySelectorAll('.reveal, .hero-reveal').forEach((el) => el.classList.add('visible'));
   }
 
-  // Generic slider component
+  // Smooth scroll slider (native scroll-snap based)
   document.querySelectorAll('[data-slider]').forEach((slider) => {
     const track = slider.querySelector('.dom-slider-track');
     const slides = slider.querySelectorAll('.dom-slider-slide');
@@ -36,11 +49,10 @@
     let current = 0;
     const total = slides.length;
 
-    // Build dots
     if (dotsContainer) {
       slides.forEach((_, i) => {
         const dot = document.createElement('button');
-        dot.className = 'w-2 h-2 rounded-full transition-colors ' + (i === 0 ? 'bg-fg' : 'bg-fg/20');
+        dot.className = 'w-2 h-2 rounded-full transition-all duration-300 ' + (i === 0 ? 'bg-white w-6' : 'bg-white/30');
         dot.setAttribute('aria-label', 'Slide ' + (i + 1));
         dot.addEventListener('click', () => goTo(i));
         dotsContainer.appendChild(dot);
@@ -49,18 +61,25 @@
 
     function goTo(index) {
       current = Math.max(0, Math.min(index, total - 1));
-      track.style.transform = 'translateX(-' + (current * 100) + '%)';
-      if (dotsContainer) {
-        dotsContainer.querySelectorAll('button').forEach((d, i) => {
-          d.className = 'w-2 h-2 rounded-full transition-colors ' + (i === current ? 'bg-fg' : 'bg-fg/20');
-        });
-      }
+      const slideWidth = slides[0].offsetWidth + parseInt(getComputedStyle(track).gap || '0');
+      track.scrollTo({ left: current * slideWidth, behavior: 'smooth' });
+      updateDots();
+    }
+
+    function updateDots() {
+      if (!dotsContainer) return;
+      dotsContainer.querySelectorAll('button').forEach((d, i) => {
+        if (i === current) {
+          d.className = 'w-6 h-2 rounded-full transition-all duration-300 bg-white';
+        } else {
+          d.className = 'w-2 h-2 rounded-full transition-all duration-300 bg-white/30';
+        }
+      });
     }
 
     if (prevBtn) prevBtn.addEventListener('click', () => goTo(current - 1));
     if (nextBtn) nextBtn.addEventListener('click', () => goTo(current + 1));
 
-    // Touch support
     let startX = 0;
     track.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
     track.addEventListener('touchend', (e) => {
@@ -71,9 +90,9 @@
 
   // Cart drawer toggle
   const cartOverlay = document.getElementById('cartOverlay');
-  const cartDrawer = document.getElementById('cartDrawer');
 
   function toggleCart(open) {
+    if (!cartOverlay) return;
     const isOpen = open ?? !cartOverlay.classList.contains('open');
     cartOverlay.classList.toggle('open', isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -88,10 +107,27 @@
   document.querySelectorAll('.dom-cart-close').forEach((btn) => {
     btn.addEventListener('click', () => toggleCart(false));
   });
+
+  // Mobile menu toggle
+  const menuOverlay = document.getElementById('mobileMenu');
+  function toggleMenu(open) {
+    if (!menuOverlay) return;
+    const isOpen = open ?? !menuOverlay.classList.contains('open');
+    menuOverlay.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+  document.querySelectorAll('.dom-menu-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => toggleMenu());
+  });
+  document.querySelectorAll('.dom-menu-close').forEach((btn) => {
+    btn.addEventListener('click', () => toggleMenu(false));
+  });
+
+  // Escape key closes drawers/menus
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && cartOverlay && cartOverlay.classList.contains('open')) {
-      toggleCart(false);
-    }
+    if (e.key !== 'Escape') return;
+    if (cartOverlay && cartOverlay.classList.contains('open')) toggleCart(false);
+    if (menuOverlay && menuOverlay.classList.contains('open')) toggleMenu(false);
   });
 
   // Countdown timer
@@ -142,4 +178,22 @@
       btn.classList.add('bg-fg', 'text-white', 'border-fg');
     });
   });
+
+  // Header scroll: compact on scroll
+  const header = document.querySelector('header[role="banner"]');
+  if (header) {
+    let lastY = 0;
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const y = window.scrollY;
+          header.classList.toggle('shadow-sm', y > 50);
+          lastY = y;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
 })();

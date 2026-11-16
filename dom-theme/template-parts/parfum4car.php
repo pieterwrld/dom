@@ -5,50 +5,49 @@ $slides = [];
 if (function_exists('get_field')) {
     $slides = get_field('parfum4car_slides', 'option') ?: [];
 }
+
+$fallback_images = [];
+for ($n = 2; $n <= 10; $n++) {
+    $fallback_images[] = content_url('/uploads/2025/09/' . $n . '.jpg');
+}
 ?>
-<div class="reveal">
-    <div class="flex items-baseline justify-between gap-4 mb-5">
-        <h2 class="text-xl md:text-2xl font-bold tracking-tight">Parfum4car</h2>
-        <a href="https://parfum4car.nl" target="_blank" rel="noopener" class="text-sm text-muted hover:text-fg transition-colors whitespace-nowrap">Bekijk collectie &rarr;</a>
-    </div>
-
-    <div class="dom-slider relative overflow-hidden rounded-lg border border-border" data-slider>
-        <div class="dom-slider-track flex transition-transform duration-500 ease-out">
-            <?php if (!empty($slides)) : ?>
-                <?php foreach ($slides as $slide) : ?>
-                    <div class="dom-slider-slide flex-shrink-0 w-full">
-                        <div class="relative aspect-[16/7] bg-surface">
-                            <?php if (!empty($slide['image'])) : ?>
-                                <img src="<?php echo esc_url($slide['image']['url']); ?>" alt="<?php echo esc_attr($slide['title'] ?? 'Parfum4car'); ?>" class="w-full h-full object-cover" loading="lazy">
-                            <?php endif; ?>
-                            <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
-                            <div class="absolute bottom-0 left-0 p-6 md:p-8 text-white">
-                                <span class="text-2xs font-bold uppercase tracking-label silver-text mb-1 block">Parfum4car</span>
-                                <span class="text-lg md:text-xl font-bold"><?php echo esc_html($slide['title'] ?? ''); ?></span>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else : ?>
-                <div class="dom-slider-slide flex-shrink-0 w-full">
-                    <div class="relative aspect-[16/7] bg-surface flex items-center justify-center">
-                        <div class="text-center p-8">
-                            <span class="text-2xs font-bold uppercase tracking-label silver-text block mb-2">Partner</span>
-                            <span class="text-2xl font-bold block mb-1">Parfum4car</span>
-                            <span class="text-sm text-muted">Premium autoparfums</span>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
+<div>
+    <div class="reveal flex items-end justify-between gap-4 mb-8 md:mb-10">
+        <div>
+            <span class="block text-2xs font-bold uppercase tracking-label text-muted mb-2">Partner</span>
+            <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-none">Parfum<span class="silver-text">4</span>Car</h2>
         </div>
-
-        <button class="dom-slider-prev absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 backdrop-blur border border-border hover:bg-white transition-colors" aria-label="Vorige">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
-        </button>
-        <button class="dom-slider-next absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 backdrop-blur border border-border hover:bg-white transition-colors" aria-label="Volgende">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>
-        </button>
-
-        <div class="dom-slider-dots absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5"></div>
+        <a href="https://parfum4car.nl/" target="_blank" rel="noopener" class="hidden md:inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-fg transition-colors whitespace-nowrap group">
+            Bekijk alles
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+        </a>
     </div>
+
+    <div class="flex gap-3 md:gap-4 overflow-x-auto scrollbar-none scroll-smooth snap-x snap-mandatory pb-2" style="scroll-padding: 0 16px">
+        <?php
+        $images = [];
+        if (!empty($slides)) {
+            foreach ($slides as $slide) {
+                $images[] = $slide['image']['url'] ?? '';
+            }
+        } else {
+            $images = $fallback_images;
+        }
+
+        foreach ($images as $i => $img) :
+            if (!$img) continue;
+        ?>
+            <div class="reveal flex-shrink-0 w-[70vw] md:w-[320px] snap-start group" style="transition-delay: <?php echo $i * 60; ?>ms">
+                <div class="relative aspect-[4/5] rounded-xl overflow-hidden bg-surface">
+                    <img src="<?php echo esc_url($img); ?>" alt="Parfum4Car" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
+    <a href="https://parfum4car.nl/" target="_blank" rel="noopener" class="md:hidden flex items-center justify-center gap-2 mt-5 py-3 border border-border rounded-lg text-sm font-semibold hover:bg-surface transition-colors">
+        Bekijk Parfum4Car
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
+    </a>
 </div>

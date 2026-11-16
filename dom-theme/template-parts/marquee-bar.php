@@ -2,11 +2,12 @@
 defined('ABSPATH') || exit;
 
 $messages = [
-    'Black Friday Deals — tot 50% korting',
-    'Voor 17:00 besteld = morgen in huis',
-    'Gratis verzending vanaf €200',
-    '3 voor €130 op T-shirts & Zwembroeken',
-    '24/7 Klantenservice via WhatsApp',
+    '24/7 KLANTENSERVICE VIA WHATSAPP',
+    'VOOR 17:00 BESTELD = MORGEN IN HUIS',
+    '14 DAGEN GRATIS RETOURNEREN',
+    '100% ORIGINELE MERKKLEDING',
+    'GRATIS VERZENDING VANAF €200',
+    '3 VOOR €130 OP T-SHIRTS & ZWEMBROEKEN',
 ];
 
 if (function_exists('get_field')) {
