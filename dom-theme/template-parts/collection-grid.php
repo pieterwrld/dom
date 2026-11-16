@@ -1,79 +1,109 @@
 <?php
 defined('ABSPATH') || exit;
 
-$target_cats = ['sneakers', 'jassen', 'jeans', 'trainingspakken', 'sweaters-hoodies', 't-shirts', 'zwembroeken', 'tassen', 'brillen', 'slippers', 'petten', 'sale'];
+$preferred_order = [
+    'sneakers', 'jassen', 'jeans', 'trainingspakken',
+    'sweaters-hoodies', 't-shirts', 'zwembroeken', 'slippers', 'sale',
+];
 
-$categories = get_terms([
+$all_cats = get_terms([
     'taxonomy'   => 'product_cat',
     'hide_empty' => false,
-    'slug'       => $target_cats,
-    'orderby'    => 'slug__in',
+    'parent'     => 0,
 ]);
 
-if (is_wp_error($categories) || empty($categories)) return;
+if (is_wp_error($all_cats)) {
+    $all_cats = [];
+}
+
+$exclude_slugs = ['uncategorized', 'bestsellers'];
+$cats_by_slug  = [];
+foreach ($all_cats as $cat) {
+    if (in_array($cat->slug, $exclude_slugs, true)) continue;
+    $cats_by_slug[$cat->slug] = $cat;
+}
 
 $ordered = [];
-foreach ($target_cats as $slug) {
-    foreach ($categories as $cat) {
-        if ($cat->slug === $slug) {
-            $ordered[] = $cat;
-            break;
-        }
+foreach ($preferred_order as $slug) {
+    if (isset($cats_by_slug[$slug])) {
+        $ordered[] = $cats_by_slug[$slug];
+        unset($cats_by_slug[$slug]);
     }
 }
-$categories = array_slice($ordered, 0, 9);
+foreach ($cats_by_slug as $cat) {
+    $ordered[] = $cat;
+}
+
+$tiles = array_slice($ordered, 0, 9);
+
+$sale_slugs = ['sale'];
+$badge_map  = [
+    'sneakers' => ['label' => 'Bestseller', 'class' => ''],
+    'jassen'   => ['label' => '-25%',       'class' => 'bf'],
+    't-shirts' => ['label' => '3 v. &euro;130', 'class' => 'bf'],
+    'sale'     => ['label' => 'Tot -50%',   'class' => 'bf'],
+];
+
+$shop_url = get_permalink(wc_get_page_id('shop'));
 ?>
-<div>
-    <div class="reveal flex items-end justify-between gap-4 mb-8 md:mb-10">
-        <div>
-            <span class="block text-2xs font-bold uppercase tracking-label text-muted mb-2">Shop by category</span>
-            <h2 class="text-3xl md:text-4xl font-black tracking-tight leading-none">Ontdek onze<br>collecties</h2>
-        </div>
-        <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>" class="hidden md:inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-fg transition-colors whitespace-nowrap group">
-            Bekijk alles
-            <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
-        </a>
-    </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-        <?php foreach ($categories as $i => $cat) :
-            $thumbnail_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
-            $image_url = $thumbnail_id ? wp_get_attachment_image_url($thumbnail_id, 'collection-card') : '';
-            $discount = '';
-            if (function_exists('get_field')) {
-                $discount = get_field('category_discount_label', 'product_cat_' . $cat->term_id);
-            }
-            $is_large = ($i === 0 || $i === 4);
-            $aspect = $is_large ? 'aspect-[4/5]' : 'aspect-[3/4]';
-            if ($i === 0) $aspect = 'aspect-[4/5] md:row-span-2 md:aspect-auto md:h-full';
-        ?>
-            <a href="<?php echo esc_url(get_term_link($cat)); ?>"
-               class="reveal group relative <?php echo $aspect; ?> rounded-lg overflow-hidden bg-surface block"
-               style="transition-delay: <?php echo $i * 60; ?>ms">
-                <?php if ($image_url) : ?>
-                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($cat->name); ?>" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" loading="lazy">
-                <?php else : ?>
-                    <div class="absolute inset-0 bg-gradient-to-br from-surface to-surface-2"></div>
-                <?php endif; ?>
-
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
-
-                <div class="absolute bottom-0 left-0 right-0 p-4 md:p-5">
-                    <?php if ($discount) : ?>
-                        <span class="inline-block px-2.5 py-1 bg-urgency text-white text-[10px] font-bold rounded-sm tracking-wide uppercase mb-2"><?php echo esc_html($discount); ?></span>
-                    <?php endif; ?>
-                    <h3 class="text-sm md:text-base font-bold uppercase tracking-wide text-white leading-tight"><?php echo esc_html($cat->name); ?></h3>
-                    <span class="inline-flex items-center gap-1.5 mt-1.5 text-[11px] text-white/60 font-medium uppercase tracking-label group-hover:text-white/80 transition-colors">
-                        Shop nu
-                        <svg class="w-3 h-3 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
-                    </span>
-                </div>
-            </a>
-        <?php endforeach; ?>
-    </div>
-
-    <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>" class="md:hidden flex items-center justify-center gap-2 mt-5 py-3 border border-border rounded-lg text-sm font-semibold hover:bg-surface transition-colors">
-        Bekijk alle collecties
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12,5 19,12 12,19"/></svg>
-    </a>
+<div class="sec-t" data-rv="up">
+  <div class="eyebrow"><i></i><span class="lbl">Collecties</span></div>
+  <div class="sec-h">
+    <h2 class="d2 split">Shop per categorie</h2>
+    <a href="<?php echo esc_url($shop_url); ?>" class="lk">Alle producten <span class="arw">&rarr;</span></a>
+  </div>
 </div>
+
+<div class="cgrid">
+  <?php foreach ($tiles as $i => $cat) :
+    $thumb_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
+    $img_url  = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'product-card') : '';
+    $link     = get_term_link($cat);
+    $delay    = $i * 50;
+    $is_sale  = in_array($cat->slug, $sale_slugs, true);
+    $badge    = $badge_map[$cat->slug] ?? null;
+
+    $min_price = '';
+    $cheapest  = get_posts([
+        'post_type'      => 'product',
+        'posts_per_page' => 1,
+        'tax_query'      => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $cat->slug]],
+        'meta_key'       => '_price',
+        'orderby'        => 'meta_value_num',
+        'order'          => 'ASC',
+        'fields'         => 'ids',
+    ]);
+    if ($cheapest) {
+        $p = wc_get_product($cheapest[0]);
+        if ($p) $min_price = 'vanaf &euro;' . number_format((float) $p->get_price(), 0, ',', '.');
+    }
+  ?>
+    <a href="<?php echo esc_url($link); ?>"
+       class="ctile<?php echo $is_sale ? ' saletile' : ''; ?>"
+       data-rv="scale"<?php if ($delay) echo ' style="--d:' . $delay . 'ms"'; ?>>
+      <?php if ($img_url) : ?>
+        <img class="cim" src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($cat->name); ?>" loading="lazy">
+      <?php else : ?>
+        <div class="cim ph"><span class="ph-l"><?php echo esc_html($cat->name); ?></span></div>
+      <?php endif; ?>
+      <span class="shade"></span>
+      <?php if ($badge) : ?>
+        <span class="cbadge<?php echo $badge['class'] ? ' ' . $badge['class'] : ''; ?>"><?php echo $badge['label']; ?></span>
+      <?php endif; ?>
+      <span class="cline"></span>
+      <div class="cbody">
+        <div class="cname"><?php echo esc_html($cat->name); ?></div>
+        <?php if ($min_price) : ?><div class="cmeta"><?php echo $min_price; ?></div><?php endif; ?>
+        <div class="cgo">Shop nu <span class="arw">&rarr;</span></div>
+      </div>
+    </a>
+  <?php endforeach; ?>
+</div>
+
+<a href="<?php echo esc_url($shop_url); ?>" class="dealbar" data-rv="up">
+  <div>
+    <h3>3 voor &euro;130</h3>
+    <p>Combineer 3 T&#8209;shirts of zwembroeken. Korting automatisch bij het afrekenen.</p>
+  </div>
+  <span class="btn btn-ow">Stel je deal samen <span class="arw">&rarr;</span></span>
+</a>
