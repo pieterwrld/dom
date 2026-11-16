@@ -89,6 +89,15 @@ function dom_enqueue_assets() {
         );
     }
 
+    if (is_checkout() || is_account_page() || is_cart() || is_page()) {
+        wp_enqueue_style(
+            'dom-woocommerce',
+            DOM_THEME_URI . '/assets/css/woocommerce.css',
+            ['dom-core'],
+            DOM_THEME_VERSION
+        );
+    }
+
     wp_enqueue_script(
         'dom-core',
         DOM_THEME_URI . '/assets/js/core.js',
