@@ -55,7 +55,11 @@ function dom_ajax_update_cart_qty() {
     }
 
     $qty = $item['quantity'];
-    $new_qty = ($direction === 'increase') ? $qty + 1 : max(0, $qty - 1);
+    if ($direction === 'remove') {
+        $new_qty = 0;
+    } else {
+        $new_qty = ($direction === 'increase') ? $qty + 1 : max(0, $qty - 1);
+    }
 
     if ($new_qty === 0) {
         $cart->remove_cart_item($key);
