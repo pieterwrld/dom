@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: DOM Delivery Estimate
- * Description: Dynamic delivery date calculation. Respects weekends, cutoff time (18:00 CET), and Dutch holidays.
+ * Description: Dynamic delivery date calculation. Respects weekends, cutoff time (17:00 CET), and Dutch holidays.
  * Version: 1.0.0
  * Author: De Outfitman
  * Requires Plugins: woocommerce
@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 class DOM_Delivery_Estimate {
 
     private static $instance = null;
-    private $cutoff_hour = 18;
+    private $cutoff_hour = 17;
     private $timezone = 'Europe/Amsterdam';
 
     public static function instance() {

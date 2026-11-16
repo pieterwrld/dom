@@ -37,32 +37,42 @@ class DOM_Stock_Urgency {
         $qty = $product->get_stock_quantity();
         $status = $product->get_stock_status();
 
-        if ($status !== 'instock' || $qty === null) {
+        if ($status === 'outofstock' || $qty === 0) {
+            return [
+                'text'  => __('Deze maat is uitverkocht', 'dom-stock-urgency'),
+                'level' => 'out',
+            ];
+        }
+
+        if ($qty === null) {
             return '';
         }
 
-        if ($qty <= 1) {
+        if ($qty === 1) {
             return [
-                'text'  => __('Laatste op voorraad — wees er snel bij!', 'dom-stock-urgency'),
+                'text'  => __('Laatste op voorraad', 'dom-stock-urgency'),
                 'level' => 'critical',
             ];
         }
 
-        if ($qty <= 2) {
+        if ($qty === 2) {
             return [
-                'text'  => sprintf(__('Nog %d op voorraad — twijfel niet!', 'dom-stock-urgency'), $qty),
+                'text'  => __('Nog 2 op voorraad — twijfel niet!', 'dom-stock-urgency'),
                 'level' => 'warning',
             ];
         }
 
         if ($qty <= 6) {
             return [
-                'text'  => __('Bijna uitverkocht', 'dom-stock-urgency'),
+                'text'  => sprintf(__('Nog %d op voorraad — bijna uitverkocht', 'dom-stock-urgency'), $qty),
                 'level' => 'notice',
             ];
         }
 
-        return '';
+        return [
+            'text'  => __('Op voorraad', 'dom-stock-urgency'),
+            'level' => 'ok',
+        ];
     }
 
     public function ajax_check() {
