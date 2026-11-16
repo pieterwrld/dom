@@ -1,0 +1,27 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+
+# Compiled CSS is committed (no build step on server needed if pre-compiled)
+# dom-theme/assets/css/style.css
+
+# Font files are committed (self-hosted)
+# dom-theme/assets/fonts/
+
+# ACF JSON is committed (version controlled field groups)
+# dom-theme/acf-json/
+
+# WordPress uploads (not in repo)
+uploads/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+dom-theme/node_modules/
+dom-theme/package-lock.json
