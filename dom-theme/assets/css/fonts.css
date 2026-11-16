@@ -1,15 +1,40 @@
+/* Barlow Condensed — display / headings / buttons */
 @font-face {
-  font-family: 'Geist';
-  src: url('../fonts/GeistVF.woff2') format('woff2');
+  font-family: 'Barlow Condensed';
+  src: url('../fonts/barlow-condensed/BarlowCondensed-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('../fonts/barlow-condensed/BarlowCondensed-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  src: url('../fonts/barlow-condensed/BarlowCondensed-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Inter — body / UI text */
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/inter/Inter-latin.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
+/* JetBrains Mono — prices / data */
 @font-face {
-  font-family: 'Geist Mono';
-  src: url('../fonts/GeistMonoVF.woff2') format('woff2');
-  font-weight: 100 900;
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/jetbrains-mono/JetBrainsMono-latin.woff2') format('woff2');
+  font-weight: 100 800;
   font-style: normal;
   font-display: swap;
 }

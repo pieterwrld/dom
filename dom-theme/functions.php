@@ -57,7 +57,6 @@ add_action('after_setup_theme', 'dom_theme_setup');
  * Enqueue styles and scripts
  */
 function dom_enqueue_assets() {
-    // Geist font (local, preloaded in header.php)
     wp_enqueue_style(
         'dom-fonts',
         DOM_THEME_URI . '/assets/css/fonts.css',
@@ -65,28 +64,43 @@ function dom_enqueue_assets() {
         DOM_THEME_VERSION
     );
 
-    // Main compiled Tailwind + custom CSS
     wp_enqueue_style(
-        'dom-style',
-        DOM_THEME_URI . '/assets/css/style.css',
+        'dom-core',
+        DOM_THEME_URI . '/assets/css/core.css',
         ['dom-fonts'],
         DOM_THEME_VERSION
     );
 
-    // Main JS (deferred)
+    if (is_shop() || is_product_category() || is_product_tag()) {
+        wp_enqueue_style(
+            'dom-collection',
+            DOM_THEME_URI . '/assets/css/collection.css',
+            ['dom-core'],
+            DOM_THEME_VERSION
+        );
+    }
+
+    if (is_product()) {
+        wp_enqueue_style(
+            'dom-product',
+            DOM_THEME_URI . '/assets/css/product.css',
+            ['dom-core'],
+            DOM_THEME_VERSION
+        );
+    }
+
     wp_enqueue_script(
-        'dom-main',
-        DOM_THEME_URI . '/assets/js/main.js',
+        'dom-core',
+        DOM_THEME_URI . '/assets/js/core.js',
         [],
         DOM_THEME_VERSION,
         ['strategy' => 'defer', 'in_footer' => true]
     );
 
-    // Cart drawer JS
     wp_enqueue_script(
         'dom-cart',
         DOM_THEME_URI . '/assets/js/cart.js',
-        ['dom-main'],
+        ['dom-core'],
         DOM_THEME_VERSION,
         ['strategy' => 'defer', 'in_footer' => true]
     );
@@ -97,7 +111,6 @@ function dom_enqueue_assets() {
         'currency' => get_woocommerce_currency_symbol(),
     ]);
 
-    // Gallery JS — only on product pages
     if (is_product()) {
         wp_enqueue_script(
             'dom-gallery',
@@ -108,7 +121,6 @@ function dom_enqueue_assets() {
         );
     }
 
-    // Filters JS — only on shop/archive pages
     if (is_shop() || is_product_category() || is_product_tag()) {
         wp_enqueue_script(
             'dom-filters',
@@ -208,11 +220,11 @@ add_filter('acf/settings/load_json', function ($paths) {
 function dom_cart_fragments($fragments) {
     ob_start();
     get_template_part('template-parts/cart-drawer');
-    $fragments['div.dom-cart-drawer'] = ob_get_clean();
+    $fragments['div.drw'] = ob_get_clean();
 
     ob_start();
-    echo '<span class="dom-cart-count">' . WC()->cart->get_cart_contents_count() . '</span>';
-    $fragments['span.dom-cart-count'] = ob_get_clean();
+    echo '<span class="n js-cart-count">' . WC()->cart->get_cart_contents_count() . '</span>';
+    $fragments['.js-cart-count'] = ob_get_clean();
 
     return $fragments;
 }

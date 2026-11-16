@@ -1,0 +1,39 @@
+<?php
+/**
+ * Black Friday Countdown Strip
+ * Uses .bfs classes from core.css
+ * Countdown target: November 27, 2026 23:59:59
+ */
+?>
+<div class="bfs" id="bf-strip" data-end="2026-11-27T23:59:59">
+	<div class="bfs-in wrap">
+		<div class="bfs-t">
+			<b>BLACK FRIDAY</b>
+			<s>DEALS TOT 50% KORTING</s>
+		</div>
+		<div class="cd" id="bf-cd">
+			<div class="u">
+				<b data-unit="d">00</b>
+				<span>DAGEN</span>
+			</div>
+			<div class="u">
+				<b data-unit="h">00</b>
+				<span>UREN</span>
+			</div>
+			<div class="u">
+				<b data-unit="m">00</b>
+				<span>MIN</span>
+			</div>
+			<div class="u">
+				<b data-unit="s">00</b>
+				<span>SEC</span>
+			</div>
+		</div>
+		<a href="<?php echo esc_url( home_url( '/product-categorie/sale/' ) ); ?>" class="go">
+			SHOP NU <span class="arw">&rarr;</span>
+		</a>
+	</div>
+	<button class="bfs-close" aria-label="Sluiten">
+		<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+	</button>
+</div>
