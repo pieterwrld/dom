@@ -242,6 +242,7 @@ add_action('wp_enqueue_scripts', 'dom_dequeue_jquery', 99);
  * Include theme modules
  */
 $dom_includes = [
+    '/inc/fatal-log.php',
     '/inc/theme-setup.php',
     '/inc/woocommerce.php',
     '/inc/enqueue.php',
