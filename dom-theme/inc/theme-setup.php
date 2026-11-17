@@ -12,10 +12,10 @@ defined('ABSPATH') || exit;
 add_filter('body_class', function ($classes) {
     $classes[] = 'dom-theme';
 
-    if (is_product()) {
+    if (dom_has_woo() && is_product()) {
         $classes[] = 'dom-product-page';
     }
-    if (is_shop() || is_product_category()) {
+    if (dom_has_woo() && (is_shop() || is_product_category())) {
         $classes[] = 'dom-shop-page';
     }
 

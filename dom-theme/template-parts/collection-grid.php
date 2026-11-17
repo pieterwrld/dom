@@ -61,7 +61,7 @@ $sale_slugs = ['sale'];
  * dat niet klopt met de werkelijke prijzen is misleidend, dus we tonen alleen de
  * echte maximale korting binnen een categorie, en anders geen badge.
  */
-$on_sale_ids = wc_get_product_ids_on_sale();
+$on_sale_ids = function_exists('wc_get_product_ids_on_sale') ? wc_get_product_ids_on_sale() : [];
 
 $dom_category_badge = static function ($slug) use ($on_sale_ids) {
     if (!$on_sale_ids) {
@@ -81,7 +81,7 @@ $dom_category_badge = static function ($slug) use ($on_sale_ids) {
     }
     $best = 0;
     foreach ($ids as $id) {
-        $product = wc_get_product($id);
+        $product = function_exists('wc_get_product') ? wc_get_product($id) : null;
         if (!$product) {
             continue;
         }
@@ -97,7 +97,7 @@ $dom_category_badge = static function ($slug) use ($on_sale_ids) {
     return ['label' => 'Tot -' . $best . '%', 'class' => 'bf'];
 };
 
-$shop_url = get_permalink(wc_get_page_id('shop'));
+$shop_url = dom_shop_url();
 ?>
 <div class="sec-t" data-rv="up">
   <div class="eyebrow"><i></i><span class="lbl">Collecties</span></div>
@@ -111,7 +111,7 @@ $shop_url = get_permalink(wc_get_page_id('shop'));
   <?php foreach ($tiles as $i => $cat) :
     $thumb_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
     $img_url  = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'product-card') : '';
-    $link     = get_term_link($cat);
+    $link     = dom_term_url($cat);
     $delay    = $i * 50;
     $is_sale  = in_array($cat->slug, $sale_slugs, true);
     $badge    = $dom_category_badge($cat->slug);
@@ -141,7 +141,7 @@ $shop_url = get_permalink(wc_get_page_id('shop'));
         'fields'         => 'ids',
     ]);
     if ($cheapest) {
-        $p = wc_get_product($cheapest[0]);
+        $p = function_exists('wc_get_product') ? wc_get_product($cheapest[0]) : null;
         if ($p) $min_price = 'vanaf &euro;' . number_format((float) $p->get_price(), 0, ',', '.');
     }
   ?>

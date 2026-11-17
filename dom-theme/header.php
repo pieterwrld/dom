@@ -57,7 +57,7 @@
                 <b>Black Friday Deals</b>
                 <span>Tot 50% korting op geselecteerde items</span>
             </div>
-            <a href="<?php echo esc_url(get_term_link('sale', 'product_cat')); ?>" class="btn btn-ow" style="height:34px;padding:0 14px;font-size:12px">Shop Sale <span class="arw">&rarr;</span></a>
+            <a href="<?php echo esc_url(dom_term_url('sale', 'product_cat')); ?>" class="btn btn-ow" style="height:34px;padding:0 14px;font-size:12px">Shop Sale <span class="arw">&rarr;</span></a>
         </div>
     </div>
 
@@ -105,7 +105,7 @@
                 }
                 $is_sale = ($cat->slug === 'sale');
         ?>
-            <a href="<?php echo esc_url(get_term_link($cat)); ?>" class="ml<?php echo $is_sale ? ' sale' : ''; ?>">
+            <a href="<?php echo esc_url(dom_term_url($cat)); ?>" class="ml<?php echo $is_sale ? ' sale' : ''; ?>">
                 <span class="mth">
                     <?php if ($thumb_url) : ?>
                         <img src="<?php echo esc_url($thumb_url); ?>" alt="" loading="lazy" width="46" height="58">
@@ -125,7 +125,7 @@
     <div class="menu-f">
         <a href="<?php echo esc_url(home_url('/contact')); ?>">Contact</a>
         <a href="<?php echo esc_url(home_url('/faq')); ?>">Veelgestelde vragen</a>
-        <a href="<?php echo esc_url(wc_get_page_permalink('myaccount')); ?>">Mijn account</a>
+        <a href="<?php echo esc_url(function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/')); ?>">Mijn account</a>
         <a href="<?php echo esc_url(home_url('/retourneren')); ?>">Retourneren</a>
     </div>
 </nav>

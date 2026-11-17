@@ -91,7 +91,7 @@ if (is_wp_error($brands)) $brands = [];
           $is_active = ($is_category && $current_cat->term_id === $cat->term_id);
           $is_sale   = (strtolower($cat->slug) === 'sale');
         ?>
-          <a href="<?php echo esc_url(get_term_link($cat)); ?>"
+          <a href="<?php echo esc_url(dom_term_url($cat)); ?>"
              class="qcb<?php echo $is_active ? ' on' : ''; ?><?php echo $is_sale ? ' bf' : ''; ?>">
             <b><?php echo esc_html($cat->name); ?></b>
           </a>
@@ -174,7 +174,7 @@ if (is_wp_error($brands)) $brands = [];
 
   <div class="wrap">
     <?php if ($cat_banner_img) : ?>
-      <a class="cbanner" href="<?php echo $is_category ? esc_url(get_term_link($current_cat)) : '#'; ?>">
+      <a class="cbanner" href="<?php echo $is_category ? esc_url(dom_term_url($current_cat)) : '#'; ?>">
         <img src="<?php echo esc_url($cat_banner_img); ?>" alt="<?php echo esc_attr($page_title); ?>" loading="lazy">
         <div class="cb-in">
           <div>

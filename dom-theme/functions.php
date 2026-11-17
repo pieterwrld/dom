@@ -54,6 +54,49 @@ function dom_theme_setup() {
 add_action('after_setup_theme', 'dom_theme_setup');
 
 /**
+ * Draait WooCommerce op dit moment?
+ *
+ * De conditionals van WooCommerce (is_shop, is_product, ...) bestaan alleen
+ * zolang de plugin actief is. Ze zonder controle aanroepen betekent dat de
+ * winkel een wit scherm geeft op het moment dat WooCommerce uitvalt of nog
+ * niet geladen is, precies wanneer je dat het minst kunt gebruiken.
+ */
+function dom_has_woo() {
+    return class_exists('WooCommerce') && function_exists('is_shop');
+}
+
+/**
+ * De URL van een term, of een lege string als die er niet is.
+ *
+ * get_term_link() geeft een WP_Error terug wanneer de term niet bestaat. Zo'n
+ * object is truthy, dus het glipt door een ?:-fallback heen en belandt in
+ * esc_url(), waar PHP 8 er een TypeError van maakt en de pagina omvalt. Eén
+ * ontbrekende categorie zou zo de hele winkel neerhalen.
+ *
+ * @param WP_Term|int|string $term
+ * @param string             $taxonomy
+ * @return string
+ */
+function dom_term_url($term, $taxonomy = '') {
+    if (empty($term)) {
+        return '';
+    }
+    $link = $taxonomy ? get_term_link($term, $taxonomy) : get_term_link($term);
+    return (is_string($link) && $link !== '') ? $link : '';
+}
+
+/**
+ * De shop-URL, of de homepage als WooCommerce er niet is.
+ */
+function dom_shop_url() {
+    if (!function_exists('wc_get_page_id')) {
+        return home_url('/');
+    }
+    $page_id = wc_get_page_id('shop');
+    return $page_id > 0 ? get_permalink($page_id) : home_url('/');
+}
+
+/**
  * Enqueue styles and scripts
  */
 function dom_enqueue_assets() {
@@ -71,7 +114,7 @@ function dom_enqueue_assets() {
         DOM_THEME_VERSION
     );
 
-    if (is_shop() || is_product_category() || is_product_tag()) {
+    if (dom_has_woo() && (is_shop() || is_product_category() || is_product_tag())) {
         wp_enqueue_style(
             'dom-collection',
             DOM_THEME_URI . '/assets/css/collection.css',
@@ -80,7 +123,7 @@ function dom_enqueue_assets() {
         );
     }
 
-    if (is_product()) {
+    if (dom_has_woo() && is_product()) {
         wp_enqueue_style(
             'dom-product',
             DOM_THEME_URI . '/assets/css/product.css',
@@ -89,7 +132,7 @@ function dom_enqueue_assets() {
         );
     }
 
-    if (is_checkout() || is_account_page() || is_cart() || is_page()) {
+    if (is_page() || (dom_has_woo() && (is_checkout() || is_account_page() || is_cart()))) {
         wp_enqueue_style(
             'dom-woocommerce',
             DOM_THEME_URI . '/assets/css/woocommerce.css',
@@ -117,10 +160,10 @@ function dom_enqueue_assets() {
     wp_localize_script('dom-cart', 'domCart', [
         'ajaxUrl'  => admin_url('admin-ajax.php'),
         'nonce'    => wp_create_nonce('dom-cart-nonce'),
-        'currency' => get_woocommerce_currency_symbol(),
+        'currency' => function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : '€',
     ]);
 
-    if (is_product()) {
+    if (dom_has_woo() && is_product()) {
         wp_enqueue_script(
             'dom-gallery',
             DOM_THEME_URI . '/assets/js/gallery.js',
@@ -130,7 +173,7 @@ function dom_enqueue_assets() {
         );
     }
 
-    if (is_shop() || is_product_category() || is_product_tag()) {
+    if (dom_has_woo() && (is_shop() || is_product_category() || is_product_tag())) {
         wp_enqueue_script(
             'dom-filters',
             DOM_THEME_URI . '/assets/js/filters.js',
@@ -188,7 +231,7 @@ add_filter('wp_resource_hints', function ($urls, $relation_type) {
  * Dequeue jQuery on frontend (WooCommerce may re-add it where needed)
  */
 function dom_dequeue_jquery() {
-    if (!is_admin() && !is_checkout() && !is_account_page()) {
+    if (!is_admin() && !(dom_has_woo() && (is_checkout() || is_account_page()))) {
         wp_dequeue_script('jquery');
         wp_deregister_script('jquery');
     }
@@ -235,7 +278,8 @@ function dom_cart_fragments($fragments) {
     $fragments['aside.drw'] = ob_get_clean();
 
     ob_start();
-    echo '<span class="n js-cart-count">' . WC()->cart->get_cart_contents_count() . '</span>';
+    $count = (function_exists('WC') && WC()->cart) ? WC()->cart->get_cart_contents_count() : 0;
+    echo '<span class="n js-cart-count">' . esc_html($count) . '</span>';
     $fragments['.js-cart-count'] = ob_get_clean();
 
     return $fragments;

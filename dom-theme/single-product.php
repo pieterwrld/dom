@@ -166,7 +166,7 @@ while (have_posts()) : the_post();
       <a href="<?php echo esc_url(home_url('/')); ?>">Home</a><span>/</span>
       <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>">Shop</a>
       <?php if ($primary_cat) : ?>
-        <span>/</span><a href="<?php echo esc_url(get_term_link($primary_cat)); ?>"><?php echo esc_html($primary_cat->name); ?></a>
+        <span>/</span><a href="<?php echo esc_url(dom_term_url($primary_cat)); ?>"><?php echo esc_html($primary_cat->name); ?></a>
       <?php endif; ?>
       <span>/</span><b><?php echo esc_html($product->get_name()); ?></b>
     </nav>
@@ -441,7 +441,7 @@ while (have_posts()) : the_post();
                 <button class="rnav" data-rail="sim" data-dir="1" aria-label="Volgende"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
               </div>
               <?php if ($primary_cat) : ?>
-                <a href="<?php echo esc_url(get_term_link($primary_cat)); ?>" class="lk">Alle <?php echo esc_html(strtolower($primary_cat->name)); ?> <span class="arw">&rarr;</span></a>
+                <a href="<?php echo esc_url(dom_term_url($primary_cat)); ?>" class="lk">Alle <?php echo esc_html(strtolower($primary_cat->name)); ?> <span class="arw">&rarr;</span></a>
               <?php endif; ?>
             </div>
           </div>

@@ -126,7 +126,7 @@ $eur = function ($v) {
       else : ?>
         <div style="padding:40px 0;text-align:center">
           <p class="cap" style="margin-bottom:16px">Je winkelwagen is nog leeg.</p>
-          <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>" class="btn btn-chrome js-cart-close" style="display:inline-flex">
+          <a href="<?php echo esc_url(dom_shop_url()); ?>" class="btn btn-chrome js-cart-close" style="display:inline-flex">
             <span>Bekijk shop</span>
             <span class="arw">&rarr;</span>
           </a>
@@ -220,7 +220,7 @@ $eur = function ($v) {
       <span class="lb">Subtotaal</span>
       <span class="vv" id="cartTotal"><?php echo $eur($cart_total); ?><?php if ($saved > 0) : ?><small>Je bespaart <?php echo $eur($saved); ?></small><?php endif; ?></span>
     </div>
-    <a href="<?php echo esc_url(wc_get_checkout_url()); ?>" class="btn btn-chrome">
+    <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : dom_shop_url()); ?>" class="btn btn-chrome">
       <span>Afrekenen</span>
       <span class="arw">&rarr;</span>
     </a>

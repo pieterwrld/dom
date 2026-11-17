@@ -27,7 +27,7 @@ foreach ($acc_cats as $slug) {
     $acc_data[] = [
         'name'   => $term->name,
         'slug'   => $slug,
-        'url'    => get_term_link($term),
+        'url'    => dom_term_url($term),
         'img'    => $img ?: '',
         'brands' => $brand_hints[$slug] ?? '',
     ];

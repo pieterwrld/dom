@@ -29,7 +29,15 @@
 				<span>SEC</span>
 			</div>
 		</div>
-		<a href="<?php echo esc_url( get_term_link( 'sale', 'product_cat' ) ?: home_url( '/product-category/sale/' ) ); ?>" class="go">
+		<?php
+		// get_term_link() geeft een WP_Error als de term niet bestaat, en een
+		// WP_Error is truthy: die glipt dus door een ?:-fallback heen.
+		$dom_sale_link = dom_term_url( 'sale', 'product_cat' );
+		if ( '' === $dom_sale_link ) {
+			$dom_sale_link = dom_shop_url();
+		}
+		?>
+		<a href="<?php echo esc_url( $dom_sale_link ); ?>" class="go">
 			SHOP NU <span class="arw">&rarr;</span>
 		</a>
 	</div>

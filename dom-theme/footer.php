@@ -82,13 +82,13 @@
     <div class="ft-col">
       <h5>Shop</h5>
       <ul>
-        <li><a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>">Alle producten</a></li>
+        <li><a href="<?php echo esc_url(dom_shop_url()); ?>">Alle producten</a></li>
         <?php
         $ft_cats = ['sneakers','jassen','jeans','trainingspakken','sweaters-hoodies','t-shirts','sale'];
         foreach ($ft_cats as $slug) :
           $term = get_term_by('slug', $slug, 'product_cat');
           if ($term) : ?>
-            <li><a href="<?php echo esc_url(get_term_link($term)); ?>"><?php echo esc_html($term->name); ?></a></li>
+            <li><a href="<?php echo esc_url(dom_term_url($term)); ?>"><?php echo esc_html($term->name); ?></a></li>
           <?php endif;
         endforeach; ?>
       </ul>

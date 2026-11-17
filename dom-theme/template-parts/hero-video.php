@@ -21,7 +21,7 @@ if (!$video_url && !$hero_poster) {
     }
 }
 
-$shop_url = get_permalink(wc_get_page_id('shop'));
+$shop_url = dom_shop_url();
 ?>
 <section class="hero" id="hero">
   <div class="hero-media">

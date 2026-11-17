@@ -3,7 +3,7 @@
  * Plugin Name: De Outfitman Launcher
  * Plugin URI:  https://github.com/pieterwrld/dom
  * Description: Zet het nieuwe thema klaar, laat het alleen aan jou zien, en ruimt een paar dingen op die de winkel in de weg zitten. Alles vanuit WP Admin, geen SSH nodig.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      De Outfitman
  * Requires PHP: 8.0
  */
@@ -373,39 +373,97 @@ function dom_launcher_rest_cache() {
  * 3. Preview: alleen voor beheerders
  * ===================================================================== */
 
-function dom_launcher_may_preview() {
-    return is_user_logged_in() && current_user_can('update_themes');
-}
+/**
+ * De preview wisselt het thema om via de filters 'template' en 'stylesheet'.
+ *
+ * Die filters draaien zodra íémand get_stylesheet() aanroept, en dat gebeurt
+ * ook tijdens het laden van plugins: dus voordat WordPress pluggable.php heeft
+ * ingelezen en dus voordat is_user_logged_in() bestaat. Een eerdere versie
+ * vroeg daar naar de ingelogde gebruiker en haalde zo de hele winkel onderuit
+ * zodra een andere plugin vroeg naar het thema vroeg.
+ *
+ * Daarom wordt hier alles één keer uitgerekend op 'setup_theme', ruim nadat
+ * pluggable.php geladen is, en zijn de filters daarna niets meer dan het
+ * teruggeven van een kant-en-klare string.
+ */
+
+/** @var array{template:string,stylesheet:string,name:string}|null */
+$GLOBALS['dom_launcher_preview'] = null;
 
 function dom_launcher_preview_theme() {
-    static $theme = null;
-    if (null !== $theme) {
-        return $theme;
+    $preview = $GLOBALS['dom_launcher_preview'] ?? null;
+    return is_array($preview) ? $preview['name'] : '';
+}
+
+add_action('setup_theme', function () {
+    // Geen preview gevraagd? Dan raken we de thema-filters niet aan, en kan
+    // een gewone bezoeker hier per definitie geen last van hebben.
+    if (!isset($_GET['dom_preview']) && !isset($_COOKIE[DOM_LAUNCHER_COOKIE])) {
+        return;
+    }
+    if (is_admin() || wp_doing_ajax()) {
+        return;
     }
 
-    $theme = '';
-
-    if (!dom_launcher_may_preview()) {
-        return $theme;
-    }
-
-    if (isset($_GET['dom_preview'])) {
-        $requested = sanitize_key(wp_unslash($_GET['dom_preview']));
-        if ($requested !== '' && $requested !== 'off' && wp_get_theme($requested)->exists()) {
-            $theme = $requested;
+    try {
+        if (!is_user_logged_in() || !current_user_can('update_themes')) {
+            return;
         }
-    } elseif (isset($_COOKIE[DOM_LAUNCHER_COOKIE])) {
-        $stored = sanitize_key(wp_unslash($_COOKIE[DOM_LAUNCHER_COOKIE]));
-        if ($stored !== '' && wp_get_theme($stored)->exists()) {
-            $theme = $stored;
-        }
-    }
 
-    return $theme;
+        $name = '';
+        if (isset($_GET['dom_preview'])) {
+            $requested = sanitize_key(wp_unslash($_GET['dom_preview']));
+            if ($requested !== '' && $requested !== 'off') {
+                $name = $requested;
+            }
+        } elseif (isset($_COOKIE[DOM_LAUNCHER_COOKIE])) {
+            $name = sanitize_key(wp_unslash($_COOKIE[DOM_LAUNCHER_COOKIE]));
+        }
+
+        if ($name === '') {
+            return;
+        }
+
+        $theme = wp_get_theme($name);
+        if (!$theme->exists() || $theme->errors() instanceof WP_Error) {
+            return;
+        }
+        if (!dom_launcher_looks_like_theme($theme->get_stylesheet_directory())) {
+            return;
+        }
+
+        // Nu vastleggen, zodat de filters hierna niets meer hoeven op te zoeken.
+        $GLOBALS['dom_launcher_preview'] = [
+            'name'       => $name,
+            'template'   => $theme->get_template(),
+            'stylesheet' => $theme->get_stylesheet(),
+        ];
+
+        add_filter('template', 'dom_launcher_filter_template', 99);
+        add_filter('stylesheet', 'dom_launcher_filter_stylesheet', 99);
+    } catch (Throwable $e) {
+        // Een preview is comfort. Gaat hier iets mis, dan laten we de winkel
+        // gewoon het echte thema tonen in plaats van om te vallen.
+        $GLOBALS['dom_launcher_preview'] = null;
+        error_log('[dom-launcher] preview uitgeschakeld: ' . $e->getMessage());
+    }
+}, 1);
+
+function dom_launcher_filter_template($value) {
+    $preview = $GLOBALS['dom_launcher_preview'] ?? null;
+    return is_array($preview) ? $preview['template'] : $value;
+}
+
+function dom_launcher_filter_stylesheet($value) {
+    $preview = $GLOBALS['dom_launcher_preview'] ?? null;
+    return is_array($preview) ? $preview['stylesheet'] : $value;
 }
 
 add_action('init', function () {
-    if (!isset($_GET['dom_preview']) || !dom_launcher_may_preview() || headers_sent()) {
+    if (!isset($_GET['dom_preview']) || headers_sent()) {
+        return;
+    }
+    if (!is_user_logged_in() || !current_user_can('update_themes')) {
         return;
     }
     $theme = dom_launcher_preview_theme();
@@ -418,22 +476,6 @@ add_action('init', function () {
         'samesite' => 'Lax',
     ]);
 });
-
-foreach (['template', 'stylesheet'] as $dom_launcher_filter) {
-    add_filter($dom_launcher_filter, function ($value) {
-        if (is_admin() || wp_doing_ajax()) {
-            return $value;
-        }
-        $theme = dom_launcher_preview_theme();
-        if (!$theme) {
-            return $value;
-        }
-        $preview = wp_get_theme($theme);
-        return current_filter() === 'template'
-            ? $preview->get_template()
-            : $preview->get_stylesheet();
-    }, 99);
-}
 
 // Een preview mag nooit in de cache belanden en zo bij een klant terechtkomen.
 add_action('template_redirect', function () {
