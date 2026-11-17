@@ -320,6 +320,30 @@ function dom_dequeue_jquery() {
 add_action('wp_enqueue_scripts', 'dom_dequeue_jquery', 99);
 
 /**
+ * Elementor-scripts weghalen op de voorpagina.
+ *
+ * De voorpagina is in WordPress nog een Elementor-pagina, dus Elementor laadt
+ * zijn frontend mee. Wij tonen daar front-page.php van dit thema, zodat die
+ * inhoud nooit verschijnt en het script zijn configuratie mist:
+ * "elementorFrontendConfig is not defined", wat alles erna in dat bundel stopt.
+ */
+function dom_dequeue_elementor_on_front() {
+    if (is_admin() || !is_front_page() || is_home()) {
+        return;
+    }
+    foreach ([
+        'elementor-frontend',
+        'elementor-frontend-modules',
+        'elementor-webpack-runtime',
+        'elementor-pro-frontend',
+        'elementor-pro-webpack-runtime',
+    ] as $handle) {
+        wp_dequeue_script($handle);
+    }
+}
+add_action('wp_enqueue_scripts', 'dom_dequeue_elementor_on_front', 100);
+
+/**
  * Include theme modules
  */
 $dom_includes = [
