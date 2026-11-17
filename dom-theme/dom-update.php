@@ -71,9 +71,16 @@ function dom_theme_update_from_github() {
     // Cleanup
     $wp_filesystem->delete($tmp_dir, true);
 
-    // Flush
+    // Flush caches
     if (function_exists('flush_rewrite_rules')) {
         flush_rewrite_rules();
+    }
+    wp_cache_flush();
+
+    // Purge LiteSpeed Cache
+    if (class_exists('LiteSpeed\Purge') || class_exists('LiteSpeed_Cache_Purge')) {
+        do_action('litespeed_purge_all');
+        $results['litespeed'] = 'purged';
     }
 
     return new WP_REST_Response(['ok' => true, 'results' => $results], 200);

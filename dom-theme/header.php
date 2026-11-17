@@ -85,7 +85,11 @@
             $menu_categories[] = $sale_menu;
         }
 
+        $menu_exclude = ['uncategorized', 'bestsellers', 'nieuwste-collectie', 'truien-vesten'];
         if (!is_wp_error($menu_categories) && !empty($menu_categories)) :
+            $menu_categories = array_filter($menu_categories, function($c) use ($menu_exclude) {
+                return !in_array($c->slug, $menu_exclude, true);
+            });
             foreach ($menu_categories as $cat) :
                 $thumb_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
                 $thumb_url = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'thumbnail') : '';
