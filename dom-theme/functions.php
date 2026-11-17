@@ -283,11 +283,39 @@ add_filter('wp_resource_hints', function ($urls, $relation_type) {
 /**
  * Dequeue jQuery on frontend (WooCommerce may re-add it where needed)
  */
+/**
+ * jQuery alleen weghalen als niemand het nodig heeft.
+ *
+ * Het thema zelf gebruikt geen jQuery, maar de winkel draait tientallen
+ * plugins die dat wel doen. Het onvoorwaardelijk weggooien leverde op elke
+ * pagina "jQuery is not defined" op, waarmee die plugins stilvielen: op de
+ * contactpagina is dat het formulier dat niet meer verstuurt.
+ *
+ * Daarom kijken we eerst of een ingeladen script jQuery als afhankelijkheid
+ * opgeeft. Zo ja, dan blijft het staan.
+ */
 function dom_dequeue_jquery() {
-    if (!is_admin() && !(dom_has_woo() && (is_checkout() || is_account_page()))) {
-        wp_dequeue_script('jquery');
-        wp_deregister_script('jquery');
+    if (is_admin()) {
+        return;
     }
+    if (dom_has_woo() && (is_checkout() || is_account_page() || is_cart())) {
+        return;
+    }
+
+    $scripts = wp_scripts();
+
+    foreach ($scripts->queue as $handle) {
+        if (!isset($scripts->registered[$handle])) {
+            continue;
+        }
+        $deps = (array) $scripts->registered[$handle]->deps;
+        if (in_array('jquery', $deps, true) || in_array('jquery-core', $deps, true)) {
+            return; // iets heeft jQuery nodig: laten staan.
+        }
+    }
+
+    wp_dequeue_script('jquery');
+    wp_deregister_script('jquery');
 }
 add_action('wp_enqueue_scripts', 'dom_dequeue_jquery', 99);
 
