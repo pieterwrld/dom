@@ -3,7 +3,7 @@
  * Plugin Name: De Outfitman Launcher
  * Plugin URI:  https://github.com/pieterwrld/dom
  * Description: Zet het nieuwe thema klaar, laat het alleen aan jou zien, en ruimt een paar dingen op die de winkel in de weg zitten. Alles vanuit WP Admin, geen SSH nodig.
- * Version:     1.0.0
+ * Version:     1.1.0
  * Author:      De Outfitman
  * Requires PHP: 8.0
  */
@@ -90,6 +90,16 @@ function dom_launcher_page() {
         <p>Pas als de preview goed is: ga naar <a href="<?php echo esc_url(admin_url('themes.php')); ?>">Weergave &rarr; Thema's</a>
            en activeer <strong>De Outfitman</strong>. Let op dat je niet <em>De Outfitman v2</em> kiest; dat is een oude kopie.</p>
         <p>Valt het tegen, activeer dan gewoon Ecomus Child weer. Je raakt niets kwijt.</p>
+
+        <hr>
+
+        <h2>Op afstand beheren</h2>
+        <p>Zolang deze plugin actief is, kunnen de bovenstaande stappen ook op afstand worden
+           uitgevoerd, zodat je ze niet zelf hoeft te klikken. Dat loopt over
+           <code>/wp-json/dom/v1/</code> en vraagt dezelfde rechten als wp-admin: alleen een
+           ingelogde beheerder komt erdoor.</p>
+        <p>Wil je dat niet meer? Deactiveer deze plugin. Daarmee vervallen de routes,
+           de preview en de opschoning in één keer, en verandert er niets aan je winkel.</p>
     </div>
     <?php
 }
@@ -187,6 +197,176 @@ function dom_launcher_deploy() {
     }
 
     return $message;
+}
+
+/* =====================================================================
+ * 2b. REST-routes
+ *
+ * WordPress heeft zelf geen route om een thema te activeren, waardoor elke
+ * deploy handwerk in wp-admin werd. Deze routes vullen dat gat, zodat het
+ * hele traject (code ophalen, activeren, cache legen, terugdraaien) op
+ * afstand kan. Alles is afgeschermd met dezelfde rechten die wp-admin
+ * ervoor vraagt, dus dit geeft niemand meer rechten dan hij al had.
+ * ===================================================================== */
+
+add_action('rest_api_init', function () {
+    $can_themes = function () {
+        return current_user_can('switch_themes') && current_user_can('update_themes');
+    };
+
+    register_rest_route('dom/v1', '/status', [
+        'methods'             => 'GET',
+        'callback'            => 'dom_launcher_rest_status',
+        'permission_callback' => function () { return current_user_can('update_themes'); },
+    ]);
+
+    register_rest_route('dom/v1', '/deploy', [
+        'methods'             => 'POST',
+        'callback'            => 'dom_launcher_rest_deploy',
+        'permission_callback' => $can_themes,
+    ]);
+
+    register_rest_route('dom/v1', '/theme', [
+        'methods'             => 'POST',
+        'callback'            => 'dom_launcher_rest_activate',
+        'permission_callback' => $can_themes,
+        'args'                => [
+            'stylesheet' => ['required' => true, 'type' => 'string'],
+        ],
+    ]);
+
+    register_rest_route('dom/v1', '/rollback', [
+        'methods'             => 'POST',
+        'callback'            => 'dom_launcher_rest_rollback',
+        'permission_callback' => $can_themes,
+    ]);
+
+    register_rest_route('dom/v1', '/cache', [
+        'methods'             => 'POST',
+        'callback'            => 'dom_launcher_rest_cache',
+        'permission_callback' => function () { return current_user_can('manage_options'); },
+    ]);
+});
+
+function dom_launcher_rest_status() {
+    $themes = [];
+    foreach (wp_get_themes() as $slug => $theme) {
+        $themes[$slug] = [
+            'name'    => $theme->get('Name'),
+            'version' => $theme->get('Version'),
+            'active'  => get_stylesheet() === $slug,
+            'valid'   => dom_launcher_looks_like_theme($theme->get_stylesheet_directory()),
+        ];
+    }
+
+    if (!function_exists('get_plugins')) {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    }
+
+    $plugins = [];
+    foreach (get_plugins() as $file => $data) {
+        $plugins[$file] = [
+            'name'   => $data['Name'],
+            'active' => is_plugin_active($file),
+        ];
+    }
+
+    return new WP_REST_Response([
+        'active_theme'    => get_stylesheet(),
+        'previous_theme'  => get_option('dom_launcher_previous_theme', ''),
+        'themes'          => $themes,
+        'plugins'         => $plugins,
+        'php'             => PHP_VERSION,
+        'wp'              => get_bloginfo('version'),
+    ], 200);
+}
+
+function dom_launcher_rest_deploy() {
+    $result = dom_launcher_deploy();
+    if (is_wp_error($result)) {
+        return new WP_REST_Response(['ok' => false, 'error' => $result->get_error_message()], 500);
+    }
+    return new WP_REST_Response(['ok' => true, 'message' => $result], 200);
+}
+
+function dom_launcher_rest_activate(WP_REST_Request $request) {
+    $stylesheet = sanitize_key($request->get_param('stylesheet'));
+    $theme      = wp_get_theme($stylesheet);
+
+    if (!$theme->exists()) {
+        return new WP_REST_Response(['ok' => false, 'error' => 'Dat thema staat er niet.'], 404);
+    }
+
+    $error = $theme->errors();
+    if ($error instanceof WP_Error) {
+        return new WP_REST_Response(
+            ['ok' => false, 'error' => 'WordPress keurt dit thema af: ' . $error->get_error_message()],
+            400
+        );
+    }
+
+    // Een thema zonder deze bestanden activeren levert een witte winkel op.
+    if (!dom_launcher_looks_like_theme($theme->get_stylesheet_directory())) {
+        return new WP_REST_Response(
+            ['ok' => false, 'error' => 'Dit thema is onvolledig, activeren geweigerd.'],
+            400
+        );
+    }
+
+    $current = get_stylesheet();
+    if ($current === $stylesheet) {
+        return new WP_REST_Response(['ok' => true, 'message' => 'Stond al actief.', 'active' => $current], 200);
+    }
+
+    update_option('dom_launcher_previous_theme', $current);
+    switch_theme($stylesheet);
+
+    if (has_action('litespeed_purge_all')) {
+        do_action('litespeed_purge_all');
+    }
+    wp_cache_flush();
+
+    return new WP_REST_Response([
+        'ok'       => true,
+        'message'  => 'Geactiveerd. Terugdraaien kan via /dom/v1/rollback.',
+        'active'   => get_stylesheet(),
+        'previous' => $current,
+    ], 200);
+}
+
+function dom_launcher_rest_rollback() {
+    $previous = get_option('dom_launcher_previous_theme', '');
+
+    if (!$previous || !wp_get_theme($previous)->exists()) {
+        return new WP_REST_Response(
+            ['ok' => false, 'error' => 'Geen eerder thema bekend om naar terug te gaan.'],
+            400
+        );
+    }
+
+    $current = get_stylesheet();
+    update_option('dom_launcher_previous_theme', $current);
+    switch_theme($previous);
+
+    if (has_action('litespeed_purge_all')) {
+        do_action('litespeed_purge_all');
+    }
+    wp_cache_flush();
+
+    return new WP_REST_Response(['ok' => true, 'active' => get_stylesheet()], 200);
+}
+
+function dom_launcher_rest_cache() {
+    $done = [];
+
+    if (has_action('litespeed_purge_all')) {
+        do_action('litespeed_purge_all');
+        $done[] = 'litespeed';
+    }
+    wp_cache_flush();
+    $done[] = 'object-cache';
+
+    return new WP_REST_Response(['ok' => true, 'purged' => $done], 200);
 }
 
 /* =====================================================================
