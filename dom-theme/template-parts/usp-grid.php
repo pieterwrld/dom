@@ -28,7 +28,7 @@
       </svg>
     </div>
     <h4>Veilig betalen</h4>
-    <p>iDEAL, creditcard, Klarna, PayPal &mdash; altijd beveiligd en vertrouwd.</p>
+    <p>iDEAL, Bancontact, creditcard en Apple Pay &mdash; altijd via een beveiligde omgeving.</p>
   </div>
   <div class="ucard">
     <div class="uic">

@@ -232,17 +232,14 @@ $eur = function ($v) {
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
       </div>
-      <span>4.9 &middot; 200+ klanten geholpen</span>
+      <span>Echte reviews via WhatsApp</span>
     </div>
     <div class="cpays">
       <span class="paychip" style="--sd:0s">iDEAL</span>
       <span class="paychip" style="--sd:.4s">VISA</span>
       <span class="paychip" style="--sd:.8s">Mastercard</span>
       <span class="paychip" style="--sd:1.2s">Apple Pay</span>
-      <span class="paychip" style="--sd:1.6s">Klarna</span>
-      <span class="paychip" style="--sd:2s">PayPal</span>
-      <span class="paychip" style="--sd:2.4s">Google Pay</span>
-      <span class="paychip" style="--sd:2.8s">Bancontact</span>
+      <span class="paychip" style="--sd:1.6s">Bancontact</span>
     </div>
   </div>
   <?php endif; ?>

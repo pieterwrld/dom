@@ -322,7 +322,7 @@ while (have_posts()) : the_post();
           <!-- WhatsApp -->
           <div class="wa-link">
             <svg width="17" height="17" viewBox="0 0 32 32" fill="#25D366" aria-hidden="true"><path d="M16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.5 1.7 6.4L3 29l6.8-1.8A13 13 0 1 0 16 3zm0 23.7c-2 0-4-.5-5.7-1.6l-.4-.2-4 1 1.1-3.9-.3-.4A10.7 10.7 0 1 1 16 26.7zm6.1-7.9c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2s-.9 1.1-1.1 1.3c-.2.2-.4.3-.8.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.5-.3.4-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.8 6 5.3 2.2.9 3.1 1 4.2.8.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4z"/></svg>
-            <span>Twijfel over je maat? <a href="https://wa.link/a36gtn" target="_blank" rel="noopener">Vraag het via WhatsApp</a></span>
+            <span>Twijfel over je maat? <a href="https://wa.me/31616264544" target="_blank" rel="noopener">Vraag het via WhatsApp</a></span>
           </div>
         </div>
 
@@ -332,7 +332,7 @@ while (have_posts()) : the_post();
           <span class="paychip" style="--sd:.4s">VISA</span>
           <span class="paychip" style="--sd:.8s">Mastercard</span>
           <span class="paychip" style="--sd:1.2s">Apple Pay</span>
-          <span class="paychip" style="--sd:1.6s">Klarna</span>
+          <span class="paychip" style="--sd:1.6s">Bancontact</span>
         </div>
 
         <!-- 10. 4 USP'S -->
@@ -498,7 +498,7 @@ while (have_posts()) : the_post();
         <div>
           <div class="acc-l" style="border-top:1px solid var(--line)">
             <div class="ai"><button class="ai-b">Met welke methodes kan ik betalen? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="ai-c"><div class="inr">iDEAL, Bancontact, creditcard, Apple Pay en Klarna. Alle betalingen lopen via een beveiligde omgeving.</div></div></div>
+              <div class="ai-c"><div class="inr">iDEAL, Bancontact, creditcard en Apple Pay. Alle betalingen lopen via een beveiligde omgeving.</div></div></div>
             <div class="ai"><button class="ai-b">Krijg ik alle toebehoren mee? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
               <div class="ai-c"><div class="inr">Ja. Elk paar komt met alle toebehoren en een extra set veters. Wij controleren elk product voor verzending.</div></div></div>
             <div class="ai"><button class="ai-b">Hoe bereik ik de klantenservice? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>

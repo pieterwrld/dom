@@ -1,23 +1,23 @@
 <?php
 defined('ABSPATH') || exit;
 
-$influencers = [
-    ['name' => 'Djezja',          'sub' => '@djezja',          'img' => ''],
-    ['name' => 'Furkan',          'sub' => '@furkan',           'img' => ''],
-    ['name' => 'Kubi de Barber',  'sub' => '@kubidebarber',     'img' => ''],
-    ['name' => 'Fato YT',         'sub' => '@fatoyt',           'img' => ''],
-    ['name' => 'Djezja',          'sub' => '@djezja',          'img' => ''],
-    ['name' => 'Furkan',          'sub' => '@furkan',           'img' => ''],
-];
+/**
+ * "Gedragen door" toont echte personen. Een naam of handle van een echte persoon
+ * mag alleen bij de bijbehorende foto staan, dus deze sectie rendert uitsluitend
+ * wanneer er beheerde data met afbeeldingen is. Geen data: sectie valt weg.
+ */
+$influencers = [];
 
 if (function_exists('get_field')) {
     $acf = get_field('influencers', 'option');
-    if (is_array($acf) && $acf) {
-        $influencers = [];
+    if (is_array($acf)) {
         foreach ($acf as $row) {
             $img = '';
             if (!empty($row['image'])) {
                 $img = is_array($row['image']) ? ($row['image']['url'] ?? '') : $row['image'];
+            }
+            if (!$img) {
+                continue;
             }
             $influencers[] = [
                 'name' => $row['name'] ?? '',
@@ -28,26 +28,8 @@ if (function_exists('get_field')) {
     }
 }
 
-// Fallback: use product images when no influencer images are set
-$has_real_images = false;
-foreach ($influencers as $inf) {
-    if (!empty($inf['img'])) { $has_real_images = true; break; }
-}
-if (!$has_real_images) {
-    $fallback_products = get_posts([
-        'post_type'      => 'product',
-        'posts_per_page' => 6,
-        'post_status'    => 'publish',
-        'meta_query'     => [['key' => '_thumbnail_id', 'compare' => 'EXISTS']],
-        'orderby'        => 'rand',
-        'fields'         => 'ids',
-    ]);
-    foreach ($influencers as $k => &$inf) {
-        if (empty($inf['img']) && isset($fallback_products[$k])) {
-            $inf['img'] = get_the_post_thumbnail_url($fallback_products[$k], 'large') ?: '';
-        }
-    }
-    unset($inf);
+if (!$influencers) {
+    return;
 }
 ?>
 <section class="sec cover-sec" id="wornby">
@@ -70,13 +52,7 @@ if (!$has_real_images) {
   <div class="cover" id="cover">
     <?php foreach ($influencers as $inf) : ?>
       <div class="cv" data-name="<?php echo esc_attr($inf['name']); ?>" data-sub="<?php echo esc_attr($inf['sub']); ?>">
-        <?php if ($inf['img']) : ?>
-          <img src="<?php echo esc_url($inf['img']); ?>" alt="<?php echo esc_attr($inf['name']); ?>" loading="lazy">
-        <?php else : ?>
-          <div class="ph" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-            <span class="ph-l"><?php echo esc_html($inf['name']); ?></span>
-          </div>
-        <?php endif; ?>
+        <img src="<?php echo esc_url($inf['img']); ?>" alt="<?php echo esc_attr($inf['name']); ?>" loading="lazy">
       </div>
     <?php endforeach; ?>
   </div>

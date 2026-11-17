@@ -29,7 +29,7 @@
 				<span>SEC</span>
 			</div>
 		</div>
-		<a href="<?php echo esc_url( home_url( '/product-categorie/sale/' ) ); ?>" class="go">
+		<a href="<?php echo esc_url( get_term_link( 'sale', 'product_cat' ) ?: home_url( '/product-category/sale/' ) ); ?>" class="go">
 			SHOP NU <span class="arw">&rarr;</span>
 		</a>
 	</div>

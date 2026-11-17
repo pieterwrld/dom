@@ -1,6 +1,13 @@
 <?php
 defined('ABSPATH') || exit;
 
+/**
+ * Reviews: echte WhatsApp-screenshots.
+ * ACF-veld 'homepage_reviews' heeft voorrang; anders de screenshots die in het
+ * thema zitten (assets/img/reviews). Er worden nooit namen of teksten verzonnen:
+ * de kaarten tonen de chat zoals hij is, met De Outfitman als afzender.
+ */
+
 $reviews = [];
 if (function_exists('get_field')) {
     $acf_reviews = get_field('homepage_reviews', 'option');
@@ -9,8 +16,23 @@ if (function_exists('get_field')) {
     }
 }
 
-$review_count = count($reviews) ?: 12;
-$avg_rating   = 4.9;
+if (!$reviews) {
+    $dir = get_stylesheet_directory() . '/assets/img/reviews';
+    $uri = get_stylesheet_directory_uri() . '/assets/img/reviews';
+    if (is_dir($dir)) {
+        foreach (glob($dir . '/review-*.webp') ?: [] as $path) {
+            $reviews[] = ['screenshot' => $uri . '/' . basename($path)];
+        }
+    }
+}
+
+$review_count = count($reviews);
+if (!$review_count) {
+    return;
+}
+
+$wa_number = '31616264544';
+$star      = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 17.2 6.1 20.3l1.2-6.6L2.5 9.1l6.6-.9z"/></svg>';
 ?>
 <section class="sec" id="reviews" style="background:var(--off);border-bottom:1px solid var(--line)">
   <div class="wrap">
@@ -20,9 +42,7 @@ $avg_rating   = 4.9;
         <h2 class="d2 split">Wat onze klanten zeggen</h2>
       </div>
       <div class="rev-stat">
-        <div class="bigno"><span data-count="<?php echo (int) $review_count; ?>">0</span><small>reviews</small></div>
-        <div class="bigno"><span data-count="<?php echo number_format($avg_rating, 1); ?>">0</span><small>gemiddeld</small></div>
-        <div class="bigno"><span data-count="98">0</span><small>% aanraden</small></div>
+        <div class="bigno"><span data-count="<?php echo (int) $review_count; ?>">0</span><small>WhatsApp reviews</small></div>
       </div>
       <div class="rvctl">
         <div class="rvdots" id="rvDots"></div>
@@ -39,72 +59,41 @@ $avg_rating   = 4.9;
 
     <div class="rvwrap">
       <div class="rvtrack" id="rvTrack">
-        <?php if ($reviews) : ?>
-          <?php foreach ($reviews as $r) :
-            $name   = $r['reviewer_name'] ?? 'Klant';
-            $stars  = (int) ($r['rating'] ?? 5);
-            $date   = $r['date'] ?? '';
-            $img    = '';
+        <?php foreach ($reviews as $r) :
+            $img = '';
             if (!empty($r['screenshot'])) {
                 $img = is_array($r['screenshot']) ? ($r['screenshot']['url'] ?? '') : $r['screenshot'];
             }
-          ?>
-            <div class="rev">
-              <div class="rev-top">
-                <div class="rev-av"><?php echo esc_html(mb_substr($name, 0, 1)); ?></div>
-                <div>
-                  <b><?php echo esc_html($name); ?></b>
-                  <div class="stars"><?php echo str_repeat('&#9733;', $stars); ?></div>
-                </div>
-                <?php if ($date) : ?><time><?php echo esc_html($date); ?></time><?php endif; ?>
+            if (!$img) {
+                continue;
+            }
+        ?>
+          <div class="rev">
+            <div class="rev-top">
+              <span class="rev-av">DO</span>
+              <div>
+                <div class="nm">De Outfitman</div>
+                <div class="on">online</div>
               </div>
-              <?php if ($img) : ?>
-                <div class="rev-shot"><img src="<?php echo esc_url($img); ?>" alt="Review van <?php echo esc_attr($name); ?>" loading="lazy"></div>
-              <?php endif; ?>
-              <div class="rev-foot">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-                <span>via WhatsApp</span>
-              </div>
+              <svg class="wa" viewBox="0 0 24 24" fill="#15A34A" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
             </div>
-          <?php endforeach; ?>
-        <?php else : ?>
-          <?php
-          $placeholder_reviews = [
-              ['name' => 'Mohammed', 'text' => 'Top kwaliteit! Precies wat ik zocht. Snelle levering ook, binnen 2 dagen in huis.'],
-              ['name' => 'Dylan',    'text' => 'Mijn derde bestelling al. Altijd tevreden met de kwaliteit en de service via WhatsApp.'],
-              ['name' => 'Youssef',  'text' => 'Broer deze site is echt fire. Alles origineel en de prijzen zijn niet normaal goed.'],
-              ['name' => 'Jayden',   'text' => 'Sneakers besteld, top kwaliteit. Vriend van mij heeft ook meteen besteld na het zien.'],
-              ['name' => 'Achraf',   'text' => 'Hele goede communicatie via WhatsApp. Maat advies gekregen en het paste perfect!'],
-              ['name' => 'Bilal',    'text' => 'Trainigspak en jeans besteld, allebei netjes ingepakt. Aanrader voor iedereen.'],
-          ];
-          foreach ($placeholder_reviews as $pr) : ?>
-            <div class="rev">
-              <div class="rev-top">
-                <div class="rev-av"><?php echo mb_substr($pr['name'], 0, 1); ?></div>
-                <div>
-                  <b><?php echo $pr['name']; ?></b>
-                  <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                </div>
-              </div>
-              <div style="padding:16px;font-size:13.5px;line-height:1.6;color:var(--ink);flex:1">
-                <p>&ldquo;<?php echo $pr['text']; ?>&rdquo;</p>
-              </div>
-              <div class="rev-foot">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-                <span>via WhatsApp</span>
-                <span class="vf" style="margin-left:auto">
-                  <svg width="11" height="11" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
-                  Geverifieerd
-                </span>
-              </div>
+            <div class="rev-shot">
+              <img src="<?php echo esc_url($img); ?>" alt="WhatsApp bericht van een klant" loading="lazy" decoding="async" width="460" height="800">
             </div>
-          <?php endforeach; ?>
-        <?php endif; ?>
+            <div class="rev-foot">
+              <div class="stars" aria-label="5 van de 5 sterren"><?php echo str_repeat($star, 5); ?></div>
+              <span class="vf">
+                <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+                Geverifieerd
+              </span>
+            </div>
+          </div>
+        <?php endforeach; ?>
       </div>
     </div>
 
     <div style="text-align:center;margin-top:40px" data-rv="up">
-      <a href="https://wa.me/31612345678" class="btn btn-bf" target="_blank" rel="noopener">
+      <a href="https://wa.me/<?php echo esc_attr($wa_number); ?>" class="btn btn-bf" target="_blank" rel="noopener">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
         Stuur ons een bericht
       </a>

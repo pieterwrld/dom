@@ -39,8 +39,8 @@
           <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,1 12.6,7.4 19.5,7.6 14,11.8 15.8,18.8 10,14.8 4.2,18.8 6,11.8 0.5,7.6 7.4,7.4" fill="currentColor"/></svg>
           <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,1 12.6,7.4 19.5,7.6 14,11.8 15.8,18.8 10,14.8 4.2,18.8 6,11.8 0.5,7.6 7.4,7.4" fill="currentColor"/></svg>
         </div>
-        <b>4.9</b>
-        <span>Uit 200+ reviews</span>
+        <b>Echte reviews</b>
+        <span>Via WhatsApp</span>
       </div>
       <div class="ftt">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -64,10 +64,18 @@
     <div class="ft-news">
       <h4>Blijf op de hoogte</h4>
       <p>Ontvang exclusieve aanbiedingen, early access op nieuwe collecties en style tips — direct in je inbox.</p>
-      <form class="nform" action="#" method="post">
-        <input type="email" name="email" required placeholder="E-mailadres" aria-label="E-mailadres">
-        <button type="submit" class="btn btn-bf">Aanmelden</button>
-      </form>
+      <?php
+      // Alleen een werkend formulier tonen. MC4WP is de aanmeldlijst; zonder die
+      // plugin zou het formulier inzendingen stilzwijgend weggooien.
+      if (function_exists('mc4wp_show_form')) {
+          mc4wp_show_form();
+      } else {
+          printf(
+              '<p class="nform-alt"><a class="btn btn-bf" href="%s" target="_blank" rel="noopener">Aanmelden via WhatsApp</a></p>',
+              esc_url('https://wa.me/31616264544')
+          );
+      }
+      ?>
     </div>
 
     <!-- Shop -->
@@ -128,11 +136,8 @@
         <span class="paychip">iDEAL</span>
         <span class="paychip" style="--sd:.4s">VISA</span>
         <span class="paychip" style="--sd:.8s">Mastercard</span>
-        <span class="paychip" style="--sd:1.2s">PayPal</span>
-        <span class="paychip" style="--sd:1.6s">Klarna</span>
-        <span class="paychip" style="--sd:2s">Apple Pay</span>
-        <span class="paychip" style="--sd:2.4s">Google Pay</span>
-        <span class="paychip" style="--sd:2.8s">Bancontact</span>
+        <span class="paychip" style="--sd:1.2s">Apple Pay</span>
+        <span class="paychip" style="--sd:1.6s">Bancontact</span>
       </div>
     </div>
   </div>

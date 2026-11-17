@@ -73,7 +73,7 @@ $shop_url = get_permalink(wc_get_page_id('shop'));
       </div>
       <div class="ht">
         <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-        <div><b><span data-count="800">0</span>+ klanten</b><span>24/7 via WhatsApp</span></div>
+        <div><b>Persoonlijk advies</b><span>24/7 via WhatsApp</span></div>
       </div>
     </div>
   </div>

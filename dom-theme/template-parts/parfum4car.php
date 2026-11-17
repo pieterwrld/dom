@@ -13,7 +13,7 @@ defined('ABSPATH') || exit;
     <p class="tx" style="--d:260ms">Premium autoparfums voor in je auto. Dezelfde kwaliteit, dezelfde service. Ruik de luxe onderweg.</p>
     <a href="https://parfum4car.nl/" class="btn btn-bf" style="width:max-content" target="_blank" rel="noopener">Bekijk parfums <span class="arw">&rarr;</span></a>
     <div class="kk-stats">
-      <div><b>50+</b><span>Geuren</span></div>
+      <div><b>Auto&shy;parfum</b><span>Van Parfum4Car</span></div>
       <div><b>1&ndash;2</b><span>Dagen levering</span></div>
       <div><b>14</b><span>Dagen retour</span></div>
     </div>

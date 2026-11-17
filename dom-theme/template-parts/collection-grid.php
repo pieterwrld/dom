@@ -55,12 +55,47 @@ foreach ($cats_by_slug as $cat) {
 $tiles = array_slice($ordered, 0, 9);
 
 $sale_slugs = ['sale'];
-$badge_map  = [
-    'sneakers' => ['label' => 'Bestseller', 'class' => ''],
-    'jassen'   => ['label' => '-25%',       'class' => 'bf'],
-    't-shirts' => ['label' => '3 v. &euro;130', 'class' => 'bf'],
-    'sale'     => ['label' => 'Tot -50%',   'class' => 'bf'],
-];
+
+/**
+ * Badges komen uit WooCommerce, nooit uit een vaste lijst. Een kortingspercentage
+ * dat niet klopt met de werkelijke prijzen is misleidend, dus we tonen alleen de
+ * echte maximale korting binnen een categorie, en anders geen badge.
+ */
+$on_sale_ids = wc_get_product_ids_on_sale();
+
+$dom_category_badge = static function ($slug) use ($on_sale_ids) {
+    if (!$on_sale_ids) {
+        return null;
+    }
+    $ids = get_posts([
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => 60,
+        'post__in'       => $on_sale_ids,
+        'tax_query'      => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $slug]],
+        'fields'         => 'ids',
+        'no_found_rows'  => true,
+    ]);
+    if (!$ids) {
+        return null;
+    }
+    $best = 0;
+    foreach ($ids as $id) {
+        $product = wc_get_product($id);
+        if (!$product) {
+            continue;
+        }
+        $regular = (float) $product->get_regular_price();
+        $sale    = (float) $product->get_sale_price();
+        if ($regular > 0 && $sale > 0 && $sale < $regular) {
+            $best = max($best, (int) round((($regular - $sale) / $regular) * 100));
+        }
+    }
+    if ($best <= 0) {
+        return ['label' => 'Sale', 'class' => 'bf'];
+    }
+    return ['label' => 'Tot -' . $best . '%', 'class' => 'bf'];
+};
 
 $shop_url = get_permalink(wc_get_page_id('shop'));
 ?>
@@ -79,7 +114,7 @@ $shop_url = get_permalink(wc_get_page_id('shop'));
     $link     = get_term_link($cat);
     $delay    = $i * 50;
     $is_sale  = in_array($cat->slug, $sale_slugs, true);
-    $badge    = $badge_map[$cat->slug] ?? null;
+    $badge    = $dom_category_badge($cat->slug);
 
     // Fallback: use first product's featured image if no category thumbnail
     if (!$img_url) {
