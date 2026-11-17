@@ -44,9 +44,8 @@ foreach ($cats as $c) {
 $cat_banner_img = '';
 $cat_banner_tag = 'Collectie';
 $cat_banner_copy = '';
-if ($is_category && function_exists('get_field')) {
-    $cat_banner_img = get_field('category_banner', 'product_cat_' . $current_cat->term_id);
-    if (is_array($cat_banner_img)) $cat_banner_img = $cat_banner_img['url'] ?? '';
+if ($is_category && function_exists('dom_category_banner_url')) {
+    $cat_banner_img = dom_category_banner_url($current_cat->term_id);
 }
 if (!$cat_banner_img && $is_category) {
     $thumb_id = get_term_meta($current_cat->term_id, 'thumbnail_id', true);

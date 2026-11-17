@@ -4,27 +4,10 @@
  * Uses .ann classes from core.css
  */
 
-$messages = [];
-
-if ( function_exists( 'have_rows' ) && have_rows( 'marquee_messages', 'option' ) ) {
-	while ( have_rows( 'marquee_messages', 'option' ) ) {
-		the_row();
-		$messages[] = [
-			'text'   => get_sub_field( 'message' ),
-			'is_hot' => get_sub_field( 'is_hot' ),
-		];
-	}
-}
+$messages = function_exists( 'dom_marquee_messages' ) ? dom_marquee_messages() : [];
 
 if ( empty( $messages ) ) {
-	$messages = [
-		[ 'text' => 'Gratis verzending vanaf €200', 'is_hot' => false ],
-		[ 'text' => 'BLACK FRIDAY DEALS', 'is_hot' => true ],
-		[ 'text' => '14 dagen retourrecht', 'is_hot' => false ],
-		[ 'text' => '24/7 WhatsApp support', 'is_hot' => false ],
-		[ 'text' => '100% authentieke producten', 'is_hot' => false ],
-		[ 'text' => 'TOT 50% KORTING', 'is_hot' => true ],
-	];
+	return;
 }
 ?>
 <div class="ann" role="marquee" aria-label="Aankondigingen">

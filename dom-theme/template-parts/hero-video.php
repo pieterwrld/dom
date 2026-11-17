@@ -1,20 +1,8 @@
 <?php
 defined('ABSPATH') || exit;
 
-$hero_video = function_exists('get_field') ? get_field('hero_video', 'option') : '';
-$hero_image = function_exists('get_field') ? get_field('hero_image', 'option') : '';
-$hero_poster = '';
-if (is_array($hero_image) && !empty($hero_image['url'])) {
-    $hero_poster = $hero_image['url'];
-} elseif (is_string($hero_image) && $hero_image) {
-    $hero_poster = $hero_image;
-}
-$video_url = '';
-if (is_array($hero_video) && !empty($hero_video['url'])) {
-    $video_url = $hero_video['url'];
-} elseif (is_string($hero_video) && $hero_video) {
-    $video_url = $hero_video;
-}
+$video_url   = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_video') : '';
+$hero_poster = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_image') : '';
 
 // Fallback: use recent product images as hero background collage
 if (!$video_url && !$hero_poster) {

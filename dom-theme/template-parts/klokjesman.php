@@ -1,15 +1,7 @@
 <?php
 defined('ABSPATH') || exit;
 
-$kk_image = '';
-if (function_exists('get_field')) {
-    $img = get_field('klokjesman_image', 'option');
-    if (is_array($img) && !empty($img['url'])) {
-        $kk_image = $img['url'];
-    } elseif (is_string($img) && $img) {
-        $kk_image = $img;
-    }
-}
+$kk_image = function_exists('dom_setting_image_url') ? dom_setting_image_url('klokjesman_image') : '';
 ?>
 <div class="kk" data-rv="up">
   <div class="kk-im">

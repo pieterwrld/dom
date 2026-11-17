@@ -24,9 +24,10 @@
             </button>
         </div>
 
-        <a href="<?php echo esc_url(home_url('/')); ?>" class="brand<?php echo (function_exists('get_field') && get_field('header_logo', 'option')) ? '' : ' txt'; ?>" aria-label="<?php bloginfo('name'); ?>">
-            <?php if (function_exists('get_field') && get_field('header_logo', 'option')) : ?>
-                <img class="logo" src="<?php echo esc_url(get_field('header_logo', 'option')['url']); ?>" alt="<?php bloginfo('name'); ?>" width="160" height="40">
+        <?php $dom_logo = function_exists('dom_setting_image_url') ? dom_setting_image_url('header_logo') : ''; ?>
+        <a href="<?php echo esc_url(home_url('/')); ?>" class="brand<?php echo $dom_logo ? '' : ' txt'; ?>" aria-label="<?php bloginfo('name'); ?>">
+            <?php if ($dom_logo) : ?>
+                <img class="logo" src="<?php echo esc_url($dom_logo); ?>" alt="<?php bloginfo('name'); ?>" width="160" height="40">
             <?php endif; ?>
             <span class="brand-txt">De Outf<i>i</i>tman</span>
         </a>
