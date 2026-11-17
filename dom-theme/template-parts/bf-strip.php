@@ -4,12 +4,37 @@
  * Uses .bfs classes from core.css
  * Countdown target: November 27, 2026 23:59:59
  */
+
+/**
+ * De korting die hier staat moet kloppen met de prijzen in de winkel. Een vast
+ * "tot 50%" is een prijsclaim die niemand nakijkt en die zomaar onjuist kan
+ * zijn, dus we rekenen de hoogste werkelijke korting uit en laten de zin weg
+ * als er niets in de aanbieding is.
+ */
+$dom_bf_claim = '';
+if ( function_exists( 'wc_get_product_ids_on_sale' ) && function_exists( 'wc_get_product' ) ) {
+	$dom_bf_best = 0;
+	foreach ( array_slice( wc_get_product_ids_on_sale(), 0, 100 ) as $dom_bf_id ) {
+		$dom_bf_product = wc_get_product( $dom_bf_id );
+		if ( ! $dom_bf_product ) {
+			continue;
+		}
+		$dom_bf_regular = (float) $dom_bf_product->get_regular_price();
+		$dom_bf_sale    = (float) $dom_bf_product->get_sale_price();
+		if ( $dom_bf_regular > 0 && $dom_bf_sale > 0 && $dom_bf_sale < $dom_bf_regular ) {
+			$dom_bf_best = max( $dom_bf_best, (int) round( ( ( $dom_bf_regular - $dom_bf_sale ) / $dom_bf_regular ) * 100 ) );
+		}
+	}
+	if ( $dom_bf_best > 0 ) {
+		$dom_bf_claim = sprintf( 'DEALS TOT %d%% KORTING', $dom_bf_best );
+	}
+}
 ?>
 <div class="bfs" id="bf-strip" data-end="2026-11-27T23:59:59">
 	<div class="bfs-in wrap">
 		<div class="bfs-t">
 			<b>BLACK FRIDAY</b>
-			<s>DEALS TOT 50% KORTING</s>
+			<?php if ( $dom_bf_claim ) : ?><s><?php echo esc_html( $dom_bf_claim ); ?></s><?php endif; ?>
 		</div>
 		<div class="cd" id="bf-cd">
 			<div class="u" data-unit="d">

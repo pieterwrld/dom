@@ -54,6 +54,25 @@ function dom_theme_setup() {
 add_action('after_setup_theme', 'dom_theme_setup');
 
 /**
+ * De eigen voorpagina laten winnen van Elementor.
+ *
+ * De homepage is een Elementor-pagina met paginatemplate "elementor_header_footer".
+ * Elementor dringt dat template via template_include op, waardoor front-page.php
+ * van dit thema nooit aan bod kwam en de homepage de oude opmaak bleef tonen.
+ *
+ * Dit wordt hier opgelost en niet door de pagina zelf aan te passen, zodat de
+ * content onaangeroerd blijft en terugschakelen naar het oude thema meteen weer
+ * de oude homepage geeft.
+ */
+add_filter('template_include', function ($template) {
+    if (is_admin() || !is_front_page() || is_home()) {
+        return $template;
+    }
+    $front = locate_template('front-page.php');
+    return $front ?: $template;
+}, 999);
+
+/**
  * Draait WooCommerce op dit moment?
  *
  * De conditionals van WooCommerce (is_shop, is_product, ...) bestaan alleen
