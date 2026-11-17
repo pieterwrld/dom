@@ -23,11 +23,8 @@ register_shutdown_function(function () {
         return;
     }
 
-    // Alleen fouten uit dit thema; een crash van een plugin is niet aan ons.
-    if (strpos($error['file'], 'themes/dom-theme') === false) {
-        return;
-    }
-
+    // Alles vastleggen: een crash die het thema uitlokt slaat vaak neer in een
+    // bestand van WooCommerce, dus filteren op de themamap mist juist die.
     if (!function_exists('get_option') || !function_exists('update_option')) {
         return;
     }
