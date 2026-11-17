@@ -11,24 +11,8 @@
  * zijn, dus we rekenen de hoogste werkelijke korting uit en laten de zin weg
  * als er niets in de aanbieding is.
  */
-$dom_bf_claim = '';
-if ( function_exists( 'wc_get_product_ids_on_sale' ) && function_exists( 'wc_get_product' ) ) {
-	$dom_bf_best = 0;
-	foreach ( array_slice( wc_get_product_ids_on_sale(), 0, 100 ) as $dom_bf_id ) {
-		$dom_bf_product = wc_get_product( $dom_bf_id );
-		if ( ! $dom_bf_product ) {
-			continue;
-		}
-		$dom_bf_regular = (float) $dom_bf_product->get_regular_price();
-		$dom_bf_sale    = (float) $dom_bf_product->get_sale_price();
-		if ( $dom_bf_regular > 0 && $dom_bf_sale > 0 && $dom_bf_sale < $dom_bf_regular ) {
-			$dom_bf_best = max( $dom_bf_best, (int) round( ( ( $dom_bf_regular - $dom_bf_sale ) / $dom_bf_regular ) * 100 ) );
-		}
-	}
-	if ( $dom_bf_best > 0 ) {
-		$dom_bf_claim = sprintf( 'DEALS TOT %d%% KORTING', $dom_bf_best );
-	}
-}
+$dom_bf_pct   = function_exists( 'dom_max_sale_percentage' ) ? dom_max_sale_percentage() : 0;
+$dom_bf_claim = $dom_bf_pct > 0 ? sprintf( 'DEALS TOT %d%% KORTING', $dom_bf_pct ) : '';
 ?>
 <div class="bfs" id="bf-strip" data-end="2026-11-27T23:59:59">
 	<div class="bfs-in wrap">

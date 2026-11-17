@@ -55,7 +55,8 @@
         <div class="mb">
             <div>
                 <b>Black Friday Deals</b>
-                <span>Tot 50% korting op geselecteerde items</span>
+                <?php $dom_hdr_pct = function_exists('dom_max_sale_percentage') ? dom_max_sale_percentage() : 0; ?>
+                <?php if ($dom_hdr_pct > 0) : ?><span>Tot <?php echo (int) $dom_hdr_pct; ?>% korting op geselecteerde items</span><?php endif; ?>
             </div>
             <a href="<?php echo esc_url(dom_term_url('sale', 'product_cat')); ?>" class="btn btn-ow" style="height:34px;padding:0 14px;font-size:12px">Shop Sale <span class="arw">&rarr;</span></a>
         </div>

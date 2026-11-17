@@ -85,6 +85,40 @@ function dom_has_woo() {
 }
 
 /**
+ * De hoogste werkelijke korting in de winkel, als percentage. 0 betekent: niets
+ * in de aanbieding.
+ *
+ * Kortingsclaims horen uit de prijzen te komen. Een vast percentage in een
+ * template is een bewering die niemand nakijkt en die stilletjes onjuist wordt
+ * zodra de aanbiedingen wijzigen.
+ */
+function dom_max_sale_percentage() {
+    static $best = null;
+    if (null !== $best) {
+        return $best;
+    }
+    $best = 0;
+
+    if (!function_exists('wc_get_product_ids_on_sale') || !function_exists('wc_get_product')) {
+        return $best;
+    }
+
+    foreach (array_slice(wc_get_product_ids_on_sale(), 0, 100) as $id) {
+        $product = wc_get_product($id);
+        if (!$product) {
+            continue;
+        }
+        $regular = (float) $product->get_regular_price();
+        $sale    = (float) $product->get_sale_price();
+        if ($regular > 0 && $sale > 0 && $sale < $regular) {
+            $best = max($best, (int) round((($regular - $sale) / $regular) * 100));
+        }
+    }
+
+    return $best;
+}
+
+/**
  * De URL van een term, of een lege string als die er niet is.
  *
  * get_term_link() geeft een WP_Error terug wanneer de term niet bestaat. Zo'n

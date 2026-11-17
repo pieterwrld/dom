@@ -49,7 +49,7 @@ acf_add_local_field_group([
             'label' => 'Hero Subheading',
             'name'  => 'hero_subheading',
             'type'  => 'text',
-            'default_value' => 'Tot 50% korting op alles',
+            'default_value' => 'Black Friday deals',
         ],
         [
             'key'   => 'field_hero_cta_text',

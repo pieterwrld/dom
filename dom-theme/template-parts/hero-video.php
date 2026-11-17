@@ -39,7 +39,10 @@ $shop_url = dom_shop_url();
     <div data-rv="fade">
       <div class="hero-ban">
         <span class="l"><i class="dot"></i><b>Black Friday live</b></span>
-        <span class="r"><span>Tot -50% op de hele collectie</span></span>
+        <?php $dom_hero_pct = function_exists('dom_max_sale_percentage') ? dom_max_sale_percentage() : 0; ?>
+        <?php if ($dom_hero_pct > 0) : ?>
+          <span class="r"><span>Tot -<?php echo (int) $dom_hero_pct; ?>% op geselecteerde items</span></span>
+        <?php endif; ?>
       </div>
     </div>
     <h1 class="d1 split">
