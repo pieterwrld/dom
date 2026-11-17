@@ -15,6 +15,24 @@ if (is_array($hero_video) && !empty($hero_video['url'])) {
 } elseif (is_string($hero_video) && $hero_video) {
     $video_url = $hero_video;
 }
+
+// Fallback: use recent product images as hero background collage
+if (!$video_url && !$hero_poster) {
+    $hero_products = get_posts([
+        'post_type'      => 'product',
+        'posts_per_page' => 1,
+        'post_status'    => 'publish',
+        'meta_key'       => 'total_sales',
+        'orderby'        => 'meta_value_num',
+        'order'          => 'DESC',
+        'meta_query'     => [['key' => '_thumbnail_id', 'compare' => 'EXISTS']],
+        'fields'         => 'ids',
+    ]);
+    if ($hero_products) {
+        $hero_poster = get_the_post_thumbnail_url($hero_products[0], 'full');
+    }
+}
+
 $shop_url = get_permalink(wc_get_page_id('shop'));
 ?>
 <section class="hero" id="hero">

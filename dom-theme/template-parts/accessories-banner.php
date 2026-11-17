@@ -11,12 +11,24 @@ $acc_data = [];
 foreach ($acc_cats as $slug) {
     $term = get_term_by('slug', $slug, 'product_cat');
     if (!$term) continue;
-    $thumb_id   = get_term_meta($term->term_id, 'thumbnail_id', true);
+    $thumb_id = get_term_meta($term->term_id, 'thumbnail_id', true);
+    $img      = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'product-card') : '';
+    // Fallback: use first product's featured image
+    if (!$img) {
+        $prods = get_posts([
+            'post_type'      => 'product',
+            'posts_per_page' => 1,
+            'post_status'    => 'publish',
+            'tax_query'      => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $slug]],
+            'fields'         => 'ids',
+        ]);
+        if ($prods) $img = get_the_post_thumbnail_url($prods[0], 'product-card');
+    }
     $acc_data[] = [
         'name'   => $term->name,
         'slug'   => $slug,
         'url'    => get_term_link($term),
-        'img'    => $thumb_id ? wp_get_attachment_image_url($thumb_id, 'product-card') : '',
+        'img'    => $img ?: '',
         'brands' => $brand_hints[$slug] ?? '',
     ];
 }

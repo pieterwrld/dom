@@ -69,7 +69,7 @@
 
     <div class="menu-b">
         <?php
-        $exclude_slugs = ['uncategorized', 'bestsellers'];
+        $exclude_slugs = ['uncategorized', 'bestsellers', 'heren'];
         $menu_categories = get_terms([
             'taxonomy'   => 'product_cat',
             'hide_empty' => false,
@@ -89,6 +89,11 @@
                 if (!$thumb_url && function_exists('get_field')) {
                     $acf_img = get_field('category_thumbnail', 'product_cat_' . $cat->term_id);
                     $thumb_url = is_array($acf_img) ? ($acf_img['sizes']['thumbnail'] ?? $acf_img['url']) : ($acf_img ?: '');
+                }
+                // Fallback: use first product image from this category
+                if (!$thumb_url) {
+                    $cat_prods = get_posts(['post_type' => 'product', 'posts_per_page' => 1, 'post_status' => 'publish', 'tax_query' => [['taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => $cat->term_id]], 'fields' => 'ids']);
+                    if ($cat_prods) $thumb_url = get_the_post_thumbnail_url($cat_prods[0], 'thumbnail');
                 }
                 $is_sale = ($cat->slug === 'sale');
         ?>

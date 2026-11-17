@@ -727,6 +727,16 @@ input,select{font:inherit}
 .menu-f a{font-size:12.5px;color:var(--muted)}
 .menu-f a:hover{color:var(--ink)}
 
+/* ---------- placeholders ---------- */
+.ph{position:relative;background:linear-gradient(var(--ph,135deg),var(--surface) 0%,#E8E8E6 50%,var(--surface) 100%);
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ph::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.5) 50%,transparent 75%);
+  background-size:200% 100%;animation:phShim 2.4s ease-in-out infinite}
+@keyframes phShim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.ph-l{position:relative;z-index:1;font-family:var(--disp);font-size:13px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--muted);opacity:.5}
+
 /* ---------- page transitions ---------- */
 @keyframes pgIn{from{opacity:0}to{opacity:1}}
 @keyframes pgUp{from{opacity:0;transform:translate3d(0,16px,0)}to{opacity:1;transform:none}}

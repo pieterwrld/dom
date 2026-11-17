@@ -12,20 +12,20 @@
 			<s>DEALS TOT 50% KORTING</s>
 		</div>
 		<div class="cd" id="bf-cd">
-			<div class="u">
-				<b data-unit="d">00</b>
+			<div class="u" data-unit="d">
+				<b>00</b>
 				<span>DAGEN</span>
 			</div>
-			<div class="u">
-				<b data-unit="h">00</b>
+			<div class="u" data-unit="h">
+				<b>00</b>
 				<span>UREN</span>
 			</div>
-			<div class="u">
-				<b data-unit="m">00</b>
+			<div class="u" data-unit="m">
+				<b>00</b>
 				<span>MIN</span>
 			</div>
-			<div class="u">
-				<b data-unit="s">00</b>
+			<div class="u" data-unit="s">
+				<b>00</b>
 				<span>SEC</span>
 			</div>
 		</div>

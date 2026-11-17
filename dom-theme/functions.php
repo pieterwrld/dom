@@ -203,6 +203,7 @@ $dom_includes = [
     '/inc/woocommerce.php',
     '/inc/enqueue.php',
     '/inc/acf-fields.php',
+    '/dom-update.php',
 ];
 
 foreach ($dom_includes as $file) {

@@ -69,23 +69,36 @@ $avg_rating   = 4.9;
           <?php endforeach; ?>
         <?php else : ?>
           <?php
-          $names = ['Mohammed', 'Dylan', 'Youssef', 'Jayden', 'Achraf', 'Bilal'];
-          for ($i = 0; $i < 6; $i++) : ?>
+          $placeholder_reviews = [
+              ['name' => 'Mohammed', 'text' => 'Top kwaliteit! Precies wat ik zocht. Snelle levering ook, binnen 2 dagen in huis.'],
+              ['name' => 'Dylan',    'text' => 'Mijn derde bestelling al. Altijd tevreden met de kwaliteit en de service via WhatsApp.'],
+              ['name' => 'Youssef',  'text' => 'Broer deze site is echt fire. Alles origineel en de prijzen zijn niet normaal goed.'],
+              ['name' => 'Jayden',   'text' => 'Sneakers besteld, top kwaliteit. Vriend van mij heeft ook meteen besteld na het zien.'],
+              ['name' => 'Achraf',   'text' => 'Hele goede communicatie via WhatsApp. Maat advies gekregen en het paste perfect!'],
+              ['name' => 'Bilal',    'text' => 'Trainigspak en jeans besteld, allebei netjes ingepakt. Aanrader voor iedereen.'],
+          ];
+          foreach ($placeholder_reviews as $pr) : ?>
             <div class="rev">
               <div class="rev-top">
-                <div class="rev-av"><?php echo mb_substr($names[$i], 0, 1); ?></div>
+                <div class="rev-av"><?php echo mb_substr($pr['name'], 0, 1); ?></div>
                 <div>
-                  <b><?php echo $names[$i]; ?></b>
+                  <b><?php echo $pr['name']; ?></b>
                   <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                 </div>
               </div>
-              <div class="rev-shot"><div class="ph" style="height:200px"><span class="ph-l">Review screenshot</span></div></div>
+              <div style="padding:16px;font-size:13.5px;line-height:1.6;color:var(--ink);flex:1">
+                <p>&ldquo;<?php echo $pr['text']; ?>&rdquo;</p>
+              </div>
               <div class="rev-foot">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
                 <span>via WhatsApp</span>
+                <span class="vf" style="margin-left:auto">
+                  <svg width="11" height="11" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                  Geverifieerd
+                </span>
               </div>
             </div>
-          <?php endfor; ?>
+          <?php endforeach; ?>
         <?php endif; ?>
       </div>
     </div>

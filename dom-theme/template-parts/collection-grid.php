@@ -3,7 +3,7 @@ defined('ABSPATH') || exit;
 
 $preferred_order = [
     'sneakers', 'jassen', 'jeans', 'trainingspakken',
-    'sweaters-hoodies', 't-shirts', 'zwembroeken', 'slippers', 'sale',
+    'sweaters-hoodies', 't-shirts', 'zwembroeken', 'petten', 'sale',
 ];
 
 $all_cats = get_terms([
@@ -16,7 +16,7 @@ if (is_wp_error($all_cats)) {
     $all_cats = [];
 }
 
-$exclude_slugs = ['uncategorized', 'bestsellers'];
+$exclude_slugs = ['uncategorized', 'bestsellers', 'heren'];
 $cats_by_slug  = [];
 foreach ($all_cats as $cat) {
     if (in_array($cat->slug, $exclude_slugs, true)) continue;
@@ -62,6 +62,20 @@ $shop_url = get_permalink(wc_get_page_id('shop'));
     $delay    = $i * 50;
     $is_sale  = in_array($cat->slug, $sale_slugs, true);
     $badge    = $badge_map[$cat->slug] ?? null;
+
+    // Fallback: use first product's featured image if no category thumbnail
+    if (!$img_url) {
+        $cat_products = get_posts([
+            'post_type'      => 'product',
+            'posts_per_page' => 1,
+            'post_status'    => 'publish',
+            'tax_query'      => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $cat->slug]],
+            'fields'         => 'ids',
+        ]);
+        if ($cat_products) {
+            $img_url = get_the_post_thumbnail_url($cat_products[0], 'product-card');
+        }
+    }
 
     $min_price = '';
     $cheapest  = get_posts([

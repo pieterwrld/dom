@@ -27,6 +27,28 @@ if (function_exists('get_field')) {
         }
     }
 }
+
+// Fallback: use product images when no influencer images are set
+$has_real_images = false;
+foreach ($influencers as $inf) {
+    if (!empty($inf['img'])) { $has_real_images = true; break; }
+}
+if (!$has_real_images) {
+    $fallback_products = get_posts([
+        'post_type'      => 'product',
+        'posts_per_page' => 6,
+        'post_status'    => 'publish',
+        'meta_query'     => [['key' => '_thumbnail_id', 'compare' => 'EXISTS']],
+        'orderby'        => 'rand',
+        'fields'         => 'ids',
+    ]);
+    foreach ($influencers as $k => &$inf) {
+        if (empty($inf['img']) && isset($fallback_products[$k])) {
+            $inf['img'] = get_the_post_thumbnail_url($fallback_products[$k], 'large') ?: '';
+        }
+    }
+    unset($inf);
+}
 ?>
 <section class="sec cover-sec" id="wornby">
   <div class="wrap">
