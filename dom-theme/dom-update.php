@@ -47,12 +47,14 @@ function dom_theme_update_from_github() {
 
     $results = ['theme' => false, 'plugins' => []];
 
-    // Update theme
+    // Update the ACTIVE theme (handles dom-theme, dom-theme-v2, etc.)
     $theme_src = $repo_dir . '/dom-theme';
-    $theme_dst = get_theme_root() . '/dom-theme';
-    if (is_dir($theme_src)) {
+    $active_stylesheet = get_stylesheet();
+    $theme_dst = get_theme_root() . '/' . $active_stylesheet;
+    if (is_dir($theme_src) && is_dir($theme_dst)) {
         $wp_filesystem->delete($theme_dst, true);
         $results['theme'] = !is_wp_error(copy_dir($theme_src, $theme_dst));
+        $results['theme_dir'] = $active_stylesheet;
     }
 
     // Update plugins

@@ -6,17 +6,35 @@ $preferred_order = [
     'sweaters-hoodies', 't-shirts', 'zwembroeken', 'petten', 'sale',
 ];
 
+// Categories live under "Heren" parent
+$heren = get_term_by('slug', 'heren', 'product_cat');
+$parent_id = $heren ? $heren->term_id : 0;
+
 $all_cats = get_terms([
     'taxonomy'   => 'product_cat',
     'hide_empty' => false,
-    'parent'     => 0,
+    'parent'     => $parent_id,
 ]);
 
-if (is_wp_error($all_cats)) {
-    $all_cats = [];
+// Fallback to top-level if no children found
+if (is_wp_error($all_cats) || empty($all_cats)) {
+    $all_cats = get_terms([
+        'taxonomy'   => 'product_cat',
+        'hide_empty' => false,
+        'parent'     => 0,
+    ]);
+    if (is_wp_error($all_cats)) {
+        $all_cats = [];
+    }
 }
 
-$exclude_slugs = ['uncategorized', 'bestsellers', 'heren'];
+// Also add SALE (top-level) to the mix
+$sale_term = get_term_by('slug', 'sale', 'product_cat');
+if ($sale_term && !is_wp_error($sale_term)) {
+    $all_cats[] = $sale_term;
+}
+
+$exclude_slugs = ['uncategorized', 'bestsellers', 'heren', 'nieuwste-collectie', 'truien-vesten'];
 $cats_by_slug  = [];
 foreach ($all_cats as $cat) {
     if (in_array($cat->slug, $exclude_slugs, true)) continue;

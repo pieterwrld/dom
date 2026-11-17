@@ -69,18 +69,21 @@
 
     <div class="menu-b">
         <?php
-        $exclude_slugs = ['uncategorized', 'bestsellers', 'heren'];
+        // Categories live under "Heren" parent
+        $heren_menu = get_term_by('slug', 'heren', 'product_cat');
+        $menu_parent = $heren_menu ? $heren_menu->term_id : 0;
         $menu_categories = get_terms([
             'taxonomy'   => 'product_cat',
             'hide_empty' => false,
-            'parent'     => 0,
-            'exclude'    => array_filter(array_map(function($slug) {
-                $t = get_term_by('slug', $slug, 'product_cat');
-                return $t ? $t->term_id : 0;
-            }, $exclude_slugs)),
+            'parent'     => $menu_parent,
             'orderby'    => 'menu_order',
             'order'      => 'ASC',
         ]);
+        // Add SALE to the menu
+        $sale_menu = get_term_by('slug', 'sale', 'product_cat');
+        if ($sale_menu && !is_wp_error($sale_menu) && !is_wp_error($menu_categories)) {
+            $menu_categories[] = $sale_menu;
+        }
 
         if (!is_wp_error($menu_categories) && !empty($menu_categories)) :
             foreach ($menu_categories as $cat) :
