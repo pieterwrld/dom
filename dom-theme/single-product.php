@@ -20,11 +20,14 @@ while (have_posts()) : the_post();
     $thumbnail_id = $product->get_image_id();
     $all_images   = $thumbnail_id ? array_merge([$thumbnail_id], $gallery_ids) : $gallery_ids;
 
-    $on_sale    = $product->is_on_sale();
-    $regular    = (float) $product->get_regular_price();
-    $sale_price = $on_sale ? (float) $product->get_sale_price() : 0;
-    $price      = (float) $product->get_price();
-    $save_pct   = ($on_sale && $regular > 0) ? round((1 - $sale_price / $regular) * 100) : 0;
+    // Prijzen via de gedeelde helper. Bij een product met maten staan ze op de
+    // variaties; get_regular_price() is daar leeg en gaf hier € 0,00.
+    $prijs      = dom_prices($product);
+    $on_sale    = $prijs['sale'];
+    $regular    = $prijs['van'];
+    $sale_price = $prijs['nu'];
+    $price      = $prijs['nu'];
+    $save_pct   = $prijs['pct'];
 
     $product_cats = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'all']);
     $primary_cat  = !empty($product_cats) ? $product_cats[0] : null;
@@ -222,12 +225,16 @@ while (have_posts()) : the_post();
 
         <!-- 3. PRICE -->
         <div class="p-price">
-          <?php if ($on_sale) : ?>
-            <span class="now"><?php echo $eur($sale_price); ?></span>
-            <s><?php echo $eur($regular); ?></s>
-            <span class="off">-<?php echo $save_pct; ?>%</span>
+          <?php if ($prijs['geldig']) : ?>
+            <?php if ($prijs['bereik']) : ?><span class="vanaf"><?php esc_html_e('vanaf', 'dom-theme'); ?></span><?php endif; ?>
+            <span class="now"><?php echo esc_html(dom_eur($prijs['nu'])); ?></span>
+            <?php if ($on_sale) : ?>
+              <s><?php echo esc_html(dom_eur($regular)); ?></s>
+              <?php if ($save_pct > 0) : ?><span class="off">-<?php echo (int) $save_pct; ?>%</span><?php endif; ?>
+            <?php endif; ?>
           <?php else : ?>
-            <span class="now"><?php echo $eur($price); ?></span>
+            <?php // Geen bruikbare prijs: liever WooCommerce zelf laten schrijven dan € 0,00. ?>
+            <span class="now"><?php echo wp_kses_post($product->get_price_html()); ?></span>
           <?php endif; ?>
           <span class="tax">Incl. btw &middot; excl. verzending</span>
         </div>
@@ -399,8 +406,9 @@ while (have_posts()) : the_post();
         <div class="rail" id="railUp">
           <?php foreach ($upsell_products as $up) :
             $up_thumb = get_the_post_thumbnail_url($up->get_id(), 'product-card');
-            $up_sale  = $up->is_on_sale();
-            $up_pct   = ($up_sale && (float)$up->get_regular_price() > 0) ? round((1 - (float)$up->get_sale_price() / (float)$up->get_regular_price()) * 100) : 0;
+            $up_prijs = dom_prices($up);
+            $up_sale  = $up_prijs['sale'];
+            $up_pct   = $up_prijs['pct'];
           ?>
             <a class="pcard pcard-sm" href="<?php echo esc_url($up->get_permalink()); ?>" data-rv="up">
               <div class="pmedia">
@@ -411,11 +419,7 @@ while (have_posts()) : the_post();
               <div class="pinfo">
                 <div class="ptitle"><?php echo esc_html($up->get_name()); ?></div>
                 <div class="pprice<?php echo $up_sale ? ' sale' : ''; ?>">
-                  <?php if ($up_sale) : ?>
-                    <?php echo $eur((float)$up->get_sale_price()); ?> <s><?php echo $eur((float)$up->get_regular_price()); ?></s>
-                  <?php else : ?>
-                    <?php echo $eur((float)$up->get_price()); ?>
-                  <?php endif; ?>
+                  <?php echo dom_price_html($up); // phpcs:ignore WordPress.Security.EscapeOutput ?>
                 </div>
               </div>
             </a>
@@ -455,8 +459,9 @@ while (have_posts()) : the_post();
             $rp = wc_get_product($post_obj->ID);
             if (!$rp || !$rp->is_visible()) continue;
             $rp_thumb = get_the_post_thumbnail_url($post_obj->ID, 'product-card');
-            $rp_sale  = $rp->is_on_sale();
-            $rp_pct   = ($rp_sale && (float)$rp->get_regular_price() > 0) ? round((1 - (float)$rp->get_sale_price() / (float)$rp->get_regular_price()) * 100) : 0;
+            $rp_prijs = dom_prices($rp);
+            $rp_sale  = $rp_prijs['sale'];
+            $rp_pct   = $rp_prijs['pct'];
           ?>
             <a class="pcard pcard-sm" href="<?php echo esc_url($rp->get_permalink()); ?>" data-rv="up">
               <div class="pmedia">
@@ -467,11 +472,7 @@ while (have_posts()) : the_post();
               <div class="pinfo">
                 <div class="ptitle"><?php echo esc_html($rp->get_name()); ?></div>
                 <div class="pprice<?php echo $rp_sale ? ' sale' : ''; ?>">
-                  <?php if ($rp_sale) : ?>
-                    <?php echo $eur((float)$rp->get_sale_price()); ?> <s><?php echo $eur((float)$rp->get_regular_price()); ?></s>
-                  <?php else : ?>
-                    <?php echo $eur((float)$rp->get_price()); ?>
-                  <?php endif; ?>
+                  <?php echo dom_price_html($rp); // phpcs:ignore WordPress.Security.EscapeOutput ?>
                 </div>
               </div>
             </a>

@@ -37,10 +37,9 @@ $dom_category_badge = static function ($slug) use ($on_sale_ids) {
         if (!$product) {
             continue;
         }
-        $regular = (float) $product->get_regular_price();
-        $sale    = (float) $product->get_sale_price();
-        if ($regular > 0 && $sale > 0 && $sale < $regular) {
-            $best = max($best, (int) round((($regular - $sale) / $regular) * 100));
+        $p = dom_prices($product);
+        if ($p['sale'] && $p['pct'] > 0) {
+            $best = max($best, $p['pct']);
         }
     }
     if ($best <= 0) {
@@ -67,19 +66,35 @@ $shop_url = dom_shop_url();
     $is_sale  = in_array($cat->slug, $sale_slugs, true);
     $badge    = $dom_category_badge($cat->slug);
 
+    /**
+     * De laagste prijs in deze categorie.
+     *
+     * Sorteren op het veld _price werkt hier niet: bij een product met maten
+     * staat de prijs op de variaties en is dat veld op het hoofdproduct vaak
+     * leeg. Daarom halen we een handvol producten op en rekenen we het zelf uit.
+     */
     $min_price = '';
-    $cheapest  = get_posts([
+    $kandidaten = get_posts([
         'post_type'      => 'product',
-        'posts_per_page' => 1,
+        'post_status'    => 'publish',
+        'posts_per_page' => 24,
         'tax_query'      => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $cat->slug]],
-        'meta_key'       => '_price',
-        'orderby'        => 'meta_value_num',
-        'order'          => 'ASC',
         'fields'         => 'ids',
+        'no_found_rows'  => true,
     ]);
-    if ($cheapest) {
-        $p = function_exists('wc_get_product') ? wc_get_product($cheapest[0]) : null;
-        if ($p) $min_price = 'vanaf &euro;' . number_format((float) $p->get_price(), 0, ',', '.');
+    $laagste = 0.0;
+    foreach ($kandidaten as $kandidaat_id) {
+        $kandidaat = function_exists('wc_get_product') ? wc_get_product($kandidaat_id) : null;
+        if (!$kandidaat) {
+            continue;
+        }
+        $kp = dom_prices($kandidaat);
+        if ($kp['geldig'] && ($laagste === 0.0 || $kp['nu'] < $laagste)) {
+            $laagste = $kp['nu'];
+        }
+    }
+    if ($laagste > 0) {
+        $min_price = 'vanaf &euro;' . number_format($laagste, 0, ',', '.');
     }
   ?>
     <a href="<?php echo esc_url($link); ?>"

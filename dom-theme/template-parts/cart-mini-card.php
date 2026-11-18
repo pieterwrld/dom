@@ -37,7 +37,7 @@ if ($product->is_type('variable')) {
     <?php endif; ?>
   </a>
   <div class="t"><?php echo esc_html(get_the_title($product_id)); ?></div>
-  <div class="p"><?php echo wp_kses_post(wc_price((float) $product->get_price())); ?></div>
+  <div class="p"><?php echo dom_price_html($product); // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
   <div class="row2">
     <?php if ($sizes) : ?>
       <select aria-label="<?php esc_attr_e('Maat', 'dom-theme'); ?>">

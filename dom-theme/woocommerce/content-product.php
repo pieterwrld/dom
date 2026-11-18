@@ -18,12 +18,11 @@ $thumbnail_id = $product->get_image_id();
 $all_images   = $thumbnail_id ? array_merge([$thumbnail_id], $gallery_ids) : $gallery_ids;
 $all_images   = array_slice($all_images, 0, 5);
 
-$on_sale  = $product->is_on_sale();
-$sale_pct = '';
-if ($on_sale && $product->get_regular_price() > 0) {
-    $pct = round((1 - ($product->get_sale_price() / $product->get_regular_price())) * 100);
-    $sale_pct = '-' . $pct . '%';
-}
+// Prijzen via de gedeelde helper: bij producten met maten staan ze op de
+// variaties, en dan geeft get_regular_price() een lege waarde.
+$prijs    = dom_prices($product);
+$on_sale  = $prijs['sale'];
+$sale_pct = $prijs['pct'] > 0 ? '-' . $prijs['pct'] . '%' : '';
 
 $is_new = (strtotime($product->get_date_created()) > strtotime('-14 days'));
 $is_out = !$product->is_in_stock();
@@ -37,10 +36,7 @@ if ($product->is_type('variable')) {
     }
 }
 
-$price_display = (float) $product->get_price();
-$eur = function($v) {
-    return '€' . number_format($v, 2, ',', '.');
-};
+
 ?>
 <a href="<?php echo esc_url($product->get_permalink()); ?>"
    class="pcard" data-rv="up" style="--d:<?php echo $delay; ?>ms">
@@ -90,12 +86,7 @@ $eur = function($v) {
   <div class="pinfo">
     <div class="ptitle"><?php echo esc_html($product->get_name()); ?></div>
     <div class="pprice<?php echo $on_sale ? ' sale' : ''; ?>">
-      <?php if ($on_sale) : ?>
-        <?php echo $eur((float)$product->get_sale_price()); ?>
-        <s><?php echo $eur((float)$product->get_regular_price()); ?></s>
-      <?php else : ?>
-        <?php echo $eur($price_display); ?>
-      <?php endif; ?>
+      <?php echo dom_price_html($product); // phpcs:ignore WordPress.Security.EscapeOutput ?>
     </div>
     <?php if (!empty($sizes)) : ?>
       <div class="psizes">

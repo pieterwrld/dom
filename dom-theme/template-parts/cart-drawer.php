@@ -16,9 +16,9 @@ if (function_exists('WC') && WC()->cart) {
     $cart_total = (float) WC()->cart->get_subtotal();
     $cart_items = WC()->cart->get_cart();
     foreach ($cart_items as $item) {
-        $product = $item['data'];
-        if ($product->is_on_sale()) {
-            $saved += ((float) $product->get_regular_price() - (float) $product->get_price()) * $item['quantity'];
+        $regelprijs = dom_prices($item['data']);
+        if ($regelprijs['sale']) {
+            $saved += ($regelprijs['van'] - $regelprijs['nu']) * $item['quantity'];
         }
     }
 }
@@ -88,8 +88,9 @@ $eur = function ($v) {
           $product    = $cart_item['data'];
           $product_id = $cart_item['product_id'];
           $quantity   = $cart_item['quantity'];
-          $price      = (float) $product->get_price();
-          $was        = $product->is_on_sale() ? (float) $product->get_regular_price() : 0;
+          $regelprijs = dom_prices($product);
+          $price      = $regelprijs['nu'];
+          $was        = $regelprijs['van'];
           $line_total = $price * $quantity;
           $line_was   = $was > 0 ? $was * $quantity : 0;
           $thumbnail  = get_the_post_thumbnail_url($product_id, 'thumbnail');

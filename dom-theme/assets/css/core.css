@@ -460,6 +460,12 @@ input,select{font:inherit}
   align-items:baseline;gap:7px}
 .pprice.sale{color:var(--bf)}
 .pprice s{color:var(--muted);font-weight:400;font-size:11px}
+/* "vanaf" bij producten waarvan de maten niet allemaal evenveel kosten */
+.pprice .vanaf{font-family:var(--body);font-size:10px;font-weight:500;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.06em}
+.pprice .nu{font-family:inherit;font-weight:inherit}
+.pprice .off{font-family:var(--disp);font-size:10px;font-weight:800;color:#fff;background:var(--bf);
+  padding:1px 5px;letter-spacing:.02em}
 .psizes{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
 .psizes span{font-family:var(--mono);font-size:9.5px;color:var(--muted);border:1px solid var(--line);
   text-transform:uppercase;

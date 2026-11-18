@@ -125,14 +125,110 @@ function dom_max_sale_percentage() {
         if (!$product) {
             continue;
         }
-        $regular = (float) $product->get_regular_price();
-        $sale    = (float) $product->get_sale_price();
-        if ($regular > 0 && $sale > 0 && $sale < $regular) {
-            $best = max($best, (int) round((($regular - $sale) / $regular) * 100));
+        $p = dom_prices($product);
+        if ($p['sale'] && $p['pct'] > 0) {
+            $best = max($best, $p['pct']);
         }
     }
 
     return $best;
+}
+
+/**
+ * De prijzen van één product, op een manier die ook klopt bij maten.
+ *
+ * Bij een variabel product (een product met maten) staan de prijzen op de
+ * variaties, niet op het hoofdproduct. get_regular_price() en get_sale_price()
+ * geven daar een lege waarde terug, en die werd als € 0,00 op de kaart gezet.
+ * WooCommerce heeft hier eigen methodes voor, en die gebruiken we hier.
+ *
+ * Hebben de maten niet allemaal dezelfde prijs, dan is 'bereik' waar en toont
+ * de sjabloon "vanaf" bij de laagste prijs.
+ *
+ * @param WC_Product $product
+ * @return array{nu:float, nu_max:float, van:float, sale:bool, pct:int, bereik:bool, geldig:bool}
+ */
+function dom_prices($product) {
+    $leeg = ['nu' => 0.0, 'nu_max' => 0.0, 'van' => 0.0, 'sale' => false, 'pct' => 0, 'bereik' => false, 'geldig' => false];
+
+    if (!$product || !is_a($product, 'WC_Product')) {
+        return $leeg;
+    }
+
+    if ($product->is_type('variable')) {
+        $nu     = (float) $product->get_variation_price('min', true);
+        $nu_max = (float) $product->get_variation_price('max', true);
+        $van    = (float) $product->get_variation_regular_price('min', true);
+    } elseif ($product->is_type('grouped')) {
+        // Een groep heeft zelf geen prijs; die van de kinderen bepalen hem.
+        $kinderen = [];
+        foreach ($product->get_children() as $kind_id) {
+            $kind = wc_get_product($kind_id);
+            if ($kind && '' !== $kind->get_price()) {
+                $kinderen[] = (float) wc_get_price_to_display($kind);
+            }
+        }
+        $nu     = $kinderen ? min($kinderen) : 0.0;
+        $nu_max = $kinderen ? max($kinderen) : 0.0;
+        $van    = $nu;
+    } else {
+        $nu     = '' === $product->get_price() ? 0.0 : (float) wc_get_price_to_display($product);
+        $nu_max = $nu;
+        $regular = $product->get_regular_price();
+        $van = '' === $regular || null === $regular
+            ? $nu
+            : (float) wc_get_price_to_display($product, ['price' => $regular]);
+    }
+
+    $sale = $van > 0 && $nu > 0 && $nu < $van;
+
+    return [
+        'nu'     => $nu,
+        'nu_max' => $nu_max,
+        'van'    => $sale ? $van : 0.0,
+        'sale'   => $sale,
+        'pct'    => $sale ? (int) round((($van - $nu) / $van) * 100) : 0,
+        'bereik' => $nu_max > $nu,
+        // Zonder bruikbare prijs toont de sjabloon liever niets dan € 0,00.
+        'geldig' => $nu > 0,
+    ];
+}
+
+/** Een bedrag als € 1.234,56. */
+function dom_eur($bedrag) {
+    return '€' . number_format((float) $bedrag, 2, ',', '.');
+}
+
+/**
+ * De prijsregel van een product als kant-en-klare HTML.
+ *
+ * @param WC_Product $product
+ * @param bool       $toon_korting Het rode -x% label erbij.
+ * @return string
+ */
+function dom_price_html($product, $toon_korting = false) {
+    $p = dom_prices($product);
+
+    if (!$p['geldig']) {
+        // Terugval op WooCommerce zelf: beter een prijsbereik of "Prijs op
+        // aanvraag" dan een verzonnen nul.
+        return $product ? (string) $product->get_price_html() : '';
+    }
+
+    $uit = '';
+    if ($p['bereik']) {
+        $uit .= '<span class="vanaf">' . esc_html__('vanaf', 'dom-theme') . '</span> ';
+    }
+    $uit .= '<span class="nu">' . esc_html(dom_eur($p['nu'])) . '</span>';
+
+    if ($p['sale']) {
+        $uit .= ' <s>' . esc_html(dom_eur($p['van'])) . '</s>';
+        if ($toon_korting && $p['pct'] > 0) {
+            $uit .= ' <span class="off">-' . (int) $p['pct'] . '%</span>';
+        }
+    }
+
+    return $uit;
 }
 
 /**
