@@ -2,9 +2,11 @@
 defined('ABSPATH') || exit;
 
 /**
- * "Gedragen door" toont echte personen. Een naam of handle van een echte persoon
- * mag alleen bij de bijbehorende foto staan, dus deze sectie rendert uitsluitend
- * wanneer er beheerde data met afbeeldingen is. Geen data: sectie valt weg.
+ * "Gedragen door": de coverflow uit het ontwerp.
+ *
+ * Namen van echte personen horen bij hun eigen foto, dus de koppeling komt
+ * letterlijk uit het ontwerpprototype en wordt niet door het thema verzonnen.
+ * Staat er beheerde data klaar, dan gaat die voor.
  */
 $influencers = [];
 
@@ -29,8 +31,30 @@ if (function_exists('get_field')) {
 }
 
 if (!$influencers) {
+    $uploads = wp_get_upload_dir();
+    $base    = $uploads['baseurl'] ?? '';
+
+    foreach ([
+        ['Djezja',         'Shop de look', '2025/09/11.jpg'],
+        ['Furkan',         'Shop de look', '2025/09/12.jpg'],
+        ['Kubi de Barber', 'Shop de look', '2025/09/13.jpg'],
+        ['Fato YT',        'Shop de look', '2025/09/14.jpg'],
+        ['De Outfitman',   'Winter drop',  '2025/09/17.jpg'],
+        ['De Outfitman',   'Black Friday', '2025/09/19.jpg'],
+    ] as [$name, $sub, $file]) {
+        $path = ($uploads['basedir'] ?? '') . '/' . $file;
+        if (!$base || !file_exists($path)) {
+            continue;
+        }
+        $influencers[] = ['name' => $name, 'sub' => $sub, 'img' => $base . '/' . $file];
+    }
+}
+
+if (!$influencers) {
     return;
 }
+
+$dom_cover_shop = dom_shop_url();
 ?>
 <section class="sec cover-sec" id="wornby">
   <div class="wrap">
@@ -53,6 +77,11 @@ if (!$influencers) {
     <?php foreach ($influencers as $inf) : ?>
       <div class="cv" data-name="<?php echo esc_attr($inf['name']); ?>" data-sub="<?php echo esc_attr($inf['sub']); ?>">
         <img src="<?php echo esc_url($inf['img']); ?>" alt="<?php echo esc_attr($inf['name']); ?>" loading="lazy">
+        <span class="rim"></span>
+        <div class="cvb">
+          <b><?php echo esc_html($inf['name']); ?></b>
+          <a class="shop" href="<?php echo esc_url($dom_cover_shop); ?>">Shop nu <span class="arw">&rarr;</span></a>
+        </div>
       </div>
     <?php endforeach; ?>
   </div>

@@ -94,11 +94,12 @@ function dom_marquee_messages() {
  */
 function dom_marquee_default() {
     return implode("\n", [
-        'Gratis verzending vanaf €200',
         '!Black Friday deals',
-        '14 dagen retourrecht',
-        '24/7 WhatsApp support',
-        '100% authentieke producten',
+        'Voor 17:00 besteld = morgen in huis',
+        'Gratis verzending vanaf €200',
+        '24/7 klantenservice via WhatsApp',
+        'Vanaf €350 gratis mystery shirt',
+        '14 dagen gratis retourneren',
     ]);
 }
 

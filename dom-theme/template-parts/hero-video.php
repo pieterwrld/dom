@@ -60,7 +60,7 @@ $shop_url = dom_shop_url();
       </div>
       <div class="ht">
         <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        <div><b>100% origineel</b><span>Gecontroleerd voor verzending</span></div>
+        <div><b>Gecontroleerd</b><span>Voor verzending nagekeken</span></div>
       </div>
       <div class="ht">
         <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>

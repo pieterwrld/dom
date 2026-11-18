@@ -28,12 +28,6 @@ get_header();
   </div>
 </section>
 
-<section class="sec" style="padding-top:0">
-  <div class="wrap">
-    <?php get_template_part('template-parts/parfum4car'); ?>
-  </div>
-</section>
-
 <?php get_template_part('template-parts/influencer-scroll'); ?>
 
 <?php get_template_part('template-parts/reviews-grid'); ?>

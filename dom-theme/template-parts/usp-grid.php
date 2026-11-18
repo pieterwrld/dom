@@ -8,7 +8,7 @@
       </svg>
     </div>
     <h4>Kwaliteitsgarantie</h4>
-    <p>Elk product wordt gecontroleerd voor verzending. 100% origineel, altijd.</p>
+    <p>Elk product wordt voor verzending gecontroleerd. Topkwaliteit, zonder compromis.</p>
   </div>
   <div class="ucard">
     <div class="uic">

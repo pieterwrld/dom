@@ -111,9 +111,7 @@
       <h5>Over ons</h5>
       <ul>
         <li><a href="/ons-verhaal">Ons Verhaal</a></li>
-        <li><a href="/authenticiteit">Authenticiteit</a></li>
         <li><a href="https://deklokjesman.com" target="_blank" rel="noopener">De Klokjesman</a></li>
-        <li><a href="https://parfum4car.nl" target="_blank" rel="noopener">Parfum4Car</a></li>
       </ul>
       <div class="socs">
         <!-- Instagram -->
@@ -143,6 +141,17 @@
   </div>
 
 </footer>
+
+<?php
+/**
+ * Verduisterende laag achter de winkelwagen en het menu.
+ *
+ * De CSS en de JS gingen allebei uit van dit element, maar het stond nergens in
+ * het thema: de drawer schoof open zonder achtergrond en sloot niet als je
+ * ernaast klikte. De JS zoekt op .js-overlay, de CSS stijlt .ovl.
+ */
+?>
+<div class="ovl js-overlay" id="ovl" aria-hidden="true"></div>
 
 <?php get_template_part('template-parts/cart-drawer'); ?>
 

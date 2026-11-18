@@ -97,14 +97,6 @@ acf_add_local_field_group([
             'max'   => 10,
         ],
         [
-            'key'   => 'field_parfum_videos',
-            'label' => 'Parfum4car Video Thumbnails',
-            'name'  => 'parfum_video_thumbnails',
-            'type'  => 'gallery',
-            'return_format' => 'url',
-            'preview_size'  => 'medium',
-        ],
-        [
             'key'   => 'field_influencers',
             'label' => 'Influencers',
             'name'  => 'influencers',
