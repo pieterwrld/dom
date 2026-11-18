@@ -167,10 +167,3 @@ $shop_url = dom_shop_url();
   <?php endforeach; ?>
 </div>
 
-<a href="<?php echo esc_url($shop_url); ?>" class="dealbar" data-rv="up">
-  <div>
-    <h3>3 voor &euro;130</h3>
-    <p>Combineer 3 T&#8209;shirts of zwembroeken. Korting automatisch bij het afrekenen.</p>
-  </div>
-  <span class="btn btn-ow">Stel je deal samen <span class="arw">&rarr;</span></span>
-</a>

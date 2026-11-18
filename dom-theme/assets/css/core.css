@@ -815,3 +815,26 @@ main,.hero{animation:pgUp .75s cubic-bezier(.16,1,.3,1) both}
    ingesteld geldt de normale, schermvullende hero weer. */
 .hero--nomedia{min-height:0}
 .hero--nomedia .hero-in{padding-top:clamp(40px,7vw,72px)}
+
+/* ====== BLACK FRIDAY BANNER HERO ======
+   De banner draagt zijn eigen tekst, dus er komt niets overheen behalve de
+   knop. Die staat onderin op een donkere verloopband, zodat hij leesbaar
+   blijft ongeacht wat er op dat punt in het beeld staat. */
+.hero-banner-sec{position:relative;background:#0A0A0A}
+.hero-banner{position:relative;display:block;width:100%}
+.hero-banner img{display:block;width:100%;height:auto}
+.hero-banner::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38%;
+  background:linear-gradient(to top,rgba(10,10,10,.82) 0%,rgba(10,10,10,.45) 45%,transparent 100%);
+  pointer-events:none}
+.hero-banner__cta{position:absolute;left:50%;bottom:clamp(16px,3.4vw,42px);transform:translateX(-50%);
+  z-index:2;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  height:clamp(46px,5vw,56px);padding:0 clamp(20px,3vw,34px);
+  background:var(--bf);color:#fff;border-radius:var(--r);
+  font-family:var(--disp);font-size:clamp(14px,1.5vw,17px);font-weight:800;
+  text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;
+  transition:background .3s,transform .25s var(--e)}
+.hero-banner:hover .hero-banner__cta{background:#B3101F;transform:translateX(-50%) translateY(-2px)}
+.hero-banner__cta .arw{transition:transform .3s var(--e)}
+.hero-banner:hover .hero-banner__cta .arw{transform:translateX(4px)}
+
+.hero-trust--under{padding:clamp(18px,2.6vw,30px) 0 0}

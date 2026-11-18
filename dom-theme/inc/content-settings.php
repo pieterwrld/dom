@@ -39,11 +39,22 @@ function dom_setting($key, $default = '') {
 function dom_setting_image_url($key) {
     $value = dom_setting($key);
 
-    // Het woordmerk staat al in de mediabibliotheek. Zonder deze terugval toont
-    // de header de tekstversie, waarin het mannetje in de i ontbreekt.
-    if ($key === 'header_logo' && empty($value)) {
+    /**
+     * Beeld dat al in de mediabibliotheek staat en dat de secties nodig hebben
+     * om er goed uit te zien. Zonder deze terugval toont de header bijvoorbeeld
+     * de tekstversie van het logo, waarin het mannetje in de i ontbreekt. Een
+     * eigen keuze in de Customizer gaat hier altijd voor.
+     */
+    $defaults = [
+        'header_logo'       => '/2025/03/cropped-Merkkleding-Logo-852-x-210-px-2-removebg-preview.png',
+        'bf_banner_mobile'  => '/2026/11/WhatsApp-Image-2026-11-14-at-19.35.52.jpeg',
+        'bf_banner_desktop' => '/2026/11/ChatGPT-Image.png',
+        'klokjesman_image'  => '/2025/03/Rolex-day-date-40-green-4.jpg',
+    ];
+
+    if (empty($value) && isset($defaults[$key])) {
         $uploads = wp_get_upload_dir();
-        $file    = '/2025/03/cropped-Merkkleding-Logo-852-x-210-px-2-removebg-preview.png';
+        $file    = $defaults[$key];
         if (!empty($uploads['basedir']) && file_exists($uploads['basedir'] . $file)) {
             return $uploads['baseurl'] . $file;
         }
@@ -150,6 +161,26 @@ add_action('customize_register', function (WP_Customize_Manager $wp_customize) {
     $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'hero_image', [
         'label'       => __('Hero-afbeelding', 'dom-theme'),
         'description' => __('Ook de poster van de video. Liggend, minimaal 1920px breed.', 'dom-theme'),
+        'section'     => 'dom_hero',
+    ]));
+
+    $wp_customize->add_setting('bf_banner_mobile', [
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'bf_banner_mobile', [
+        'label'       => __('Black Friday banner (mobiel)', 'dom-theme'),
+        'description' => __('Staand beeld. Vervangt de hele hero; de banner draagt zijn eigen tekst.', 'dom-theme'),
+        'section'     => 'dom_hero',
+    ]));
+
+    $wp_customize->add_setting('bf_banner_desktop', [
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ]);
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'bf_banner_desktop', [
+        'label'       => __('Black Friday banner (desktop)', 'dom-theme'),
+        'description' => __('Liggend beeld, vanaf 761px breed.', 'dom-theme'),
         'section'     => 'dom_hero',
     ]));
 

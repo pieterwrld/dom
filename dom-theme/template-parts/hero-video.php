@@ -1,23 +1,67 @@
 <?php
 defined('ABSPATH') || exit;
 
+/**
+ * Hero.
+ *
+ * Staat er een Black Friday-banner klaar, dan is dat de hero: de banner draagt
+ * zijn eigen tekst, dus er komt geen kop of badge overheen. Alleen een knop,
+ * onderin gecentreerd op een donkere verloopband zodat hij leesbaar blijft
+ * waar de banner ook licht is.
+ *
+ * Mobiel en desktop zijn verschillende uitsneden, geen geschaalde versie van
+ * elkaar, dus ze wisselen via <picture> op breedte.
+ *
+ * Zonder banner valt alles terug op de oorspronkelijke hero met video of foto.
+ */
+
+$banner_m = function_exists('dom_setting_image_url') ? dom_setting_image_url('bf_banner_mobile') : '';
+$banner_d = function_exists('dom_setting_image_url') ? dom_setting_image_url('bf_banner_desktop') : '';
+$shop_url = dom_shop_url();
+
+if ($banner_m || $banner_d) :
+    $primary = $banner_m ?: $banner_d;
+?>
+<section class="hero-banner-sec" id="hero">
+  <a class="hero-banner" href="<?php echo esc_url($shop_url); ?>">
+    <picture>
+      <?php if ($banner_d) : ?>
+        <source media="(min-width:761px)" srcset="<?php echo esc_url($banner_d); ?>">
+      <?php endif; ?>
+      <img src="<?php echo esc_url($primary); ?>"
+           alt="<?php esc_attr_e('Black Friday bij De Outfitman', 'dom-theme'); ?>"
+           loading="eager" fetchpriority="high" decoding="async">
+    </picture>
+    <span class="hero-banner__cta">
+      <?php esc_html_e('Shop alle collecties', 'dom-theme'); ?>
+      <span class="arw">&rarr;</span>
+    </span>
+  </a>
+</section>
+
+<div class="wrap">
+  <div class="hero-trust hero-trust--under" data-rv="up">
+    <div class="ht">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+      <div><b><?php esc_html_e('Voor 17:00', 'dom-theme'); ?></b><span><?php esc_html_e('Morgen in huis', 'dom-theme'); ?></span></div>
+    </div>
+    <div class="ht">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      <div><b><?php esc_html_e('Gecontroleerd', 'dom-theme'); ?></b><span><?php esc_html_e('Voor verzending nagekeken', 'dom-theme'); ?></span></div>
+    </div>
+    <div class="ht">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
+      <div><b><?php esc_html_e('Persoonlijk advies', 'dom-theme'); ?></b><span><?php esc_html_e('24/7 via WhatsApp', 'dom-theme'); ?></span></div>
+    </div>
+  </div>
+</div>
+
+<?php
+    return;
+endif;
+
 $video_url   = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_video') : '';
 $hero_poster = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_image') : '';
-
-/**
- * Zonder eigen hero-beeld tonen we er geen.
- *
- * Hier stond een terugval op de bestverkochte productfoto. Dat levert een
- * willekeurige, lichte studiofoto op waar de hero-typografie in wegvalt: de
- * bovenste regel is met opzet een lichtgrijze schaduwtekst en die verdwijnt
- * tegen zo'n achtergrond volledig. Het prototype heeft hier een video staan
- * met een tijdelijke poster, geen productfoto.
- *
- * Zonder beeld valt de witte laag over een lege achtergrond en blijft er een
- * rustige typografische hero over. Beeld instelbaar via
- * Weergave > Customizer > De Outfitman content.
- */
-$shop_url = dom_shop_url();
 ?>
 <section class="hero<?php echo ($video_url || $hero_poster) ? '' : ' hero--nomedia'; ?>" id="hero">
   <div class="hero-media">
@@ -32,37 +76,26 @@ $shop_url = dom_shop_url();
   <div class="hero-gl"><canvas id="glHero"></canvas></div>
 
   <div class="wrap hero-in">
-    <div data-rv="fade">
-      <div class="hero-ban">
-        <span class="l"><i class="dot"></i><b>Black Friday live</b></span>
-        <?php $dom_hero_pct = function_exists('dom_max_sale_percentage') ? dom_max_sale_percentage() : 0; ?>
-        <?php if ($dom_hero_pct > 0) : ?>
-          <span class="r"><span>Tot -<?php echo (int) $dom_hero_pct; ?>% op geselecteerde items</span></span>
-        <?php endif; ?>
-      </div>
-    </div>
     <h1 class="d1 split">
-      <span class="l1">Nr. 1 in merkkleding</span>
-      <span class="l2">Voor elke <span class="acc">man</span></span>
+      <span class="l1"><?php esc_html_e('Nr. 1 in merkkleding', 'dom-theme'); ?></span>
+      <span class="l2"><?php esc_html_e('Voor elke', 'dom-theme'); ?> <span class="acc"><?php esc_html_e('man', 'dom-theme'); ?></span></span>
     </h1>
     <div class="hero-cta" data-rv="up" style="--d:520ms">
-      <a href="<?php echo esc_url($shop_url); ?>" class="btn btn-bf">Shop de Black Friday deals <span class="arw">&rarr;</span></a>
-      <a href="<?php echo esc_url($shop_url); ?>" class="btn btn-o">Alle collecties</a>
+      <a href="<?php echo esc_url($shop_url); ?>" class="btn btn-bf"><?php esc_html_e('Shop alle collecties', 'dom-theme'); ?> <span class="arw">&rarr;</span></a>
     </div>
     <div class="hero-trust" data-rv="up" style="--d:640ms">
       <div class="ht">
-        <svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-        <div><b>Voor 17:00</b><span>Morgen in huis</span></div>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+        <div><b><?php esc_html_e('Voor 17:00', 'dom-theme'); ?></b><span><?php esc_html_e('Morgen in huis', 'dom-theme'); ?></span></div>
       </div>
       <div class="ht">
-        <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        <div><b>Gecontroleerd</b><span>Voor verzending nagekeken</span></div>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        <div><b><?php esc_html_e('Gecontroleerd', 'dom-theme'); ?></b><span><?php esc_html_e('Voor verzending nagekeken', 'dom-theme'); ?></span></div>
       </div>
       <div class="ht">
-        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-        <div><b>Persoonlijk advies</b><span>24/7 via WhatsApp</span></div>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
+        <div><b><?php esc_html_e('Persoonlijk advies', 'dom-theme'); ?></b><span><?php esc_html_e('24/7 via WhatsApp', 'dom-theme'); ?></span></div>
       </div>
     </div>
   </div>
-  <div class="scrollind"><span>Scroll</span><i></i></div>
 </section>
