@@ -14,35 +14,58 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Let op de volgorde.
+ *
+ * Bij een gewone paginaweergave laadt deze plugin vóór het thema, dus winnen
+ * de functies hieronder. Maar op het moment dat iemand de plugin áánzet, is
+ * het thema in diezelfde request al geladen en bestaan de terugvalfuncties uit
+ * inc/content-api.php al. Zonder de function_exists-controles hieronder gaf dat
+ * een fatale fout ("Cannot redeclare dom_c") en kon de plugin niet aan.
+ *
+ * Die ene request gebruikt dan nog de terugvalteksten van het thema; vanaf de
+ * volgende request laadt de plugin weer eerst en klopt alles.
+ */
+
+/**
  * Tekst of getal.
  *
  * @param string $pad     "home.hero.cta"
  * @param mixed  $default Wat de sjabloon toont als er niets staat.
  */
+if (!function_exists('dom_c')) :
 function dom_c($pad, $default = '') {
     return dom_content($pad, $default);
 }
+endif;
 
 /** Schakelaar. */
+if (!function_exists('dom_c_bool')) :
 function dom_c_bool($pad, $default = true) {
     return dom_content_bool($pad, $default);
 }
+endif;
 
 /** Afbeelding of video als URL. */
+if (!function_exists('dom_c_img')) :
 function dom_c_img($pad, $size = 'full') {
     return dom_content_url($pad, $size);
 }
+endif;
 
 /** Rijen van een herhaalveld. */
+if (!function_exists('dom_c_rows')) :
 function dom_c_rows($pad, array $default = []) {
     $rijen = dom_content_rows($pad);
     return $rijen ?: $default;
 }
+endif;
 
 /** Categorieplaatje. */
+if (!function_exists('dom_c_cat_img')) :
 function dom_c_cat_img($term_id, $rol = 'raster', $size = 'medium') {
     return dom_content_cat_image($term_id, $rol, $size);
 }
+endif;
 
 /**
  * De reviewscreenshots als lijst URL's.
@@ -52,6 +75,7 @@ function dom_c_cat_img($term_id, $rol = 'raster', $size = 'medium') {
  *
  * @return array<int, array{url:string, naam:string}>
  */
+if (!function_exists('dom_c_reviews')) :
 function dom_c_reviews() {
     $uit = [];
     foreach (dom_content_rows('reviews.lijst.items') as $rij) {
@@ -70,12 +94,14 @@ function dom_c_reviews() {
     }
     return $uit;
 }
+endif;
 
 /**
  * De video's van Gedragen door.
  *
  * @return array<int, array{src:string, poster:string, naam:string, sub:string, link:string}>
  */
+if (!function_exists('dom_c_ugc')) :
 function dom_c_ugc() {
     $uit = [];
     foreach (dom_content_rows('ugc.lijst.items') as $rij) {
@@ -95,6 +121,7 @@ function dom_c_ugc() {
     }
     return $uit;
 }
+endif;
 
 /* ===================================================================
  *  Snelkoppelingen in de adminbalk
