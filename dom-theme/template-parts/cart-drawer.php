@@ -95,7 +95,8 @@ $eur = function ($v) {
               $parts = [];
               foreach ($cart_item['variation'] as $attr => $val) {
                   $label = wc_attribute_label(str_replace('attribute_', '', $attr));
-                  $parts[] = $label . ' ' . $val;
+                  // Maten staan in WooCommerce vaak in kleine letters opgeslagen.
+                  $parts[] = $label . ' ' . mb_strtoupper($val, 'UTF-8');
               }
               $meta = implode(' · ', $parts);
           }
