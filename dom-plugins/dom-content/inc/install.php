@@ -35,6 +35,27 @@ add_action('admin_init', function () {
 });
 
 /**
+ * Dezelfde import als route, zodat hij ook zonder wp-admin te openen gedraaid
+ * kan worden en later nog eens overgedaan kan worden.
+ */
+add_action('rest_api_init', function () {
+    register_rest_route('dom/v1', '/reviews-importeren', [
+        'methods'             => 'POST',
+        'callback'            => function () {
+            $aantal = dom_content_import_reviews();
+            return new WP_REST_Response([
+                'ok'           => true,
+                'geimporteerd' => $aantal,
+                'in_lijst'     => count(dom_content_rows('reviews.lijst.items')),
+            ], 200);
+        },
+        'permission_callback' => function () {
+            return current_user_can('manage_options') && current_user_can('upload_files');
+        },
+    ]);
+});
+
+/**
  * De meegeleverde screenshots naar de mediabibliotheek halen.
  *
  * @return int Aantal geïmporteerde afbeeldingen.
