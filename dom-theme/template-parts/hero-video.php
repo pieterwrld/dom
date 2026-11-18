@@ -4,23 +4,19 @@ defined('ABSPATH') || exit;
 $video_url   = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_video') : '';
 $hero_poster = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_image') : '';
 
-// Fallback: use recent product images as hero background collage
-if (!$video_url && !$hero_poster) {
-    $hero_products = get_posts([
-        'post_type'      => 'product',
-        'posts_per_page' => 1,
-        'post_status'    => 'publish',
-        'meta_key'       => 'total_sales',
-        'orderby'        => 'meta_value_num',
-        'order'          => 'DESC',
-        'meta_query'     => [['key' => '_thumbnail_id', 'compare' => 'EXISTS']],
-        'fields'         => 'ids',
-    ]);
-    if ($hero_products) {
-        $hero_poster = get_the_post_thumbnail_url($hero_products[0], 'full');
-    }
-}
-
+/**
+ * Zonder eigen hero-beeld tonen we er geen.
+ *
+ * Hier stond een terugval op de bestverkochte productfoto. Dat levert een
+ * willekeurige, lichte studiofoto op waar de hero-typografie in wegvalt: de
+ * bovenste regel is met opzet een lichtgrijze schaduwtekst en die verdwijnt
+ * tegen zo'n achtergrond volledig. Het prototype heeft hier een video staan
+ * met een tijdelijke poster, geen productfoto.
+ *
+ * Zonder beeld valt de witte laag over een lege achtergrond en blijft er een
+ * rustige typografische hero over. Beeld instelbaar via
+ * Weergave > Customizer > De Outfitman content.
+ */
 $shop_url = dom_shop_url();
 ?>
 <section class="hero" id="hero">

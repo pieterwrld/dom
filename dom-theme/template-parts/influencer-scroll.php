@@ -30,26 +30,15 @@ if (function_exists('get_field')) {
     }
 }
 
-if (!$influencers) {
-    $uploads = wp_get_upload_dir();
-    $base    = $uploads['baseurl'] ?? '';
-
-    foreach ([
-        ['Djezja',         'Shop de look', '2025/09/11.jpg'],
-        ['Furkan',         'Shop de look', '2025/09/12.jpg'],
-        ['Kubi de Barber', 'Shop de look', '2025/09/13.jpg'],
-        ['Fato YT',        'Shop de look', '2025/09/14.jpg'],
-        ['De Outfitman',   'Winter drop',  '2025/09/17.jpg'],
-        ['De Outfitman',   'Black Friday', '2025/09/19.jpg'],
-    ] as [$name, $sub, $file]) {
-        $path = ($uploads['basedir'] ?? '') . '/' . $file;
-        if (!$base || !file_exists($path)) {
-            continue;
-        }
-        $influencers[] = ['name' => $name, 'sub' => $sub, 'img' => $base . '/' . $file];
-    }
-}
-
+/**
+ * Het prototype vult deze coverflow met WhatsApp-reviewscreenshots en zet daar
+ * namen van echte influencers onder. HANDOVER.md noemt dat ook met zoveel
+ * woorden: "dit zijn homepage-sliderfoto's, geen echte influencer-video's".
+ * Die koppeling overnemen zou betekenen dat Djezja, Furkan, Kubi de Barber en
+ * Fato YT met naam onder een screenshot van iemand anders komen te staan.
+ *
+ * Dus: geen echte foto's, geen sectie.
+ */
 if (!$influencers) {
     return;
 }
