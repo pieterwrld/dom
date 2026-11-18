@@ -155,3 +155,65 @@ function dom_theme_update_from_github(WP_REST_Request $request) {
 
     return new WP_REST_Response(['ok' => true, 'results' => $results], 200);
 }
+
+/**
+ * Oude back-upkopieën van het thema opruimen.
+ *
+ * Elke deploy zet de vorige versie als dom-theme-backup-<datum> opzij. Dat is
+ * prettig om op terug te vallen, maar na tientallen deploys staan er evenzoveel
+ * volledige kopieën van het thema (inclusief foto's en video's) op de schijf.
+ * Deze route gooit ze weg en houdt alleen de nieuwste paar.
+ */
+add_action('rest_api_init', function () {
+    register_rest_route('dom/v1', '/opruimen', [
+        'methods'             => 'POST',
+        'callback'            => 'dom_theme_prune_backups',
+        'permission_callback' => function () {
+            return current_user_can('switch_themes') && current_user_can('update_themes');
+        },
+        'args'                => [
+            'bewaar' => ['type' => 'integer', 'default' => 2],
+        ],
+    ]);
+});
+
+function dom_theme_prune_backups(WP_REST_Request $request) {
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    WP_Filesystem();
+    global $wp_filesystem;
+
+    $keep = max(0, (int) $request->get_param('bewaar'));
+    $root = get_theme_root();
+    $live = get_stylesheet();
+
+    $backups = [];
+    foreach ((array) glob($root . '/dom-theme-backup-*', GLOB_ONLYDIR) as $dir) {
+        $slug = basename($dir);
+        // Nooit de map weggooien waar de site op dit moment op draait.
+        if ($slug === $live || $slug === get_template()) {
+            continue;
+        }
+        $backups[] = $dir;
+    }
+
+    // Namen eindigen op jjjjmmdd-uummss, dus alfabetisch sorteren is op datum.
+    sort($backups);
+    $verwijderen = $keep > 0 ? array_slice($backups, 0, max(0, count($backups) - $keep)) : $backups;
+
+    $weg = [];
+    $mislukt = [];
+    foreach ($verwijderen as $dir) {
+        if ($wp_filesystem->delete($dir, true)) {
+            $weg[] = basename($dir);
+        } else {
+            $mislukt[] = basename($dir);
+        }
+    }
+
+    return new WP_REST_Response([
+        'ok'         => empty($mislukt),
+        'verwijderd' => $weg,
+        'bewaard'    => array_map('basename', $keep > 0 ? array_slice($backups, -$keep) : []),
+        'mislukt'    => $mislukt,
+    ], 200);
+}
