@@ -427,6 +427,7 @@ add_action('wp_enqueue_scripts', 'dom_dequeue_elementor_on_front', 100);
  */
 $dom_includes = [
     '/inc/fatal-log.php',
+    '/inc/content-api.php',
     '/inc/theme-setup.php',
     '/inc/woocommerce.php',
     '/inc/enqueue.php',

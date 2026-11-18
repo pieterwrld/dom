@@ -3,7 +3,7 @@
  * Plugin Name: De Outfitman Launcher
  * Plugin URI:  https://github.com/pieterwrld/dom
  * Description: Zet het nieuwe thema klaar, laat het alleen aan jou zien, en ruimt een paar dingen op die de winkel in de weg zitten. Alles vanuit WP Admin, geen SSH nodig.
- * Version:     1.2.0
+ * Version:     1.3.0
  * Author:      De Outfitman
  * Requires PHP: 8.0
  */
@@ -19,14 +19,20 @@ define('DOM_LAUNCHER_COOKIE', 'dom_preview_theme');
  * ===================================================================== */
 
 add_action('admin_menu', function () {
+    /**
+     * Dit is het technische scherm (thema uitrollen, terugdraaien, cache). De
+     * dagelijkse teksten en foto's staan in De Outfitman Content; die houdt de
+     * naam "De Outfitman" bovenaan het menu, dit scherm staat onderaan bij de
+     * andere systeeminstellingen zodat er geen twee gelijke menu's zijn.
+     */
     add_menu_page(
-        'De Outfitman',
-        'De Outfitman',
+        'Thema & deploy',
+        'Thema & deploy',
         'update_themes',
         'dom-launcher',
         'dom_launcher_page',
-        'dashicons-store',
-        3
+        'dashicons-update',
+        81
     );
 });
 

@@ -1,24 +1,38 @@
 <?php
 /**
- * Black Friday Countdown Strip
- * Uses .bfs classes from core.css
- * Countdown target: November 27, 2026 23:59:59
+ * Black Friday-balk met aftelklok.
+ *
+ * Tekst, einddatum en of de balk überhaupt verschijnt staan in het
+ * beheerscherm onder De Outfitman > Homepage.
  */
+
+defined('ABSPATH') || exit;
+
+if (!dom_c_bool('home.bf.aan', true)) {
+	return;
+}
+
+$dom_bf_label = dom_c('home.bf.label', 'BLACK FRIDAY');
+$dom_bf_einde = dom_c('home.bf.einde', '2026-11-27T23:59:59');
+$dom_bf_knop  = dom_c('home.bf.knop', 'SHOP NU');
 
 /**
  * De korting die hier staat moet kloppen met de prijzen in de winkel. Een vast
  * "tot 50%" is een prijsclaim die niemand nakijkt en die zomaar onjuist kan
- * zijn, dus we rekenen de hoogste werkelijke korting uit en laten de zin weg
- * als er niets in de aanbieding is.
+ * zijn. Vult de winkel zelf niets in, dan rekenen we de hoogste werkelijke
+ * korting uit en laten we de zin weg als er niets in de aanbieding is.
  */
-$dom_bf_pct   = function_exists( 'dom_max_sale_percentage' ) ? dom_max_sale_percentage() : 0;
-$dom_bf_claim = $dom_bf_pct > 0 ? sprintf( 'DEALS TOT %d%% KORTING', $dom_bf_pct ) : '';
+$dom_bf_claim = (string) dom_c('home.bf.claim', '');
+if ($dom_bf_claim === '') {
+	$dom_bf_pct   = function_exists('dom_max_sale_percentage') ? dom_max_sale_percentage() : 0;
+	$dom_bf_claim = $dom_bf_pct > 0 ? sprintf('DEALS TOT %d%% KORTING', $dom_bf_pct) : '';
+}
 ?>
-<div class="bfs" id="bf-strip" data-end="2026-11-27T23:59:59">
+<div class="bfs" id="bf-strip" data-end="<?php echo esc_attr($dom_bf_einde); ?>">
 	<div class="bfs-in wrap">
 		<div class="bfs-t">
-			<b>BLACK FRIDAY</b>
-			<?php if ( $dom_bf_claim ) : ?><s><?php echo esc_html( $dom_bf_claim ); ?></s><?php endif; ?>
+			<b><?php echo esc_html($dom_bf_label); ?></b>
+			<?php if ($dom_bf_claim) : ?><s><?php echo esc_html($dom_bf_claim); ?></s><?php endif; ?>
 		</div>
 		<div class="cd" id="bf-cd">
 			<div class="u" data-unit="d">
@@ -47,7 +61,7 @@ $dom_bf_claim = $dom_bf_pct > 0 ? sprintf( 'DEALS TOT %d%% KORTING', $dom_bf_pct
 		}
 		?>
 		<a href="<?php echo esc_url( $dom_sale_link ); ?>" class="go">
-			SHOP NU <span class="arw">&rarr;</span>
+			<?php echo esc_html( $dom_bf_knop ); ?> <span class="arw">&rarr;</span>
 		</a>
 	</div>
 	<button class="bfs-close" aria-label="Sluiten">

@@ -319,13 +319,13 @@ while (have_posts()) : the_post();
           <!-- 8. DELIVERY PROMISE -->
           <div class="deliv">
             <svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-            <span>Vandaag besteld? <b id="delivDay">Morgen in huis</b></span>
+            <span><?php echo esc_html(dom_c('product.levering.vraag', 'Vandaag besteld?')); ?> <b id="delivDay"><?php echo esc_html(dom_c('product.levering.antwoord', 'Morgen in huis')); ?></b></span>
           </div>
 
           <!-- WhatsApp -->
           <div class="wa-link">
             <svg width="17" height="17" viewBox="0 0 32 32" fill="#25D366" aria-hidden="true"><path d="M16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.5 1.7 6.4L3 29l6.8-1.8A13 13 0 1 0 16 3zm0 23.7c-2 0-4-.5-5.7-1.6l-.4-.2-4 1 1.1-3.9-.3-.4A10.7 10.7 0 1 1 16 26.7zm6.1-7.9c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2s-.9 1.1-1.1 1.3c-.2.2-.4.3-.8.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.5-.3.4-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.8 6 5.3 2.2.9 3.1 1 4.2.8.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4z"/></svg>
-            <span>Twijfel over je maat? <a href="https://wa.me/31616264544" target="_blank" rel="noopener">Vraag het via WhatsApp</a></span>
+            <span><?php echo esc_html(dom_c('product.levering.maathulp', 'Twijfel over je maat?')); ?> <a href="https://wa.me/<?php echo esc_attr(preg_replace('/\D+/', '', (string) dom_c('algemeen.contact.whatsapp', '31616264544'))); ?>" target="_blank" rel="noopener"><?php echo esc_html(dom_c('product.levering.maatlink', 'Vraag het via WhatsApp')); ?></a></span>
           </div>
         </div>
 
@@ -347,7 +347,7 @@ while (have_posts()) : the_post();
               <?php
               $desc = $product->get_description() ?: $product->get_short_description();
               if ($desc) echo wp_kses_post($desc);
-              else echo 'Geen extra productinformatie beschikbaar.';
+              else echo esc_html(dom_c('product.blokken.geen_details', 'Geen extra productinformatie beschikbaar.'));
               ?>
             </div></div>
           </div>
@@ -355,17 +355,25 @@ while (have_posts()) : the_post();
             <button class="ai-b">Maatadvies <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
             <div class="ai-c"><div class="inr">
               <?php
-              $advice = function_exists('get_field') ? (get_field('size_advice', $product->get_id()) ?: get_field('size_advice_default', 'option')) : '';
-              if ($advice) echo wp_kses_post($advice);
-              else echo 'Dit model valt op maat. Zit je tussen twee maten? Kies dan de grotere maat. Of stuur ons je gebruikelijke maat via WhatsApp, dan adviseren wij je persoonlijk.';
+              // Per product ingevuld maatadvies gaat voor, anders de algemene
+              // tekst uit De Outfitman > Productpagina.
+              $advice = function_exists('get_field') ? (get_field('size_advice', $product->get_id()) ?: '') : '';
+              if (!$advice) {
+                  $advice = dom_c('product.blokken.maatadvies', 'Dit model valt op maat. Zit je tussen twee maten? Kies dan de grotere maat. Of stuur ons je gebruikelijke maat via WhatsApp, dan adviseren wij je persoonlijk.');
+              }
+              echo wp_kses_post(wpautop($advice));
               ?>
             </div></div>
           </div>
           <div class="ai" id="ai-ship">
             <button class="ai-b">Verzending &amp; retourneren <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
             <div class="ai-c"><div class="inr">
-              <b>Verzending.</b> Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Gratis verzending vanaf &euro;200. Je ontvangt altijd een trackingcode.<br><br>
-              <b>Retourneren.</b> Niet goed? Je hebt 14 dagen om te ruilen of te retourneren, zolang het product ongebruikt is en in de originele verpakking zit. Meld je retour aan via WhatsApp en je hoort binnen enkele minuten wat je moet doen.
+              <?php
+              echo wp_kses_post(dom_c(
+                  'product.blokken.verzending',
+                  '<p><b>Verzending.</b> Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Gratis verzending vanaf €200. Je ontvangt altijd een trackingcode.</p><p><b>Retourneren.</b> Niet goed? Je hebt 14 dagen om te ruilen of te retourneren, zolang het product ongebruikt is en in de originele verpakking zit. Meld je retour aan via WhatsApp en je hoort binnen enkele minuten wat je moet doen.</p>'
+              ));
+              ?>
             </div></div>
           </div>
         </div>
@@ -480,28 +488,41 @@ while (have_posts()) : the_post();
         <div class="eyebrow"><i></i><span class="lbl">FAQ</span></div>
         <h2 class="d3 split">Veelgestelde vragen</h2>
       </div>
+      <?php
+      /**
+       * De vragen komen uit De Outfitman > Productpagina > Veelgestelde vragen.
+       * Ze worden over twee kolommen verdeeld, de eerste helft links.
+       */
+      $faq_items = dom_c_rows('product.faq.items', [
+          ['vraag' => 'Wanneer is mijn pakket in huis?', 'antwoord' => 'Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Je ontvangt altijd een trackingcode.'],
+          ['vraag' => 'Hoe werkt retourneren?', 'antwoord' => 'Je hebt 14 dagen om te ruilen of retourneren, zolang het product ongebruikt en in de originele verpakking is. Meld je retour aan via WhatsApp.'],
+          ['vraag' => 'Hoe kies ik de juiste maat?', 'antwoord' => 'Dit model valt op maat. Zit je tussen twee maten? Kies de grotere maat. Of stuur ons je gebruikelijke maat via WhatsApp, dan adviseren wij je persoonlijk.'],
+          ['vraag' => 'Met welke methodes kan ik betalen?', 'antwoord' => 'iDEAL, Bancontact, creditcard en Apple Pay. Alle betalingen lopen via een beveiligde omgeving.'],
+          ['vraag' => 'Krijg ik alle toebehoren mee?', 'antwoord' => 'Ja. Elk paar komt met alle toebehoren en een extra set veters. Wij controleren elk product voor verzending.'],
+          ['vraag' => 'Hoe bereik ik de klantenservice?', 'antwoord' => '24/7 via WhatsApp op 06-16264544. Gemiddelde reactietijd is onder 5 minuten.'],
+      ]);
+      $faq_helft = (int) ceil(count($faq_items) / 2);
+      $faq_kolommen = $faq_helft > 0
+          ? [array_slice($faq_items, 0, $faq_helft), array_slice($faq_items, $faq_helft)]
+          : [];
+      ?>
+      <?php if ($faq_kolommen) : ?>
       <div class="faq" data-rv="up">
-        <div>
-          <div class="acc-l" style="border-top:1px solid var(--line)">
-            <div class="ai"><button class="ai-b">Wanneer is mijn pakket in huis? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="ai-c"><div class="inr">Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Je ontvangt altijd een trackingcode.</div></div></div>
-            <div class="ai"><button class="ai-b">Hoe werkt retourneren? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="ai-c"><div class="inr">Je hebt 14 dagen om te ruilen of retourneren, zolang het product ongebruikt en in de originele verpakking is. Meld je retour aan via WhatsApp.</div></div></div>
-            <div class="ai"><button class="ai-b">Hoe kies ik de juiste maat? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="ai-c"><div class="inr">Dit model valt op maat. Zit je tussen twee maten? Kies de grotere maat. Of stuur ons je gebruikelijke maat via WhatsApp, dan adviseren wij je persoonlijk.</div></div></div>
+        <?php foreach ($faq_kolommen as $kolom) : ?>
+          <?php if (!$kolom) continue; ?>
+          <div>
+            <div class="acc-l" style="border-top:1px solid var(--line)">
+              <?php foreach ($kolom as $vraag) : ?>
+                <div class="ai">
+                  <button class="ai-b"><?php echo esc_html($vraag['vraag'] ?? ''); ?> <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+                  <div class="ai-c"><div class="inr"><?php echo esc_html($vraag['antwoord'] ?? ''); ?></div></div>
+                </div>
+              <?php endforeach; ?>
+            </div>
           </div>
-        </div>
-        <div>
-          <div class="acc-l" style="border-top:1px solid var(--line)">
-            <div class="ai"><button class="ai-b">Met welke methodes kan ik betalen? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="ai-c"><div class="inr">iDEAL, Bancontact, creditcard en Apple Pay. Alle betalingen lopen via een beveiligde omgeving.</div></div></div>
-            <div class="ai"><button class="ai-b">Krijg ik alle toebehoren mee? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="ai-c"><div class="inr">Ja. Elk paar komt met alle toebehoren en een extra set veters. Wij controleren elk product voor verzending.</div></div></div>
-            <div class="ai"><button class="ai-b">Hoe bereik ik de klantenservice? <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-              <div class="ai-c"><div class="inr">24/7 via WhatsApp op 06-16264544. Gemiddelde reactietijd is onder 5 minuten.</div></div></div>
-          </div>
-        </div>
+        <?php endforeach; ?>
       </div>
+      <?php endif; ?>
     </div>
   </section>
 </main>

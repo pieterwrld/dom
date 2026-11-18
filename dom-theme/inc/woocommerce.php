@@ -165,7 +165,7 @@ add_action('woocommerce_review_order_after_submit', function () {
       </span>
       <span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-        <?php esc_html_e('1.200+ tevreden klanten', 'dom-theme'); ?>
+        <?php echo esc_html(dom_c('winkelwagen.teksten.trust', __('1.200+ tevreden klanten', 'dom-theme'))); ?>
       </span>
     </div>
     <?php

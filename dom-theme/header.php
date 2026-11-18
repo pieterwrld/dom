@@ -24,7 +24,14 @@
             </button>
         </div>
 
-        <?php $dom_logo = function_exists('dom_setting_image_url') ? dom_setting_image_url('header_logo') : ''; ?>
+        <?php
+        // Beheer: De Outfitman > Algemeen > Merk. Wat eerder via de Customizer
+        // was ingesteld blijft gelden zolang daar niets gekozen is.
+        $dom_logo = dom_c_img('algemeen.merk.logo');
+        if (!$dom_logo && function_exists('dom_setting_image_url')) {
+            $dom_logo = dom_setting_image_url('header_logo');
+        }
+        ?>
         <a href="<?php echo esc_url(home_url('/')); ?>" class="brand<?php echo $dom_logo ? '' : ' txt'; ?>" aria-label="<?php bloginfo('name'); ?>">
             <?php if ($dom_logo) : ?>
                 <img class="logo" src="<?php echo esc_url($dom_logo); ?>" alt="<?php bloginfo('name'); ?>" width="160" height="40">
@@ -75,18 +82,10 @@
         $menu_categories = function_exists('dom_ordered_categories') ? dom_ordered_categories() : [];
         if (!empty($menu_categories)) :
             foreach ($menu_categories as $cat) :
-                $thumb_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
-                $thumb_url = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'thumbnail') : '';
-                if (!$thumb_url && function_exists('get_field')) {
-                    $acf_img = get_field('category_thumbnail', 'product_cat_' . $cat->term_id);
-                    $thumb_url = is_array($acf_img) ? ($acf_img['sizes']['thumbnail'] ?? $acf_img['url']) : ($acf_img ?: '');
-                }
-                // Fallback: use first product image from this category
-                if (!$thumb_url) {
-                    $cat_prods = get_posts(['post_type' => 'product', 'posts_per_page' => 1, 'post_status' => 'publish', 'tax_query' => [['taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => $cat->term_id]], 'fields' => 'ids']);
-                    if ($cat_prods) $thumb_url = get_the_post_thumbnail_url($cat_prods[0], 'thumbnail');
-                }
-                $is_sale = ($cat->slug === 'sale');
+                // Eigen menuplaatje, anders de categoriefoto, anders het eerste
+                // product. Beheer: De Outfitman > Categorieën.
+                $thumb_url = dom_c_cat_img($cat->term_id, 'menu', 'thumbnail');
+                $is_sale   = ($cat->slug === 'sale');
         ?>
             <a href="<?php echo esc_url(dom_term_url($cat)); ?>" class="ml<?php echo $is_sale ? ' sale' : ''; ?>">
                 <span class="mth">

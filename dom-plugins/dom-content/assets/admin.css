@@ -1,0 +1,243 @@
+/* Beheerscherm van De Outfitman Content */
+
+.domc { max-width: 1120px; }
+
+.domc-titel {
+  font-size: 23px;
+  font-weight: 700;
+  margin: 12px 0 4px;
+}
+.domc-titel span {
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* ── Tabbladen ── */
+.domc-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 16px 0 20px;
+  border-bottom: 1px solid #dcdcde;
+  padding-bottom: 0;
+}
+.domc-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  text-decoration: none;
+  color: #3c434a;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: -1px;
+  background: transparent;
+}
+.domc-tab:hover { color: #1d2327; background: #f0f0f1; }
+.domc-tab.is-actief {
+  background: #fff;
+  border-color: #dcdcde;
+  color: #1d2327;
+}
+.domc-tab .dashicons { font-size: 17px; width: 17px; height: 17px; }
+.domc-tab--extern { margin-left: auto; color: #2271b1; }
+
+.domc-uitleg {
+  max-width: 70ch;
+  color: #50575e;
+  margin: 0 0 18px;
+}
+
+/* ── Kaarten ── */
+.domc-kaart {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.domc-kaart__kop {
+  padding: 14px 18px;
+  border-bottom: 1px solid #f0f0f1;
+  background: #fcfcfc;
+}
+.domc-kaart__kop h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+}
+.domc-kaart__kop p {
+  margin: 4px 0 0;
+  color: #646970;
+  font-size: 13px;
+  max-width: 75ch;
+}
+.domc-kaart__body { padding: 18px; }
+.domc-kaart__body--kolommen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 18px;
+}
+
+/* ── Velden ── */
+.domc-veld { margin-bottom: 16px; }
+.domc-veld:last-child { margin-bottom: 0; }
+.domc-label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: #1d2327;
+}
+.domc-input {
+  width: 100%;
+  max-width: 640px;
+}
+.domc-input--kort { max-width: 260px; width: auto; min-width: 180px; }
+.domc-help {
+  margin: 5px 0 0;
+  color: #646970;
+  font-size: 12.5px;
+  max-width: 70ch;
+}
+
+/* Schakelaar */
+.domc-schakel { display: inline-flex; align-items: center; cursor: pointer; }
+.domc-schakel input { position: absolute; opacity: 0; }
+.domc-schakel span {
+  width: 40px; height: 22px;
+  background: #c3c4c7;
+  border-radius: 999px;
+  position: relative;
+  transition: background .15s;
+}
+.domc-schakel span::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .15s;
+}
+.domc-schakel input:checked + span { background: #2271b1; }
+.domc-schakel input:checked + span::after { transform: translateX(18px); }
+.domc-schakel input:focus-visible + span { outline: 2px solid #2271b1; outline-offset: 2px; }
+
+/* ── Media ── */
+.domc-media__vak {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px dashed #c3c4c7;
+  border-radius: 5px;
+  padding: 10px;
+  background: #fbfbfc;
+}
+.domc-media__vak.is-gevuld { border-style: solid; background: #fff; }
+.domc-media__preview {
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  border-radius: 4px;
+  background: #f0f0f1 center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.domc-media__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.domc-media__preview:empty::after {
+  content: "";
+  width: 20px; height: 20px;
+  border: 2px dashed #c3c4c7;
+  border-radius: 3px;
+}
+.domc-media__film { color: #8c8f94; font-size: 26px; width: 26px; height: 26px; }
+.domc-media__acties { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.domc-media__naam {
+  font-size: 12px;
+  color: #646970;
+  word-break: break-all;
+  flex-basis: 100%;
+}
+
+/* ── Herhaalvelden ── */
+.domc-veld--breed { max-width: none; }
+.domc-rep__rijen { margin-bottom: 10px; }
+.domc-rij {
+  border: 1px solid #dcdcde;
+  border-radius: 5px;
+  margin-bottom: 8px;
+  background: #fff;
+}
+.domc-rij.is-sleep { opacity: .6; }
+.domc-rij__kop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #f6f7f7;
+  border-bottom: 1px solid #f0f0f1;
+  border-radius: 4px 4px 0 0;
+}
+.domc-rij__greep { cursor: grab; color: #8c8f94; }
+.domc-rij__titel {
+  font-weight: 600;
+  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.domc-rij__weg {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: #b32d2e;
+  padding: 2px;
+  line-height: 1;
+}
+.domc-rij__weg:hover { color: #8a2424; }
+.domc-rij__body {
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.domc-rep--compact .domc-rij__body { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+
+/* ── Opslaanbalk ── */
+.domc-balk {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  margin-top: 8px;
+  background: linear-gradient(to top, #f0f0f1 70%, rgba(240,240,241,0));
+}
+.domc-balk__hint { color: #646970; font-size: 13px; }
+
+@media (max-width: 782px) {
+  .domc-tab { padding: 8px 10px; font-size: 13px; }
+  .domc-tab--extern { margin-left: 0; }
+}
+
+.domc-uitleg--klein {
+  font-size: 12.5px;
+  color: #787c82;
+  margin-top: -10px;
+  padding-left: 11px;
+  border-left: 3px solid #dcdcde;
+}

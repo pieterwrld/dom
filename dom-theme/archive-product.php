@@ -41,15 +41,14 @@ foreach ($cats as $c) {
     if (!in_array($c->slug, $cat_order)) $ordered_cats[] = $c;
 }
 
+// Banner per categorie. Beheer: De Outfitman > Categorieën.
 $cat_banner_img = '';
 $cat_banner_tag = 'Collectie';
-$cat_banner_copy = '';
-if ($is_category && function_exists('dom_category_banner_url')) {
-    $cat_banner_img = dom_category_banner_url($current_cat->term_id);
-}
-if (!$cat_banner_img && $is_category) {
-    $thumb_id = get_term_meta($current_cat->term_id, 'thumbnail_id', true);
-    if ($thumb_id) $cat_banner_img = wp_get_attachment_url($thumb_id);
+if ($is_category) {
+    $cat_banner_img = dom_c_cat_img($current_cat->term_id, 'banner', 'full');
+    if (!$cat_banner_img && function_exists('dom_category_banner_url')) {
+        $cat_banner_img = dom_category_banner_url($current_cat->term_id);
+    }
 }
 
 $brands = get_terms([

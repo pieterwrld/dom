@@ -42,12 +42,14 @@ add_filter('use_block_editor_for_post', function ($use, $post) {
 /**
  * Reviews als eigen berichttype.
  *
- * De WhatsApp-screenshots zaten als bestanden in het thema, dus vervangen kon
- * alleen via een nieuwe release. Hiermee staan ze gewoon in wp-admin: nieuwe
- * review toevoegen is een bericht aanmaken met een uitgelichte afbeelding, en
- * de volgorde sleep je met Post Types Order, dat al actief is.
+ * Dit was de eerste manier om de WhatsApp-screenshots te beheren. Sinds de
+ * plugin De Outfitman Content bestaat, gaan reviews daar via het tabblad
+ * Reviews; dan blijft dit berichttype wel bestaan (zodat niets verdwijnt wat
+ * er al in staat) maar verdwijnt het uit het menu, zodat er één plek is.
  */
 add_action('init', function () {
+    $los_scherm = !function_exists('dom_c_reviews');
+
     register_post_type('dom_review', [
         'labels' => [
             'name'               => __('Reviews', 'dom-theme'),
@@ -61,8 +63,8 @@ add_action('init', function () {
             'menu_name'          => __('Reviews', 'dom-theme'),
         ],
         'public'              => false,
-        'show_ui'             => true,
-        'show_in_menu'        => true,
+        'show_ui'             => $los_scherm,
+        'show_in_menu'        => $los_scherm,
         'show_in_rest'        => true,
         'menu_position'       => 26,
         'menu_icon'           => 'dashicons-format-chat',
@@ -96,6 +98,14 @@ add_action('edit_form_after_title', function ($post) {
  */
 function dom_review_screenshots() {
     $uit = [];
+
+    // Het beheerscherm gaat voor.
+    if (function_exists('dom_c_reviews')) {
+        $uit = dom_c_reviews();
+        if ($uit) {
+            return $uit;
+        }
+    }
 
     $posts = get_posts([
         'post_type'      => 'dom_review',

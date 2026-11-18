@@ -78,6 +78,18 @@ function dom_setting_image_url($key) {
 function dom_marquee_messages() {
     $messages = [];
 
+    // Het beheerscherm gaat voor: De Outfitman > Homepage > Aankondigingsbalk.
+    foreach (dom_c_rows('home.marquee.berichten', []) as $rij) {
+        $tekst = trim((string) ($rij['tekst'] ?? ''));
+        if ($tekst === '') {
+            continue;
+        }
+        $messages[] = ['text' => $tekst, 'is_hot' => !empty($rij['uitgelicht'])];
+    }
+    if ($messages) {
+        return $messages;
+    }
+
     // ACF repeater blijft werken wanneer de plugin aanwezig is.
     if (function_exists('have_rows') && have_rows('marquee_messages', 'option')) {
         while (have_rows('marquee_messages', 'option')) {

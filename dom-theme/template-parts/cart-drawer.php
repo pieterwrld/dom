@@ -5,8 +5,11 @@ $cart_count = 0;
 $cart_total = 0;
 $cart_items = [];
 $saved = 0;
-$FREE = 200;
-$GIFT = 350;
+// Beheer: De Outfitman > Winkelwagen & checkout.
+$FREE = (float) dom_c('winkelwagen.drempels.verzending', 200);
+$GIFT = (float) dom_c('winkelwagen.drempels.cadeau', 350);
+$FREE_LBL = dom_c('winkelwagen.drempels.verzending_label', 'Gratis verzending');
+$GIFT_LBL = dom_c('winkelwagen.drempels.cadeau_label', 'Gratis mystery shirt');
 
 if (function_exists('WC') && WC()->cart) {
     $cart_count = WC()->cart->get_cart_contents_count();
@@ -20,7 +23,9 @@ if (function_exists('WC') && WC()->cart) {
     }
 }
 
-$bar_pct   = min(100, ($cart_total / $GIFT) * 100);
+$bar_pct   = $GIFT > 0 ? min(100, ($cart_total / $GIFT) * 100) : 0;
+// De eerste mijlpaal staat op de plek die bij de ingestelde bedragen hoort.
+$mile_pct  = $GIFT > 0 ? min(100, ($FREE / $GIFT) * 100) : 0;
 $hit200    = $cart_total >= $FREE;
 $hit350    = $cart_total >= $GIFT;
 $rem_free  = max(0, $FREE - $cart_total);
@@ -35,7 +40,7 @@ $eur = function ($v) {
 
   <!-- Header -->
   <div class="drw-h">
-    <b>Winkelwagen (<span id="cartN2"><?php echo $cart_count; ?></span>)</b>
+    <b><?php echo esc_html(dom_c('winkelwagen.teksten.titel', 'Winkelwagen')); ?> (<span id="cartN2"><?php echo $cart_count; ?></span>)</b>
     <button class="ic js-cart-close" aria-label="Sluiten">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
@@ -45,16 +50,16 @@ $eur = function ($v) {
   <div class="ship">
     <p id="shipMsg">
       <?php if ($hit350) : ?>
-        Gratis verzending <b>+</b> mystery shirt unlocked
+        <?php echo esc_html($FREE_LBL); ?> <b>+</b> <?php echo esc_html(mb_strtolower($GIFT_LBL)); ?> gehaald
       <?php elseif ($hit200) : ?>
-        Nog <b><?php echo $eur($rem_gift); ?></b> tot je gratis mystery shirt
+        Nog <b><?php echo $eur($rem_gift); ?></b> tot je <?php echo esc_html(mb_strtolower($GIFT_LBL)); ?>
       <?php else : ?>
-        Nog <b><?php echo $eur($rem_free); ?></b> tot gratis verzending
+        Nog <b><?php echo $eur($rem_free); ?></b> tot <?php echo esc_html(mb_strtolower($FREE_LBL)); ?>
       <?php endif; ?>
     </p>
     <div class="ladder">
       <i id="shipBar" style="width:<?php echo $bar_pct; ?>%"></i>
-      <span class="mile<?php echo $hit200 ? ' hit' : ''; ?>" id="m200" style="left:57.14%">
+      <span class="mile<?php echo $hit200 ? ' hit' : ''; ?>" id="m200" style="left:<?php echo esc_attr(round($mile_pct, 2)); ?>%">
         <span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
       </span>
       <span class="mile<?php echo $hit350 ? ' hit' : ''; ?>" id="m350" style="left:100%">
@@ -63,15 +68,15 @@ $eur = function ($v) {
     </div>
     <div class="mile-lbls">
       <span>&euro;0</span>
-      <span id="t200"<?php echo $hit200 ? ' class="hit"' : ''; ?>>&euro;200 verzending</span>
-      <span id="t350"<?php echo $hit350 ? ' class="hit"' : ''; ?>>&euro;350 mystery shirt</span>
+      <span id="t200"<?php echo $hit200 ? ' class="hit"' : ''; ?>>&euro;<?php echo esc_html(number_format_i18n($FREE)); ?> verzending</span>
+      <span id="t350"<?php echo $hit350 ? ' class="hit"' : ''; ?>>&euro;<?php echo esc_html(number_format_i18n($GIFT)); ?> cadeau</span>
     </div>
     <div class="gift<?php echo $hit350 ? ' on' : ''; ?>" id="gift">
       <span class="gi">
         <svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7S9 2 6.5 4.5 12 7 12 7zM12 7s3-5 5.5-2.5S12 7 12 7z"/></svg>
       </span>
-      <div><b>Gratis mystery shirt</b></div>
-      <span class="st" id="giftSt"><?php echo $hit350 ? 'Unlocked' : 'Nog ' . $eur($rem_gift); ?></span>
+      <div><b><?php echo esc_html($GIFT_LBL); ?></b></div>
+      <span class="st" id="giftSt"><?php echo $hit350 ? esc_html__('Gehaald', 'dom-theme') : 'Nog ' . $eur($rem_gift); ?></span>
     </div>
   </div>
 
@@ -126,7 +131,7 @@ $eur = function ($v) {
       <?php endforeach;
       else : ?>
         <div style="padding:40px 0;text-align:center">
-          <p class="cap" style="margin-bottom:16px">Je winkelwagen is nog leeg.</p>
+          <p class="cap" style="margin-bottom:16px"><?php echo esc_html(dom_c('winkelwagen.teksten.leeg', 'Je winkelwagen is nog leeg.')); ?></p>
           <a href="<?php echo esc_url(dom_shop_url()); ?>" class="btn btn-chrome js-cart-close" style="display:inline-flex">
             <span>Bekijk shop</span>
             <span class="arw">&rarr;</span>
@@ -138,9 +143,9 @@ $eur = function ($v) {
     <!-- Tabs -->
     <div class="ctabs">
       <div class="ctabs-h">
-        <button class="ctab on" data-p="up">Maak het compleet</button>
-        <button class="ctab" data-p="rec">Aanbevolen voor jou</button>
-        <button class="ctab" data-p="seen">Recent bekeken</button>
+        <button class="ctab on" data-p="up"><?php echo esc_html(dom_c('winkelwagen.teksten.tab_1', 'Maak het compleet')); ?></button>
+        <button class="ctab" data-p="rec"><?php echo esc_html(dom_c('winkelwagen.teksten.tab_2', 'Aanbevolen voor jou')); ?></button>
+        <button class="ctab" data-p="seen"><?php echo esc_html(dom_c('winkelwagen.teksten.tab_3', 'Recent bekeken')); ?></button>
       </div>
       <?php
       /**
@@ -232,7 +237,7 @@ $eur = function ($v) {
       <span class="vv" id="cartTotal"><?php echo $eur($cart_total); ?><?php if ($saved > 0) : ?><small>Je bespaart <?php echo $eur($saved); ?></small><?php endif; ?></span>
     </div>
     <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : dom_shop_url()); ?>" class="btn btn-chrome">
-      <span>Afrekenen</span>
+      <span><?php echo esc_html(dom_c('winkelwagen.teksten.knop', 'Afrekenen')); ?></span>
       <span class="arw">&rarr;</span>
     </a>
     <div class="ctrust">
@@ -243,7 +248,7 @@ $eur = function ($v) {
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
       </div>
-      <span><b>1.200+</b> tevreden klanten</span>
+      <span><?php echo esc_html(dom_c('winkelwagen.teksten.trust', '1.200+ tevreden klanten')); ?></span>
     </div>
   </div>
   <?php endif; ?>

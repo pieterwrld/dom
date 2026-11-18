@@ -13,43 +13,38 @@ defined('ABSPATH') || exit;
  * er niet, dan valt die kaart weg.
  */
 
-$uploads   = wp_get_upload_dir();
-$base_url  = $uploads['baseurl'] ?? '';
-$base_dir  = $uploads['basedir'] ?? '';
-
 $clips = [];
-foreach ([
-    ['Furkan',                      'Shop de look', '/2026/11/Furkan-DKM.mp4'],
-    ['Fato YT',                     'Shop de look', '/2026/11/DOM-FATO.mp4'],
-    ['Essentials Trainingspakken',  'Shop de look', '/2026/11/DOM-VIDEO4.mp4'],
-    ['De Outfitman',                'Shop de look', '/2026/11/DOM-Naam.mp4'],
-    ['De Outfitman',                'Shop de look', '/2026/11/DOM-ALL.mp4'],
-] as [$name, $sub, $file]) {
-    if (!$base_url || !file_exists($base_dir . $file)) {
-        continue;
-    }
-    $clips[] = ['name' => $name, 'sub' => $sub, 'src' => $base_url . $file];
+
+/**
+ * Het beheerscherm gaat voor: De Outfitman > Gedragen door. Staat daar nog
+ * niets, dan vallen we terug op de clips die al in de mediabibliotheek staan.
+ */
+foreach (dom_c_ugc() as $rij) {
+    $clips[] = [
+        'name'   => $rij['naam'] ?: 'De Outfitman',
+        'sub'    => $rij['sub'] ?: __('Shop de look', 'dom-theme'),
+        'src'    => $rij['src'],
+        'poster' => $rij['poster'],
+        'link'   => $rij['link'],
+    ];
 }
 
-// Beheerde data gaat voor, als die er ooit komt.
-if (function_exists('get_field')) {
-    $acf = get_field('influencers', 'option');
-    if (is_array($acf) && $acf) {
-        $managed = [];
-        foreach ($acf as $row) {
-            $src = '';
-            if (!empty($row['video'])) {
-                $src = is_array($row['video']) ? ($row['video']['url'] ?? '') : $row['video'];
-            } elseif (!empty($row['image'])) {
-                $src = is_array($row['image']) ? ($row['image']['url'] ?? '') : $row['image'];
-            }
-            if ($src) {
-                $managed[] = ['name' => $row['name'] ?? '', 'sub' => $row['handle'] ?? '', 'src' => $src];
-            }
+if (!$clips) {
+    $uploads  = wp_get_upload_dir();
+    $base_url = $uploads['baseurl'] ?? '';
+    $base_dir = $uploads['basedir'] ?? '';
+
+    foreach ([
+        ['Furkan',                      'Shop de look', '/2026/11/Furkan-DKM.mp4'],
+        ['Fato YT',                     'Shop de look', '/2026/11/DOM-FATO.mp4'],
+        ['Essentials Trainingspakken',  'Shop de look', '/2026/11/DOM-VIDEO4.mp4'],
+        ['De Outfitman',                'Shop de look', '/2026/11/DOM-Naam.mp4'],
+        ['De Outfitman',                'Shop de look', '/2026/11/DOM-ALL.mp4'],
+    ] as [$name, $sub, $file]) {
+        if (!$base_url || !file_exists($base_dir . $file)) {
+            continue;
         }
-        if ($managed) {
-            $clips = $managed;
-        }
+        $clips[] = ['name' => $name, 'sub' => $sub, 'src' => $base_url . $file, 'poster' => '', 'link' => ''];
     }
 }
 
@@ -62,9 +57,9 @@ $dom_cover_shop = dom_shop_url();
 <section class="sec cover-sec" id="wornby">
   <div class="wrap">
     <div class="cover-head" data-rv="up">
-      <div class="eyebrow"><i></i><span class="lbl"><?php esc_html_e('Community', 'dom-theme'); ?></span></div>
-      <h2 class="split"><?php esc_html_e('Gedragen door', 'dom-theme'); ?></h2>
-      <p class="tx"><?php esc_html_e('Ontdek De Outfitman door de ogen van onze creators.', 'dom-theme'); ?></p>
+      <div class="eyebrow"><i></i><span class="lbl"><?php echo esc_html(dom_c('home.ugc.eyebrow', __('Community', 'dom-theme'))); ?></span></div>
+      <h2 class="split"><?php echo esc_html(dom_c('home.ugc.titel', __('Gedragen door', 'dom-theme'))); ?></h2>
+      <p class="tx"><?php echo esc_html(dom_c('home.ugc.tekst', __('Ontdek De Outfitman door de ogen van onze creators.', 'dom-theme'))); ?></p>
       <div class="cover-soc">
         <a href="https://www.tiktok.com/@deoutfitman" target="_blank" rel="noopener" aria-label="TikTok">
           <svg viewBox="0 0 24 24"><path d="M16 3c.4 2.3 1.9 3.9 4 4.2v3c-1.5.1-2.9-.3-4.1-1.1v6.2c0 3.6-2.9 6.2-6.2 5.6-2.5-.5-4.4-2.7-4.4-5.3 0-3.3 3-5.9 6.3-5.3v3.1c-1.4-.5-2.8.5-2.8 2 0 1.2 1 2.2 2.2 2.2s2.2-1 2.2-2.2V3z"/></svg>
@@ -80,6 +75,7 @@ $dom_cover_shop = dom_shop_url();
     <?php foreach ($clips as $clip) : ?>
       <div class="cv" data-name="<?php echo esc_attr($clip['name']); ?>" data-sub="<?php echo esc_attr($clip['sub']); ?>">
         <video src="<?php echo esc_url($clip['src']); ?>" muted loop playsinline preload="metadata"
+               <?php if (!empty($clip['poster'])) : ?>poster="<?php echo esc_url($clip['poster']); ?>"<?php endif; ?>
                aria-label="<?php echo esc_attr($clip['name']); ?>"></video>
         <button type="button" class="cv-snd" aria-pressed="false"
                 aria-label="<?php esc_attr_e('Geluid aanzetten', 'dom-theme'); ?>">
@@ -93,7 +89,7 @@ $dom_cover_shop = dom_shop_url();
         <span class="rim"></span>
         <div class="cvb">
           <b><?php echo esc_html($clip['name']); ?></b>
-          <a class="shop" href="<?php echo esc_url($dom_cover_shop); ?>"><?php esc_html_e('Shop nu', 'dom-theme'); ?> <span class="arw">&rarr;</span></a>
+          <a class="shop" href="<?php echo esc_url(!empty($clip['link']) ? $clip['link'] : $dom_cover_shop); ?>"><?php esc_html_e('Shop nu', 'dom-theme'); ?> <span class="arw">&rarr;</span></a>
         </div>
       </div>
     <?php endforeach; ?>

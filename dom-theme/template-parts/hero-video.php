@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 /**
  * Hero.
  *
- * Staat er een Black Friday-banner klaar, dan is dat de hero: de banner draagt
+ * Staat er een Black Friday-banner, dan is dat de hero: de banner draagt
  * zijn eigen tekst, dus er komt geen kop of badge overheen. Alleen een knop,
  * onderin gecentreerd op een donkere verloopband zodat hij leesbaar blijft
  * waar de banner ook licht is.
@@ -13,17 +13,43 @@ defined('ABSPATH') || exit;
  * elkaar, dus ze wisselen via <picture> op breedte.
  *
  * Zonder banner valt alles terug op de oorspronkelijke hero met video of foto.
+ *
+ * Alle teksten en beelden komen uit het beheerscherm (De Outfitman > Homepage).
+ * De waarden die hier als terugval staan zijn wat de site toont zolang daar
+ * niets is ingevuld.
  */
 
-$banner_m = function_exists('dom_setting_image_url') ? dom_setting_image_url('bf_banner_mobile') : '';
-$banner_d = function_exists('dom_setting_image_url') ? dom_setting_image_url('bf_banner_desktop') : '';
+$banner_m = dom_c_img('home.hero.banner_mobile');
+$banner_d = dom_c_img('home.hero.banner_desktop');
+
+// Wat eerder via de Customizer was ingesteld blijft gelden tot het in het
+// nieuwe scherm wordt overschreven.
+if (!$banner_m && function_exists('dom_setting_image_url')) {
+    $banner_m = dom_setting_image_url('bf_banner_mobile');
+}
+if (!$banner_d && function_exists('dom_setting_image_url')) {
+    $banner_d = dom_setting_image_url('bf_banner_desktop');
+}
+
 $shop_url = dom_shop_url();
+$cta_link = dom_c('home.hero.cta_link', '');
+$cta_link = $cta_link ?: $shop_url;
+$cta_tekst = dom_c('home.hero.cta', __('Shop alle collecties', 'dom-theme'));
+
+/** De beloftes in de doorlopende balk onder de hero. */
+$trust_items = dom_c_rows('home.trust.items', [
+    ['icoon' => 'truck',    'tekst' => 'Voor 17:00 besteld, morgen in huis'],
+    ['icoon' => 'shield',   'tekst' => 'Nr. 1 in kwaliteit'],
+    ['icoon' => 'check',    'tekst' => 'Voor verzending nagekeken'],
+    ['icoon' => 'whatsapp', 'tekst' => 'Persoonlijk advies, 24/7 via WhatsApp'],
+    ['icoon' => 'truck',    'tekst' => 'Gratis verzending vanaf €200'],
+]);
 
 if ($banner_m || $banner_d) :
     $primary = $banner_m ?: $banner_d;
 ?>
 <section class="hero-banner-sec" id="hero">
-  <a class="hero-banner" href="<?php echo esc_url($shop_url); ?>">
+  <a class="hero-banner" href="<?php echo esc_url($cta_link); ?>">
     <picture>
       <?php if ($banner_d) : ?>
         <source media="(min-width:761px)" srcset="<?php echo esc_url($banner_d); ?>">
@@ -33,69 +59,44 @@ if ($banner_m || $banner_d) :
            loading="eager" fetchpriority="high" decoding="async">
     </picture>
     <span class="hero-banner__cta">
-      <?php esc_html_e('Shop alle collecties', 'dom-theme'); ?>
+      <?php echo esc_html($cta_tekst); ?>
       <span class="arw">&rarr;</span>
     </span>
   </a>
 </section>
 
+<?php if ($trust_items) : ?>
 <!-- Doorlopende trustbalk: naast elkaar in plaats van onder elkaar.
      De rij staat twee keer in de DOM, zodat de animatie naadloos rondloopt. -->
-<div class="htm" aria-label="Onze beloftes">
+<div class="htm" aria-label="<?php esc_attr_e('Onze beloftes', 'dom-theme'); ?>">
   <div class="htm-t">
-    <div class="htm-g">
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-          <b>Voor 17:00 besteld, morgen in huis</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-          <b>Nr. 1 in kwaliteit</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-          <b>Voor verzending nagekeken</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-          <b>Persoonlijk advies, 24/7 via WhatsApp</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-          <b>Gratis verzending vanaf €200</b>
-        </span>
-    </div>
-    <div class="htm-g" aria-hidden="true">
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-          <b>Voor 17:00 besteld, morgen in huis</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-          <b>Nr. 1 in kwaliteit</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
-          <b>Voor verzending nagekeken</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-          <b>Persoonlijk advies, 24/7 via WhatsApp</b>
-        </span>
-        <span class="htm-i">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-          <b>Gratis verzending vanaf €200</b>
-        </span>
-    </div>
+    <?php for ($kopie = 0; $kopie < 2; $kopie++) : ?>
+      <div class="htm-g"<?php echo $kopie ? ' aria-hidden="true"' : ''; ?>>
+        <?php foreach ($trust_items as $item) : ?>
+          <span class="htm-i">
+            <?php echo dom_icon($item['icoon'] ?? 'check'); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+            <b><?php echo esc_html($item['tekst'] ?? ''); ?></b>
+          </span>
+        <?php endforeach; ?>
+      </div>
+    <?php endfor; ?>
   </div>
 </div>
+<?php endif; ?>
 
 <?php
     return;
 endif;
 
-$video_url   = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_video') : '';
-$hero_poster = function_exists('dom_setting_image_url') ? dom_setting_image_url('hero_image') : '';
+$video_url   = dom_c_img('home.hero.video');
+$hero_poster = dom_c_img('home.hero.image');
+
+if (!$video_url && function_exists('dom_setting_image_url')) {
+    $video_url = dom_setting_image_url('hero_video');
+}
+if (!$hero_poster && function_exists('dom_setting_image_url')) {
+    $hero_poster = dom_setting_image_url('hero_image');
+}
 ?>
 <section class="hero<?php echo ($video_url || $hero_poster) ? '' : ' hero--nomedia'; ?>" id="hero">
   <div class="hero-media">
@@ -111,25 +112,21 @@ $hero_poster = function_exists('dom_setting_image_url') ? dom_setting_image_url(
 
   <div class="wrap hero-in">
     <h1 class="d1 split">
-      <span class="l1"><?php esc_html_e('Nr. 1 in merkkleding', 'dom-theme'); ?></span>
-      <span class="l2"><?php esc_html_e('Voor elke', 'dom-theme'); ?> <span class="acc"><?php esc_html_e('man', 'dom-theme'); ?></span></span>
+      <span class="l1"><?php echo esc_html(dom_c('home.hero.titel_1', __('Nr. 1 in merkkleding', 'dom-theme'))); ?></span>
+      <span class="l2"><?php echo esc_html(dom_c('home.hero.titel_2', __('Voor elke man', 'dom-theme'))); ?></span>
     </h1>
     <div class="hero-cta" data-rv="up" style="--d:520ms">
-      <a href="<?php echo esc_url($shop_url); ?>" class="btn btn-bf"><?php esc_html_e('Shop alle collecties', 'dom-theme'); ?> <span class="arw">&rarr;</span></a>
+      <a href="<?php echo esc_url($cta_link); ?>" class="btn btn-bf"><?php echo esc_html($cta_tekst); ?> <span class="arw">&rarr;</span></a>
     </div>
-    <div class="hero-trust" data-rv="up" style="--d:640ms">
-      <div class="ht">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-        <div><b><?php esc_html_e('Voor 17:00', 'dom-theme'); ?></b><span><?php esc_html_e('Morgen in huis', 'dom-theme'); ?></span></div>
+    <?php if ($trust_items) : ?>
+      <div class="hero-trust" data-rv="up" style="--d:640ms">
+        <?php foreach (array_slice($trust_items, 0, 3) as $item) : ?>
+          <div class="ht">
+            <?php echo dom_icon($item['icoon'] ?? 'check'); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+            <div><b><?php echo esc_html($item['tekst'] ?? ''); ?></b></div>
+          </div>
+        <?php endforeach; ?>
       </div>
-      <div class="ht">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        <div><b><?php esc_html_e('Gecontroleerd', 'dom-theme'); ?></b><span><?php esc_html_e('Voor verzending nagekeken', 'dom-theme'); ?></span></div>
-      </div>
-      <div class="ht">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-        <div><b><?php esc_html_e('Persoonlijk advies', 'dom-theme'); ?></b><span><?php esc_html_e('24/7 via WhatsApp', 'dom-theme'); ?></span></div>
-      </div>
-    </div>
+    <?php endif; ?>
   </div>
 </section>

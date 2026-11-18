@@ -52,35 +52,20 @@ $dom_category_badge = static function ($slug) use ($on_sale_ids) {
 $shop_url = dom_shop_url();
 ?>
 <div class="sec-t" data-rv="up">
-  <div class="eyebrow"><i></i><span class="lbl">Collecties</span></div>
+  <div class="eyebrow"><i></i><span class="lbl"><?php echo esc_html(dom_c('home.collecties.eyebrow', 'Collecties')); ?></span></div>
   <div class="sec-h">
-    <h2 class="d2 split">Shop per categorie</h2>
-    <a href="<?php echo esc_url($shop_url); ?>" class="lk">Alle producten <span class="arw">&rarr;</span></a>
+    <h2 class="d2 split"><?php echo esc_html(dom_c('home.collecties.titel', 'Shop per categorie')); ?></h2>
+    <a href="<?php echo esc_url($shop_url); ?>" class="lk"><?php echo esc_html(dom_c('home.collecties.link', 'Alle producten')); ?> <span class="arw">&rarr;</span></a>
   </div>
 </div>
 
 <div class="cgrid">
   <?php foreach ($tiles as $i => $cat) :
-    $thumb_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
-    $img_url  = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'product-card') : '';
+    $img_url  = dom_c_cat_img($cat->term_id, 'raster', 'product-card');
     $link     = dom_term_url($cat);
     $delay    = $i * 50;
     $is_sale  = in_array($cat->slug, $sale_slugs, true);
     $badge    = $dom_category_badge($cat->slug);
-
-    // Fallback: use first product's featured image if no category thumbnail
-    if (!$img_url) {
-        $cat_products = get_posts([
-            'post_type'      => 'product',
-            'posts_per_page' => 1,
-            'post_status'    => 'publish',
-            'tax_query'      => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $cat->slug]],
-            'fields'         => 'ids',
-        ]);
-        if ($cat_products) {
-            $img_url = get_the_post_thumbnail_url($cat_products[0], 'product-card');
-        }
-    }
 
     $min_price = '';
     $cheapest  = get_posts([
