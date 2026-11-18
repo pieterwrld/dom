@@ -81,6 +81,15 @@ $dom_cover_shop = dom_shop_url();
       <div class="cv" data-name="<?php echo esc_attr($clip['name']); ?>" data-sub="<?php echo esc_attr($clip['sub']); ?>">
         <video src="<?php echo esc_url($clip['src']); ?>" muted loop playsinline preload="metadata"
                aria-label="<?php echo esc_attr($clip['name']); ?>"></video>
+        <button type="button" class="cv-snd" aria-pressed="false"
+                aria-label="<?php esc_attr_e('Geluid aanzetten', 'dom-theme'); ?>">
+          <svg class="i-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5L6 9H3v6h3l5 4z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+          <svg class="i-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+          </svg>
+        </button>
         <span class="rim"></span>
         <div class="cvb">
           <b><?php echo esc_html($clip['name']); ?></b>
@@ -129,6 +138,41 @@ document.addEventListener('DOMContentLoaded', function () {
   sync();
   new MutationObserver(sync).observe(host, {
     subtree: true, attributes: true, attributeFilter: ['class']
+  });
+
+  /* Geluid per clip. Browsers laten video alleen automatisch starten als hij
+     gedempt is, dus alles begint zonder geluid en de bezoeker zet het zelf aan.
+     Eén clip tegelijk: zet je er een aan, dan gaan de andere uit. */
+  host.addEventListener('click', function (e) {
+    var knop = e.target.closest('.cv-snd');
+    if (!knop) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    var kaart = knop.closest('.cv');
+    var video = kaart && kaart.querySelector('video');
+    if (!video) return;
+
+    var aan = video.muted;
+
+    host.querySelectorAll('.cv').forEach(function (andere) {
+      var v = andere.querySelector('video');
+      var k = andere.querySelector('.cv-snd');
+      if (!v || !k) return;
+      v.muted = true;
+      k.setAttribute('aria-pressed', 'false');
+      k.setAttribute('aria-label', 'Geluid aanzetten');
+      andere.classList.remove('snd-on');
+    });
+
+    if (aan) {
+      video.muted = false;
+      knop.setAttribute('aria-pressed', 'true');
+      knop.setAttribute('aria-label', 'Geluid uitzetten');
+      kaart.classList.add('snd-on');
+      var p = video.play();
+      if (p && p.catch) p.catch(function () {});
+    }
   });
 });
 </script>

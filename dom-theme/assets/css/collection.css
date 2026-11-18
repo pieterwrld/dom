@@ -47,9 +47,12 @@
 .fwrap{position:sticky;top:var(--hdr);z-index:40;background:rgba(255,255,255,.93);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.fbar{display:flex;align-items:center;gap:7px;flex-wrap:nowrap;padding:11px 0;overflow-x:auto;
-  overflow-y:visible;scrollbar-width:none}
-.fbar::-webkit-scrollbar{display:none}
+/* Deze balk stond op overflow-x:auto. Een scroll-container knipt absoluut
+   gepositioneerde kinderen af, dus het filterpaneel verdween achter de banner,
+   hoe hoog de z-index ook stond. Bovendien kon de pagina erdoor zijwaarts
+   schuiven. De balk wikkelt nu in plaats van te scrollen. */
+.fbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:11px 0;
+  position:relative;z-index:20}
 .fbar>*{flex:0 0 auto}
 .fgrp{position:relative}
 .fbtn{height:38px;padding:0 13px;border:1px solid var(--line);display:inline-flex;align-items:center;
@@ -62,7 +65,7 @@
 .fbtn.on svg{transform:rotate(180deg)}
 .fbtn b{font-family:var(--mono);font-weight:700;font-size:11px;color:var(--muted)}
 .fbtn.act b{color:rgba(255,255,255,.65)}
-.fpop{position:absolute;top:calc(100% + 6px);left:0;z-index:30;min-width:260px;background:#fff;
+.fpop{position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:260px;background:#fff;
   border:1px solid var(--ink);padding:15px;box-shadow:0 26px 60px -28px rgba(10,10,10,.4);
   opacity:0;visibility:hidden;transform:translateY(-6px);
   transition:opacity .26s,transform .32s var(--e),visibility .26s}
@@ -99,7 +102,7 @@
 .chip button:hover{opacity:1}
 
 /* ---- categoriebanner ---- */
-.cbanner{position:relative;display:block;margin:clamp(14px,2vw,24px) 0 clamp(16px,2.4vw,30px);
+.cbanner{position:relative;z-index:1;display:block;margin:clamp(14px,2vw,24px) 0 clamp(16px,2.4vw,30px);
   overflow:hidden;background:var(--surface);min-height:clamp(150px,17vw,220px)}
 .cbanner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;
   transition:transform 1.2s var(--e),opacity .45s}
@@ -125,8 +128,10 @@
 .pdots{position:absolute;left:0;right:0;bottom:8px;z-index:3;display:flex;justify-content:center;gap:4px;
   opacity:0;transition:opacity .3s}
 .pmedia:hover .pdots,.pmedia.touched .pdots{opacity:1}
-.pdot{width:5px;height:5px;background:rgba(255,255,255,.55);transition:all .3s}
-.pdot.on{background:#fff;width:15px}
+/* Eerst waren inactieve stippen vierkant en alleen de actieve een streepje,
+   wat als twee verschillende systemen oogde. Nu overal streepjes. */
+.pdot{width:15px;height:2px;background:rgba(255,255,255,.45);transition:background .3s}
+.pdot.on{background:#fff}
 .parrow{position:absolute;top:50%;z-index:3;width:28px;height:28px;background:rgba(255,255,255,.92);
   backdrop-filter:blur(8px);display:grid;place-items:center;transform:translateY(-50%) scale(.85);
   opacity:0;transition:all .28s}

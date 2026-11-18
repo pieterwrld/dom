@@ -10,7 +10,7 @@ get_header();
 
 <?php get_template_part('template-parts/hero-video'); ?>
 
-<section class="sec" id="collecties">
+<section class="sec" id="collecties" style="padding-bottom:0">
   <div class="wrap">
     <?php get_template_part('template-parts/collection-grid'); ?>
   </div>

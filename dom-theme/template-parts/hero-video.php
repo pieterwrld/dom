@@ -39,19 +39,53 @@ if ($banner_m || $banner_d) :
   </a>
 </section>
 
-<div class="wrap">
-  <div class="hero-trust hero-trust--under" data-rv="up">
-    <div class="ht">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
-      <div><b><?php esc_html_e('Voor 17:00', 'dom-theme'); ?></b><span><?php esc_html_e('Morgen in huis', 'dom-theme'); ?></span></div>
+<!-- Doorlopende trustbalk: naast elkaar in plaats van onder elkaar.
+     De rij staat twee keer in de DOM, zodat de animatie naadloos rondloopt. -->
+<div class="htm" aria-label="Onze beloftes">
+  <div class="htm-t">
+    <div class="htm-g">
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+          <b>Voor 17:00 besteld, morgen in huis</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          <b>Nr. 1 in kwaliteit</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <b>Voor verzending nagekeken</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
+          <b>Persoonlijk advies, 24/7 via WhatsApp</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+          <b>Gratis verzending vanaf €200</b>
+        </span>
     </div>
-    <div class="ht">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-      <div><b><?php esc_html_e('Gecontroleerd', 'dom-theme'); ?></b><span><?php esc_html_e('Voor verzending nagekeken', 'dom-theme'); ?></span></div>
-    </div>
-    <div class="ht">
-      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
-      <div><b><?php esc_html_e('Persoonlijk advies', 'dom-theme'); ?></b><span><?php esc_html_e('24/7 via WhatsApp', 'dom-theme'); ?></span></div>
+    <div class="htm-g" aria-hidden="true">
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+          <b>Voor 17:00 besteld, morgen in huis</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          <b>Nr. 1 in kwaliteit</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <b>Voor verzending nagekeken</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
+          <b>Persoonlijk advies, 24/7 via WhatsApp</b>
+        </span>
+        <span class="htm-i">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+          <b>Gratis verzending vanaf €200</b>
+        </span>
     </div>
   </div>
 </div>

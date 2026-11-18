@@ -72,26 +72,8 @@
     <div class="menu-b">
         <?php
         // Categories live under "Heren" parent
-        $heren_menu = get_term_by('slug', 'heren', 'product_cat');
-        $menu_parent = $heren_menu ? $heren_menu->term_id : 0;
-        $menu_categories = get_terms([
-            'taxonomy'   => 'product_cat',
-            'hide_empty' => false,
-            'parent'     => $menu_parent,
-            'orderby'    => 'menu_order',
-            'order'      => 'ASC',
-        ]);
-        // Add SALE to the menu
-        $sale_menu = get_term_by('slug', 'sale', 'product_cat');
-        if ($sale_menu && !is_wp_error($sale_menu) && !is_wp_error($menu_categories)) {
-            $menu_categories[] = $sale_menu;
-        }
-
-        $menu_exclude = ['uncategorized', 'bestsellers', 'nieuwste-collectie', 'truien-vesten'];
-        if (!is_wp_error($menu_categories) && !empty($menu_categories)) :
-            $menu_categories = array_filter($menu_categories, function($c) use ($menu_exclude) {
-                return !in_array($c->slug, $menu_exclude, true);
-            });
+        $menu_categories = function_exists('dom_ordered_categories') ? dom_ordered_categories() : [];
+        if (!empty($menu_categories)) :
             foreach ($menu_categories as $cat) :
                 $thumb_id = get_term_meta($cat->term_id, 'thumbnail_id', true);
                 $thumb_url = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'thumbnail') : '';

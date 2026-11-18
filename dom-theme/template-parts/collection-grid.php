@@ -1,56 +1,8 @@
 <?php
 defined('ABSPATH') || exit;
 
-$preferred_order = [
-    'sneakers', 'jassen', 'jeans', 'trainingspakken',
-    'sweaters-hoodies', 't-shirts', 'zwembroeken', 'petten', 'sale',
-];
-
-// Categories live under "Heren" parent
-$heren = get_term_by('slug', 'heren', 'product_cat');
-$parent_id = $heren ? $heren->term_id : 0;
-
-$all_cats = get_terms([
-    'taxonomy'   => 'product_cat',
-    'hide_empty' => false,
-    'parent'     => $parent_id,
-]);
-
-// Fallback to top-level if no children found
-if (is_wp_error($all_cats) || empty($all_cats)) {
-    $all_cats = get_terms([
-        'taxonomy'   => 'product_cat',
-        'hide_empty' => false,
-        'parent'     => 0,
-    ]);
-    if (is_wp_error($all_cats)) {
-        $all_cats = [];
-    }
-}
-
-// Also add SALE (top-level) to the mix
-$sale_term = get_term_by('slug', 'sale', 'product_cat');
-if ($sale_term && !is_wp_error($sale_term)) {
-    $all_cats[] = $sale_term;
-}
-
-$exclude_slugs = ['uncategorized', 'bestsellers', 'heren', 'nieuwste-collectie', 'truien-vesten'];
-$cats_by_slug  = [];
-foreach ($all_cats as $cat) {
-    if (in_array($cat->slug, $exclude_slugs, true)) continue;
-    $cats_by_slug[$cat->slug] = $cat;
-}
-
-$ordered = [];
-foreach ($preferred_order as $slug) {
-    if (isset($cats_by_slug[$slug])) {
-        $ordered[] = $cats_by_slug[$slug];
-        unset($cats_by_slug[$slug]);
-    }
-}
-foreach ($cats_by_slug as $cat) {
-    $ordered[] = $cat;
-}
+// Dezelfde volgorde als het navigatiemenu, uit één bron.
+$ordered = function_exists('dom_ordered_categories') ? dom_ordered_categories(true) : [];
 
 $tiles = array_slice($ordered, 0, 9);
 

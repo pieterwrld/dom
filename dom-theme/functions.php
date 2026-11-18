@@ -136,6 +136,68 @@ function dom_max_sale_percentage() {
 }
 
 /**
+ * De categorieën in vaste volgorde.
+ *
+ * Het menu sorteerde op menu_order en het collectiegrid op een eigen lijst,
+ * waardoor dezelfde categorieën in beide een andere volgorde kregen en het
+ * menu met Petten begon. Beide gebruiken nu deze functie.
+ *
+ * @param bool $alleen_grid Laat de categorieën weg die niet op de homepage horen.
+ * @return WP_Term[]
+ */
+function dom_ordered_categories($alleen_grid = false) {
+    static $cache = [];
+    $sleutel = $alleen_grid ? 'grid' : 'menu';
+    if (isset($cache[$sleutel])) {
+        return $cache[$sleutel];
+    }
+
+    $volgorde = [
+        'sneakers', 'jassen', 'jeans', 'trainingspakken',
+        'sweaters-hoodies', 't-shirts', 'zwembroeken', 'slippers', 'sale',
+        'petten', 'tassen', 'brillen',
+    ];
+
+    $heren  = get_term_by('slug', 'heren', 'product_cat');
+    $termen = get_terms([
+        'taxonomy'   => 'product_cat',
+        'hide_empty' => false,
+        'parent'     => $heren ? $heren->term_id : 0,
+    ]);
+    if (is_wp_error($termen)) {
+        $termen = [];
+    }
+
+    // SALE staat op het hoogste niveau, niet onder Heren.
+    $sale = get_term_by('slug', 'sale', 'product_cat');
+    if ($sale && !is_wp_error($sale)) {
+        $termen[] = $sale;
+    }
+
+    $overslaan = ['uncategorized', 'bestsellers', 'heren', 'nieuwste-collectie', 'truien-vesten'];
+    $op_slug   = [];
+    foreach ($termen as $term) {
+        if (!in_array($term->slug, $overslaan, true)) {
+            $op_slug[$term->slug] = $term;
+        }
+    }
+
+    $uit = [];
+    foreach ($volgorde as $slug) {
+        if (isset($op_slug[$slug])) {
+            $uit[] = $op_slug[$slug];
+            unset($op_slug[$slug]);
+        }
+    }
+    foreach ($op_slug as $term) {
+        $uit[] = $term;
+    }
+
+    $cache[$sleutel] = $uit;
+    return $uit;
+}
+
+/**
  * De URL van een term, of een lege string als die er niet is.
  *
  * get_term_link() geeft een WP_Error terug wanneer de term niet bestaat. Zo'n
