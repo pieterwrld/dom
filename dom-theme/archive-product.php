@@ -110,7 +110,7 @@ if (is_wp_error($brands)) $brands = [];
             <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="fpop" id="fpPop">
-            <div class="ft">Maximale prijs</div>
+            <div class="fgh">Maximale prijs</div>
             <input type="range" class="rng" id="rng" min="30" max="500" step="10" value="500">
             <div class="rngv"><span>&euro;30</span><span id="rngNow">&euro;500+</span></div>
             <button class="fclear" data-clear="price">Wissen</button>
@@ -122,9 +122,9 @@ if (is_wp_error($brands)) $brands = [];
             <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="fpop" id="fsPop">
-            <div class="ft">Kleding</div>
+            <div class="fgh">Kleding</div>
             <div class="szg" id="szClothes"></div>
-            <div class="ft" style="margin-top:13px">Schoenen</div>
+            <div class="fgh" style="margin-top:13px">Schoenen</div>
             <div class="szg" id="szShoes"></div>
             <button class="fclear" data-clear="size">Wissen</button>
           </div>
@@ -136,7 +136,7 @@ if (is_wp_error($brands)) $brands = [];
             <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="fpop" id="fbPop">
-            <div class="ft">Merken</div>
+            <div class="fgh">Merken</div>
             <div class="brg" id="brandList">
               <?php foreach ($brands as $brand) : ?>
                 <button class="brb" data-b="<?php echo esc_attr($brand->slug); ?>">
@@ -157,7 +157,7 @@ if (is_wp_error($brands)) $brands = [];
               <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fpop" id="soPop" style="left:auto;right:0;min-width:215px">
-              <div class="ft">Sorteer op</div>
+              <div class="fgh">Sorteer op</div>
               <div style="display:grid;gap:1px">
                 <button class="fclear" style="margin:0;border:0;text-align:left;padding:0 7px;height:32px" data-sort="popularity">Populair</button>
                 <button class="fclear" style="margin:0;border:0;text-align:left;padding:0 7px;height:32px" data-sort="price">Prijs laag &rarr; hoog</button>

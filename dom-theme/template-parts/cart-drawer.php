@@ -243,7 +243,7 @@ $eur = function ($v) {
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
       </div>
-      <span><b>1200+</b> klanten geholpen</span>
+      <span><b>1.200+</b> tevreden klanten</span>
     </div>
   </div>
   <?php endif; ?>

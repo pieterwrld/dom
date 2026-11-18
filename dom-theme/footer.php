@@ -39,8 +39,8 @@
           <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,1 12.6,7.4 19.5,7.6 14,11.8 15.8,18.8 10,14.8 4.2,18.8 6,11.8 0.5,7.6 7.4,7.4" fill="currentColor"/></svg>
           <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,1 12.6,7.4 19.5,7.6 14,11.8 15.8,18.8 10,14.8 4.2,18.8 6,11.8 0.5,7.6 7.4,7.4" fill="currentColor"/></svg>
         </div>
-        <b>1200+ klanten</b>
-        <span>Geholpen via WhatsApp</span>
+        <b>1.200+</b>
+        <span>Tevreden klanten</span>
       </div>
       <div class="ftt">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -60,39 +60,7 @@
   <!-- 4-column grid -->
   <div class="ft-top wrap">
 
-    <!-- Newsletter -->
-    <div class="ft-news">
-      <h4>Blijf op de hoogte</h4>
-      <p>Ontvang exclusieve aanbiedingen, early access op nieuwe collecties en style tips — direct in je inbox.</p>
-      <?php
-      // Alleen een werkend formulier tonen. MC4WP is de aanmeldlijst; zonder die
-      // plugin zou het formulier inzendingen stilzwijgend weggooien.
-      if (function_exists('mc4wp_show_form')) {
-          mc4wp_show_form();
-      } else {
-          printf(
-              '<p class="nform-alt"><a class="btn btn-bf" href="%s" target="_blank" rel="noopener">Aanmelden via WhatsApp</a></p>',
-              esc_url('https://wa.me/31616264544')
-          );
-      }
-      ?>
-    </div>
 
-    <!-- Shop -->
-    <div class="ft-col">
-      <h5>Shop</h5>
-      <ul>
-        <li><a href="<?php echo esc_url(dom_shop_url()); ?>">Alle producten</a></li>
-        <?php
-        $ft_cats = ['sneakers','jassen','jeans','trainingspakken','sweaters-hoodies','t-shirts','sale'];
-        foreach ($ft_cats as $slug) :
-          $term = get_term_by('slug', $slug, 'product_cat');
-          if ($term) : ?>
-            <li><a href="<?php echo esc_url(dom_term_url($term)); ?>"><?php echo esc_html($term->name); ?></a></li>
-          <?php endif;
-        endforeach; ?>
-      </ul>
-    </div>
 
     <!-- Klantenservice -->
     <div class="ft-col">

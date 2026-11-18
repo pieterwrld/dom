@@ -3,29 +3,14 @@ defined('ABSPATH') || exit;
 
 /**
  * Reviews: echte WhatsApp-screenshots.
- * ACF-veld 'homepage_reviews' heeft voorrang; anders de screenshots die in het
- * thema zitten (assets/img/reviews). Er worden nooit namen of teksten verzonnen:
- * de kaarten tonen de chat zoals hij is, met De Outfitman als afzender.
+ *
+ * De bron is het berichttype Reviews in wp-admin; staat daar niets, dan vallen
+ * we terug op de afbeeldingen die met het thema meekomen. Er worden nooit namen
+ * of teksten verzonnen: de kaart toont het gesprek zoals het is, met De
+ * Outfitman als afzender.
  */
 
-$reviews = [];
-if (function_exists('get_field')) {
-    $acf_reviews = get_field('homepage_reviews', 'option');
-    if (is_array($acf_reviews)) {
-        $reviews = $acf_reviews;
-    }
-}
-
-if (!$reviews) {
-    $dir = get_stylesheet_directory() . '/assets/img/reviews';
-    $uri = get_stylesheet_directory_uri() . '/assets/img/reviews';
-    if (is_dir($dir)) {
-        foreach (glob($dir . '/review-*.webp') ?: [] as $path) {
-            $reviews[] = ['screenshot' => $uri . '/' . basename($path)];
-        }
-    }
-}
-
+$reviews = function_exists('dom_review_screenshots') ? dom_review_screenshots() : [];
 $review_count = count($reviews);
 if (!$review_count) {
     return;
@@ -70,10 +55,7 @@ $star      = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.
     <div class="rvwrap">
       <div class="rvtrack" id="rvTrack">
         <?php foreach ($reviews as $r) :
-            $img = '';
-            if (!empty($r['screenshot'])) {
-                $img = is_array($r['screenshot']) ? ($r['screenshot']['url'] ?? '') : $r['screenshot'];
-            }
+            $img = $r['url'] ?? '';
             if (!$img) {
                 continue;
             }
@@ -88,7 +70,6 @@ $star      = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.
               <svg class="wa" viewBox="0 0 32 32" fill="#25D366" aria-hidden="true"><path d="M16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.5 1.7 6.4L3 29l6.8-1.8A13 13 0 1 0 16 3zm0 23.7c-2 0-4-.5-5.7-1.6l-.4-.2-4 1 1.1-3.9-.3-.4A10.7 10.7 0 1 1 16 26.7zm6.1-7.9c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2s-.9 1.1-1.1 1.3c-.2.2-.4.3-.8.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.5-.3.4-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.8 6 5.3 2.2.9 3.1 1 4.2.8.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4z"/></svg>
             </div>
             <div class="rev-phone">
-              <span class="rev-island" aria-hidden="true"></span>
               <div class="rev-shot">
                 <img src="<?php echo esc_url($img); ?>" alt="WhatsApp bericht van een klant" loading="lazy" decoding="async" width="620" height="1066">
               </div>

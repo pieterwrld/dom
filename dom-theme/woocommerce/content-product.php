@@ -79,11 +79,6 @@ $eur = function($v) {
     <?php if (count($all_images) > 1) : ?>
       <button class="parrow l" data-d="-1" aria-label="Vorige"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
       <button class="parrow r" data-d="1" aria-label="Volgende"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
-      <div class="pdots">
-        <?php foreach ($all_images as $k => $img_id) : ?>
-          <span class="pdot<?php echo $k === 0 ? ' on' : ''; ?>"></span>
-        <?php endforeach; ?>
-      </div>
       <div class="slidebars">
         <?php foreach ($all_images as $k => $img_id) : ?>
           <i<?php echo $k === 0 ? ' class="on"' : ''; ?>></i>

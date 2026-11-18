@@ -462,6 +462,7 @@ input,select{font:inherit}
 .pprice s{color:var(--muted);font-weight:400;font-size:11px}
 .psizes{display:flex;gap:4px;margin-top:7px;flex-wrap:wrap}
 .psizes span{font-family:var(--mono);font-size:9.5px;color:var(--muted);border:1px solid var(--line);
+  text-transform:uppercase;
   padding:2px 5px;line-height:1}
 @media(min-width:861px){
   .psizes{opacity:0;transform:translateY(4px);transition:opacity .35s,transform .4s var(--e)}
@@ -562,8 +563,9 @@ input,select{font:inherit}
    overheen lag is weg: die maakte de bovenste en onderste berichten vaag. */
 .rev-phone{position:relative;margin:12px;padding:7px;background:#0A0A0A;border-radius:26px;
   box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 16px 32px -20px rgba(10,10,10,.6)}
-.rev-island{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:3;
-  width:32%;max-width:78px;height:9px;background:#0A0A0A;border-radius:999px}
+/* De notch is eruit: op een kaart van deze breedte oogde het streepje als een
+   vlek in plaats van als een telefoon. */
+.rev-island{display:none}
 .rev-shot{position:relative;aspect-ratio:62/107;overflow:hidden;background:#111;border-radius:19px}
 .rev-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0;
   transition:transform 1s var(--e)}
@@ -658,9 +660,15 @@ input,select{font:inherit}
 .ovl{position:fixed;inset:0;z-index:70;background:rgba(10,10,10,.5);backdrop-filter:blur(3px);
   opacity:0;pointer-events:none;transition:opacity .45s}
 .ovl.on{opacity:1;pointer-events:auto}
+/* De open stand hangt aan <body>, niet aan de drawer zelf.
+   WooCommerce vervangt <aside class="drw"> bij elke cart-update via zijn eigen
+   cart-fragments.js, dus een klasse op dat element verdwijnt zodra je iets
+   toevoegt: de drawer sloot en de overlay bleef als wazige, klik-blokkerende
+   laag staan. <body> wordt nooit vervangen. */
+body.cart-open .ovl{opacity:1;pointer-events:auto}
 .drw{position:fixed;top:0;right:0;bottom:0;z-index:75;width:min(430px,100%);background:#fff;
   display:flex;flex-direction:column;transform:translate3d(101%,0,0);transition:transform .62s var(--e)}
-.drw.on{transform:none}
+.drw.on,body.cart-open .drw{transform:none}
 .drw-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
   border-bottom:1px solid var(--line);flex:0 0 auto}
 .drw-h b{font-family:var(--disp);font-size:17px;font-weight:800;text-transform:uppercase}
@@ -866,7 +874,7 @@ main,.hero{animation:pgUp .75s cubic-bezier(.16,1,.3,1) both}
 .hero-banner::after{content:"";position:absolute;left:0;right:0;bottom:0;height:38%;
   background:linear-gradient(to top,rgba(10,10,10,.82) 0%,rgba(10,10,10,.45) 45%,transparent 100%);
   pointer-events:none}
-.hero-banner__cta{position:absolute;left:50%;bottom:clamp(20px,4vw,52px);transform:translateX(-50%);
+.hero-banner__cta{position:absolute;left:50%;bottom:clamp(58px,11vw,120px);transform:translateX(-50%);
   z-index:2;display:inline-flex;align-items:center;justify-content:center;gap:14px;
   height:clamp(62px,7vw,82px);padding:0 clamp(32px,5vw,64px);
   max-width:calc(100% - 2*var(--gut));
@@ -876,6 +884,14 @@ main,.hero{animation:pgUp .75s cubic-bezier(.16,1,.3,1) both}
   transition:background .3s,transform .25s var(--e)}
 .hero-banner__cta .arw{font-size:1.1em}
 .hero-banner:hover .hero-banner__cta{background:#B3101F;transform:translateX(-50%) translateY(-2px)}
+/* Lichtstreep die rustig over de knop trekt, zodat hij opvalt zonder te knipperen. */
+.hero-banner__cta::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);
+  transform:skewX(-18deg);animation:ctaSweep 3.8s var(--e-io) infinite;pointer-events:none}
+@keyframes ctaSweep{0%{left:-60%}58%,100%{left:130%}}
+.hero-banner__cta{overflow:hidden;isolation:isolate}
+.hero-banner__cta>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){.hero-banner__cta::after{animation:none;opacity:0}}
 .hero-banner__cta .arw{transition:transform .3s var(--e)}
 .hero-banner:hover .hero-banner__cta .arw{transform:translateX(4px)}
 

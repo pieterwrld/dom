@@ -300,18 +300,18 @@ $$('.rnav[data-rail]').forEach(function(b){
     if(burger) burger.setAttribute('aria-expanded','false');
   }
 
+  /* De open stand staat op <body>. De drawer zelf wordt door WooCommerce
+     vervangen bij elke cart-update, dus een klasse daarop overleeft dat niet. */
   function openCart(){
-    var drw=$('.drw');
-    if(!drw) return;
-    drw.classList.add('on');
+    document.body.classList.add('cart-open');
+    var drw=$('.drw'); if(drw) drw.classList.add('on');
     var o=ovlEl(); if(o) o.classList.add('on');
     lockBody();
   }
 
   function closeCart(){
-    var drw=$('.drw');
-    if(!drw) return;
-    drw.classList.remove('on');
+    document.body.classList.remove('cart-open');
+    var drw=$('.drw'); if(drw) drw.classList.remove('on');
     var o=ovlEl(); if(o) o.classList.remove('on');
     unlockBody();
   }

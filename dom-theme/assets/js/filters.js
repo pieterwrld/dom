@@ -137,7 +137,6 @@
     media._i = idx;
     track.style.transition = 'transform .6s cubic-bezier(.16,1,.3,1)';
     track.style.transform = 'translate3d(' + (-idx * 100) + '%,0,0)';
-    $$('.pdot', media).forEach(function (d, k) { d.classList.toggle('on', k === idx); });
     $$('.slidebars i', media).forEach(function (d, k) { d.classList.toggle('on', k === idx); });
     var l = $('.parrow.l', media), r = $('.parrow.r', media);
     if (l) l.disabled = idx === 0;
