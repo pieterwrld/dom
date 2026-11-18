@@ -19,7 +19,7 @@ $hero_poster = function_exists('dom_setting_image_url') ? dom_setting_image_url(
  */
 $shop_url = dom_shop_url();
 ?>
-<section class="hero" id="hero">
+<section class="hero<?php echo ($video_url || $hero_poster) ? '' : ' hero--nomedia'; ?>" id="hero">
   <div class="hero-media">
     <?php if ($video_url) : ?>
       <video class="hv" id="heroVideo" muted loop playsinline preload="none"
