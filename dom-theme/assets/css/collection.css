@@ -76,6 +76,17 @@
   transition:opacity .26s,transform .32s var(--e),visibility .26s}
 .fpop.on{opacity:1;visibility:visible;transform:none}
 .fbar > *:last-child .fpop,.fgrp:last-child .fpop{left:auto;right:0}
+/* Op een telefoon past een paneel van 260px niet meer naast de tweede of derde
+   knop: het stak rechts buiten beeld en maakte de pagina zijwaarts schuifbaar.
+   Daar richt het paneel zich daarom naar de filterbalk en loopt het over de
+   volle breedte, in plaats van naar de knop waar het aan hangt. */
+@media(max-width:760px){
+  .fbar{position:relative}
+  .fgrp{position:static}
+  .fpop,
+  .fbar > *:last-child .fpop,
+  .fgrp:last-child .fpop{left:0;right:0;min-width:0;max-width:none}
+}
 /* Heette .ft, net als de footer. Die zet een zwarte achtergrond, waardoor de
    groepskoppen in dit paneel als zwarte balken verschenen. */
 .fpop .fgh{font-family:var(--disp);font-size:12px;font-weight:800;letter-spacing:.11em;
