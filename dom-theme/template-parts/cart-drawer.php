@@ -234,13 +234,6 @@ $eur = function ($v) {
       </div>
       <span>Echte reviews via WhatsApp</span>
     </div>
-    <div class="cpays">
-      <span class="paychip" style="--sd:0s">iDEAL</span>
-      <span class="paychip" style="--sd:.4s">VISA</span>
-      <span class="paychip" style="--sd:.8s">Mastercard</span>
-      <span class="paychip" style="--sd:1.2s">Apple Pay</span>
-      <span class="paychip" style="--sd:1.6s">Bancontact</span>
-    </div>
   </div>
   <?php endif; ?>
 

@@ -2,44 +2,58 @@
 defined('ABSPATH') || exit;
 
 /**
- * "Gedragen door": de coverflow uit het ontwerp.
+ * "Gedragen door": coverflow met video's.
  *
- * Namen van echte personen horen bij hun eigen foto, dus de koppeling komt
- * letterlijk uit het ontwerpprototype en wordt niet door het thema verzonnen.
- * Staat er beheerde data klaar, dan gaat die voor.
+ * De kaarten zijn 9:16, dus de verticale clips passen precies. Alleen de
+ * actieve kaart speelt af; de rest staat stil, anders decodeert een telefoon
+ * vijf video's tegelijk.
+ *
+ * Namen horen bij hun eigen clip. Een eerdere versie zette namen van echte
+ * personen onder willekeurig beeld, dat gebeurt hier niet: staat een bestand
+ * er niet, dan valt die kaart weg.
  */
-$influencers = [];
 
+$uploads   = wp_get_upload_dir();
+$base_url  = $uploads['baseurl'] ?? '';
+$base_dir  = $uploads['basedir'] ?? '';
+
+$clips = [];
+foreach ([
+    ['Furkan',                      'Shop de look', '/2026/11/Furkan-DKM.mp4'],
+    ['Fato YT',                     'Shop de look', '/2026/11/DOM-FATO.mp4'],
+    ['Essentials Trainingspakken',  'Shop de look', '/2026/11/DOM-VIDEO4.mp4'],
+    ['De Outfitman',                'Shop de look', '/2026/11/DOM-Naam.mp4'],
+    ['De Outfitman',                'Shop de look', '/2026/11/DOM-ALL.mp4'],
+] as [$name, $sub, $file]) {
+    if (!$base_url || !file_exists($base_dir . $file)) {
+        continue;
+    }
+    $clips[] = ['name' => $name, 'sub' => $sub, 'src' => $base_url . $file];
+}
+
+// Beheerde data gaat voor, als die er ooit komt.
 if (function_exists('get_field')) {
     $acf = get_field('influencers', 'option');
-    if (is_array($acf)) {
+    if (is_array($acf) && $acf) {
+        $managed = [];
         foreach ($acf as $row) {
-            $img = '';
-            if (!empty($row['image'])) {
-                $img = is_array($row['image']) ? ($row['image']['url'] ?? '') : $row['image'];
+            $src = '';
+            if (!empty($row['video'])) {
+                $src = is_array($row['video']) ? ($row['video']['url'] ?? '') : $row['video'];
+            } elseif (!empty($row['image'])) {
+                $src = is_array($row['image']) ? ($row['image']['url'] ?? '') : $row['image'];
             }
-            if (!$img) {
-                continue;
+            if ($src) {
+                $managed[] = ['name' => $row['name'] ?? '', 'sub' => $row['handle'] ?? '', 'src' => $src];
             }
-            $influencers[] = [
-                'name' => $row['name'] ?? '',
-                'sub'  => $row['handle'] ?? '',
-                'img'  => $img,
-            ];
+        }
+        if ($managed) {
+            $clips = $managed;
         }
     }
 }
 
-/**
- * Het prototype vult deze coverflow met WhatsApp-reviewscreenshots en zet daar
- * namen van echte influencers onder. HANDOVER.md noemt dat ook met zoveel
- * woorden: "dit zijn homepage-sliderfoto's, geen echte influencer-video's".
- * Die koppeling overnemen zou betekenen dat Djezja, Furkan, Kubi de Barber en
- * Fato YT met naam onder een screenshot van iemand anders komen te staan.
- *
- * Dus: geen echte foto's, geen sectie.
- */
-if (!$influencers) {
+if (!$clips) {
     return;
 }
 
@@ -48,9 +62,9 @@ $dom_cover_shop = dom_shop_url();
 <section class="sec cover-sec" id="wornby">
   <div class="wrap">
     <div class="cover-head" data-rv="up">
-      <div class="eyebrow"><i></i><span class="lbl">Community</span></div>
-      <h2 class="split">Gedragen door</h2>
-      <p class="tx">Influencers, atleten en creatives die De Outfitman dragen.</p>
+      <div class="eyebrow"><i></i><span class="lbl"><?php esc_html_e('Community', 'dom-theme'); ?></span></div>
+      <h2 class="split"><?php esc_html_e('Gedragen door', 'dom-theme'); ?></h2>
+      <p class="tx"><?php esc_html_e('Ontdek De Outfitman door de ogen van onze creators.', 'dom-theme'); ?></p>
       <div class="cover-soc">
         <a href="https://www.tiktok.com/@deoutfitman" target="_blank" rel="noopener" aria-label="TikTok">
           <svg viewBox="0 0 24 24"><path d="M16 3c.4 2.3 1.9 3.9 4 4.2v3c-1.5.1-2.9-.3-4.1-1.1v6.2c0 3.6-2.9 6.2-6.2 5.6-2.5-.5-4.4-2.7-4.4-5.3 0-3.3 3-5.9 6.3-5.3v3.1c-1.4-.5-2.8.5-2.8 2 0 1.2 1 2.2 2.2 2.2s2.2-1 2.2-2.2V3z"/></svg>
@@ -63,30 +77,58 @@ $dom_cover_shop = dom_shop_url();
   </div>
 
   <div class="cover" id="cover">
-    <?php foreach ($influencers as $inf) : ?>
-      <div class="cv" data-name="<?php echo esc_attr($inf['name']); ?>" data-sub="<?php echo esc_attr($inf['sub']); ?>">
-        <img src="<?php echo esc_url($inf['img']); ?>" alt="<?php echo esc_attr($inf['name']); ?>" loading="lazy">
+    <?php foreach ($clips as $clip) : ?>
+      <div class="cv" data-name="<?php echo esc_attr($clip['name']); ?>" data-sub="<?php echo esc_attr($clip['sub']); ?>">
+        <video src="<?php echo esc_url($clip['src']); ?>" muted loop playsinline preload="metadata"
+               aria-label="<?php echo esc_attr($clip['name']); ?>"></video>
         <span class="rim"></span>
         <div class="cvb">
-          <b><?php echo esc_html($inf['name']); ?></b>
-          <a class="shop" href="<?php echo esc_url($dom_cover_shop); ?>">Shop nu <span class="arw">&rarr;</span></a>
+          <b><?php echo esc_html($clip['name']); ?></b>
+          <a class="shop" href="<?php echo esc_url($dom_cover_shop); ?>"><?php esc_html_e('Shop nu', 'dom-theme'); ?> <span class="arw">&rarr;</span></a>
         </div>
       </div>
     <?php endforeach; ?>
   </div>
 
   <div class="cover-f">
-    <button class="cvnav" id="cvPrev" aria-label="Vorige">
+    <button class="cvnav" id="cvPrev" aria-label="<?php esc_attr_e('Vorige', 'dom-theme'); ?>">
       <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
     </button>
     <div class="nm">
       <b id="cvName"></b>
       <span id="cvSub"></span>
     </div>
-    <button class="cvnav" id="cvNext" aria-label="Volgende">
+    <button class="cvnav" id="cvNext" aria-label="<?php esc_attr_e('Volgende', 'dom-theme'); ?>">
       <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
     </button>
   </div>
   <div class="cvdots" id="cvDots"></div>
 </section>
-<script>document.addEventListener('DOMContentLoaded',function(){if(window.DOM&&DOM.buildCover)DOM.buildCover('#cover')});</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.DOM && DOM.buildCover) DOM.buildCover('#cover');
+
+  // Alleen de kaart die vooraan staat speelt af.
+  var host = document.getElementById('cover');
+  if (!host) return;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function sync() {
+    host.querySelectorAll('.cv').forEach(function (card) {
+      var v = card.querySelector('video');
+      if (!v) return;
+      if (card.classList.contains('act') && !reduce) {
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      } else {
+        v.pause();
+      }
+    });
+  }
+
+  sync();
+  new MutationObserver(sync).observe(host, {
+    subtree: true, attributes: true, attributeFilter: ['class']
+  });
+});
+</script>

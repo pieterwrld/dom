@@ -82,6 +82,7 @@
 .szrow{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 @media(max-width:420px){.szrow{grid-template-columns:repeat(4,1fr)}}
 .szp{height:44px;border:1px solid var(--line);font-family:var(--mono);font-size:12.5px;position:relative;
+  text-transform:uppercase;
   overflow:hidden;transition:all .22s}
 .szp:hover:not(:disabled){border-color:var(--ink)}
 .szp.on{background:var(--ink);color:#fff;border-color:var(--ink)}

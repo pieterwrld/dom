@@ -329,13 +329,28 @@ $$('.rnav[data-rail]').forEach(function(b){
     closeMenu(); closeCart(); closeSearch();
   }
 
-  $$('.js-menu-open').forEach(function(b){ b.addEventListener('click', openMenu); });
-  $$('.js-menu-close').forEach(function(b){ b.addEventListener('click', closeMenu); });
-  $$('.js-cart-open').forEach(function(b){ b.addEventListener('click', openCart); });
-  $$('.js-cart-close').forEach(function(b){ b.addEventListener('click', closeCart); });
-  $$('.js-search-open').forEach(function(b){ b.addEventListener('click', openSearch); });
-  $$('.js-search-close').forEach(function(b){ b.addEventListener('click', closeSearch); });
-  if(ovl) ovl.addEventListener('click', closeAll);
+  /* Gedelegeerd, niet per element gebonden.
+     cart.js werkt de winkelwagen bij met el.outerHTML = fragment, waarmee de
+     knoppen vervangen worden door nieuwe elementen. Luisteraars die hier
+     rechtstreeks op die knoppen stonden, verdwenen daarmee: de drawer ging
+     daarna wel open maar niet meer dicht. Via document blijft het werken,
+     hoe vaak de inhoud ook wordt vervangen. */
+  var ACTIES = [
+    ['.js-menu-open',   openMenu],
+    ['.js-menu-close',  closeMenu],
+    ['.js-cart-open',   openCart],
+    ['.js-cart-close',  closeCart],
+    ['.js-search-open', openSearch],
+    ['.js-search-close',closeSearch]
+  ];
+
+  document.addEventListener('click', function(e){
+    if(!e.target || !e.target.closest) return;
+    for(var i=0;i<ACTIES.length;i++){
+      if(e.target.closest(ACTIES[i][0])){ ACTIES[i][1](); return; }
+    }
+    if(ovl && e.target === ovl) closeAll();
+  });
 
   document.addEventListener('keydown', function(e){
     if(e.key==='Escape') closeAll();

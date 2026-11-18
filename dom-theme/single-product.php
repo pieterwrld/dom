@@ -327,13 +327,6 @@ while (have_posts()) : the_post();
         </div>
 
         <!-- 9. PAYMENT CHIPS -->
-        <div class="cpays" style="margin-top:12px;justify-content:flex-start">
-          <span class="paychip" style="--sd:0s">iDEAL</span>
-          <span class="paychip" style="--sd:.4s">VISA</span>
-          <span class="paychip" style="--sd:.8s">Mastercard</span>
-          <span class="paychip" style="--sd:1.2s">Apple Pay</span>
-          <span class="paychip" style="--sd:1.6s">Bancontact</span>
-        </div>
 
         <!-- 10. 4 USP'S -->
         <div class="usp4">
