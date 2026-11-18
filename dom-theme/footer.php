@@ -39,8 +39,8 @@
           <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,1 12.6,7.4 19.5,7.6 14,11.8 15.8,18.8 10,14.8 4.2,18.8 6,11.8 0.5,7.6 7.4,7.4" fill="currentColor"/></svg>
           <svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,1 12.6,7.4 19.5,7.6 14,11.8 15.8,18.8 10,14.8 4.2,18.8 6,11.8 0.5,7.6 7.4,7.4" fill="currentColor"/></svg>
         </div>
-        <b>Echte reviews</b>
-        <span>Via WhatsApp</span>
+        <b>1200+ klanten</b>
+        <span>Geholpen via WhatsApp</span>
       </div>
       <div class="ftt">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -130,13 +130,6 @@
   <div class="wrap">
     <div class="ft-bot">
       <span>&copy; <?php echo date('Y'); ?> De Outfitman. Alle rechten voorbehouden.</span>
-      <div class="cpays">
-        <span class="paychip">iDEAL</span>
-        <span class="paychip" style="--sd:.4s">VISA</span>
-        <span class="paychip" style="--sd:.8s">Mastercard</span>
-        <span class="paychip" style="--sd:1.2s">Apple Pay</span>
-        <span class="paychip" style="--sd:1.6s">Bancontact</span>
-      </div>
     </div>
   </div>
 

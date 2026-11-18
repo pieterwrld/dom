@@ -162,13 +162,16 @@ while (have_posts()) : the_post();
 <main>
   <div class="wrap">
     <!-- BREADCRUMB -->
-    <nav class="crumb">
-      <a href="<?php echo esc_url(home_url('/')); ?>">Home</a><span>/</span>
-      <a href="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))); ?>">Shop</a>
+    <nav class="crumb" aria-label="<?php esc_attr_e('Kruimelpad', 'dom-theme'); ?>">
+      <a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'dom-theme'); ?></a>
+      <span aria-hidden="true">/</span>
+      <a href="<?php echo esc_url(dom_shop_url()); ?>"><?php esc_html_e('Shop', 'dom-theme'); ?></a>
       <?php if ($primary_cat) : ?>
-        <span>/</span><a href="<?php echo esc_url(dom_term_url($primary_cat)); ?>"><?php echo esc_html($primary_cat->name); ?></a>
+        <span aria-hidden="true">/</span>
+        <a href="<?php echo esc_url(dom_term_url($primary_cat)); ?>"><?php echo esc_html($primary_cat->name); ?></a>
       <?php endif; ?>
-      <span>/</span><b><?php echo esc_html($product->get_name()); ?></b>
+      <span aria-hidden="true">/</span>
+      <b aria-current="page"><?php echo esc_html($product->get_name()); ?></b>
     </nav>
 
     <!-- PDP 2-column grid -->
@@ -373,7 +376,7 @@ while (have_posts()) : the_post();
 
   <!-- ══════ 12. UPSELL ══════ -->
   <?php if (!empty($upsell_products)) : ?>
-    <section class="sec" style="padding-bottom:0">
+    <section class="sec">
       <div class="wrap">
         <div class="sec-t" data-rv="up">
           <div class="eyebrow"><i></i><span class="lbl">Compleet maken</span></div>

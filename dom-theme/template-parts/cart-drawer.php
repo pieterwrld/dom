@@ -142,75 +142,85 @@ $eur = function ($v) {
         <button class="ctab" data-p="rec">Aanbevolen voor jou</button>
         <button class="ctab" data-p="seen">Recent bekeken</button>
       </div>
-      <div class="cpane on" id="pane-up">
-        <div class="crail" id="upRail">
-          <?php
-          $cat_ids = [];
-          foreach ($cart_items as $ci) {
-              $terms = get_the_terms($ci['product_id'], 'product_cat');
-              if ($terms && !is_wp_error($terms)) {
-                  foreach ($terms as $term) {
-                      $cat_ids[$term->term_id] = true;
-                  }
+      <?php
+      /**
+       * Drie panelen met dezelfde kaart. "Aanbevolen voor jou" en "Recent
+       * bekeken" waren lege divs, waardoor die tabbladen niets leken te doen.
+       */
+      $in_cart = array_map(static function ($ci) { return (int) $ci['product_id']; }, $cart_items);
+
+      // Maak het compleet: zelfde categorieën als wat er in de wagen zit.
+      $cat_ids = [];
+      foreach ($cart_items as $ci) {
+          $terms = get_the_terms($ci['product_id'], 'product_cat');
+          if ($terms && !is_wp_error($terms)) {
+              foreach ($terms as $term) {
+                  $cat_ids[] = (int) $term->term_id;
               }
           }
-          $exclude_ids = array_map(function ($ci) { return $ci['product_id']; }, $cart_items);
-          if (!empty($cat_ids)) :
-              $upsell_q = new WP_Query([
-                  'post_type'      => 'product',
-                  'posts_per_page' => 8,
-                  'post__not_in'   => $exclude_ids,
-                  'tax_query'      => [[
-                      'taxonomy' => 'product_cat',
-                      'field'    => 'term_id',
-                      'terms'    => array_keys($cat_ids),
-                  ]],
-                  'orderby' => 'rand',
-              ]);
-              while ($upsell_q->have_posts()) : $upsell_q->the_post();
-                  $up_product = wc_get_product(get_the_ID());
-                  if (!$up_product) continue;
-                  $up_thumb = get_the_post_thumbnail_url(get_the_ID(), 'thumbnail');
-                  $up_price = (float) $up_product->get_price();
-                  $up_sizes = [];
-                  if ($up_product->is_type('variable')) {
-                      $attrs = $up_product->get_variation_attributes();
-                      foreach ($attrs as $a => $vals) {
-                          $up_sizes = array_merge($up_sizes, $vals);
-                          break;
-                      }
-                  }
-              ?>
-                <div class="cmini">
-                  <a href="<?php the_permalink(); ?>" class="im">
-                    <?php if ($up_thumb) : ?>
-                      <img src="<?php echo esc_url($up_thumb); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
-                    <?php endif; ?>
-                  </a>
-                  <div class="t"><?php the_title(); ?></div>
-                  <div class="p"><?php echo $eur($up_price); ?></div>
-                  <div class="row2">
-                    <?php if (!empty($up_sizes)) : ?>
-                      <select aria-label="Maat">
-                        <?php foreach ($up_sizes as $sz) : ?>
-                          <option><?php echo esc_html($sz); ?></option>
-                        <?php endforeach; ?>
-                      </select>
-                    <?php else : ?>
-                      <span></span>
-                    <?php endif; ?>
-                    <button class="add" data-id="<?php echo get_the_ID(); ?>" aria-label="Toevoegen">
-                      <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
-                    </button>
-                  </div>
-                </div>
-              <?php endwhile; wp_reset_postdata();
-          endif;
-          ?>
+      }
+
+      $compleet = [];
+      if ($cat_ids) {
+          $compleet = get_posts([
+              'post_type'      => 'product',
+              'post_status'    => 'publish',
+              'posts_per_page' => 8,
+              'post__not_in'   => $in_cart ?: [0],
+              'orderby'        => 'rand',
+              'fields'         => 'ids',
+              'tax_query'      => [[
+                  'taxonomy' => 'product_cat',
+                  'field'    => 'term_id',
+                  'terms'    => array_unique($cat_ids),
+              ]],
+          ]);
+      }
+
+      // Aanbevolen: best verkocht in de hele winkel.
+      $aanbevolen = get_posts([
+          'post_type'      => 'product',
+          'post_status'    => 'publish',
+          'posts_per_page' => 8,
+          'post__not_in'   => array_merge($in_cart, $compleet) ?: [0],
+          'meta_key'       => 'total_sales',
+          'orderby'        => 'meta_value_num',
+          'order'          => 'DESC',
+          'fields'         => 'ids',
+      ]);
+
+      // Recent bekeken: WooCommerce houdt dit in een cookie bij.
+      $recent = [];
+      if (!empty($_COOKIE['woocommerce_recently_viewed'])) {
+          $recent = array_filter(array_map('absint', explode('|', wp_unslash($_COOKIE['woocommerce_recently_viewed']))));
+          $recent = array_slice(array_reverse(array_unique($recent)), 0, 8);
+      }
+
+      $panelen = [
+          'up'   => $compleet,
+          'rec'  => $aanbevolen,
+          'seen' => $recent,
+      ];
+      $leeg_tekst = [
+          'up'   => __('Nog niets om bij te combineren.', 'dom-theme'),
+          'rec'  => __('Nog geen aanbevelingen.', 'dom-theme'),
+          'seen' => __('Je hebt nog geen producten bekeken.', 'dom-theme'),
+      ];
+
+      foreach ($panelen as $naam => $ids) :
+      ?>
+        <div class="cpane<?php echo 'up' === $naam ? ' on' : ''; ?>" id="pane-<?php echo esc_attr($naam); ?>">
+          <?php if ($ids) : ?>
+            <div class="crail">
+              <?php foreach ($ids as $pid) {
+                  get_template_part('template-parts/cart-mini', 'card', ['id' => $pid]);
+              } ?>
+            </div>
+          <?php else : ?>
+            <p class="cpane-leeg"><?php echo esc_html($leeg_tekst[$naam]); ?></p>
+          <?php endif; ?>
         </div>
-      </div>
-      <div class="cpane" id="pane-rec"><div class="crail" id="recRail"></div></div>
-      <div class="cpane" id="pane-seen"><div class="crail" id="seenRail"></div></div>
+      <?php endforeach; ?>
     </div>
   </div>
 
@@ -233,7 +243,7 @@ $eur = function ($v) {
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
         <svg viewBox="0 0 24 24" fill="#F59E0B" width="10" height="10"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
       </div>
-      <span>Echte reviews via WhatsApp</span>
+      <span><b>1200+</b> klanten geholpen</span>
     </div>
   </div>
   <?php endif; ?>

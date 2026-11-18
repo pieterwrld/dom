@@ -33,11 +33,40 @@
   }
 
   function applyFragments(fragments) {
+    /* Het fragment voor de winkelwagen vervangt het hele <aside class="drw">.
+       De verse markup heeft geen 'on'-klasse, dus de drawer sloot zichzelf bij
+       elke update terwijl de overlay open bleef staan: een wazige laag die
+       klikken blokkeerde. Daarom de open stand onthouden en terugzetten. */
+    var oud = document.querySelector('.drw');
+    var stondOpen = !!(oud && oud.classList.contains('on'));
+    var actieveTab = document.querySelector('.ctab.on');
+    var actieveNaam = actieveTab ? actieveTab.dataset.p : null;
+
     Object.keys(fragments).forEach(function (sel) {
       var el = document.querySelector(sel);
       if (el) el.outerHTML = fragments[sel];
     });
-    bindTabs();
+
+    var nieuw = document.querySelector('.drw');
+    if (nieuw && stondOpen) {
+      nieuw.classList.add('on');
+      var ovl = document.querySelector('.js-overlay');
+      if (ovl) ovl.classList.add('on');
+      document.body.classList.add('lock');
+    }
+
+    if (actieveNaam) toonTab(actieveNaam);
+  }
+
+  function toonTab(naam) {
+    var c = document.getElementById('cart');
+    if (!c) return;
+    c.querySelectorAll('.ctab').forEach(function (t) {
+      t.classList.toggle('on', t.dataset.p === naam);
+    });
+    c.querySelectorAll('.cpane').forEach(function (p) {
+      p.classList.toggle('on', p.id === 'pane-' + naam);
+    });
   }
 
   /* Quantity +/- and remove — delegated */
@@ -83,21 +112,12 @@
     }
   });
 
-  /* Tab switching — delegated, re-bound after fragment replace */
-  function bindTabs() {
-    var c = document.getElementById('cart');
-    if (!c) return;
-    c.querySelectorAll('.ctab').forEach(function (t) {
-      t.addEventListener('click', function () {
-        c.querySelectorAll('.ctab').forEach(function (q) { q.classList.remove('on'); });
-        c.querySelectorAll('.cpane').forEach(function (q) { q.classList.remove('on'); });
-        t.classList.add('on');
-        var pane = c.querySelector('#pane-' + t.dataset.p);
-        if (pane) pane.classList.add('on');
-      });
-    });
-  }
-  bindTabs();
+  /* Tabs gedelegeerd: het drawer-fragment vervangt de knoppen bij elke
+     cart-update, dus listeners die er rechtstreeks op stonden verdwenen. */
+  document.addEventListener('click', function (e) {
+    var tab = e.target.closest('.ctab');
+    if (tab && tab.dataset.p) toonTab(tab.dataset.p);
+  });
 
   /* Intercept WooCommerce AJAX add-to-cart and open drawer */
   document.body.addEventListener('added_to_cart', function (e, fragments) {

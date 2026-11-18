@@ -152,3 +152,18 @@
 .lb-x{position:absolute;top:18px;right:18px;width:42px;height:42px;border:1px solid var(--line);
   background:#fff;display:grid;place-items:center}
 .lb-x svg{width:15px;height:15px;stroke:var(--ink);stroke-width:1.9;fill:none}
+
+/* Het kruimelpad had geen eigen opmaak, dus de afstand tussen de links hing af
+   van de regeleindes in de HTML: "Home/ Shop /Slippers". Nu een nette rij met
+   gelijke tussenruimte die op smalle schermen afbreekt in plaats van uit te lopen. */
+.crumb{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;
+  padding:clamp(10px,1.6vw,18px) 0;font-size:12.5px;line-height:1.4}
+.crumb a{color:var(--muted);transition:color .25s}
+.crumb a:hover{color:var(--ink)}
+.crumb span{color:var(--line);user-select:none}
+.crumb b{font-weight:600;color:var(--ink);min-width:0;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;max-width:min(100%,46ch)}
+@media(max-width:520px){
+  .crumb{font-size:11.5px;gap:3px 6px}
+  .crumb b{max-width:100%}
+}

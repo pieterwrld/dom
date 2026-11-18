@@ -137,3 +137,36 @@ add_filter('loop_shop_per_page', function () {
 add_filter('loop_shop_columns', function () {
     return 4;
 });
+
+/**
+ * Geen "is toegevoegd aan je winkelmand"-melding meer.
+ *
+ * De winkelwagen schuift zelf open zodra er iets is toegevoegd, dus die melding
+ * voegt niets toe. Erger: WooCommerce bewaart hem tot de volgende paginaweergave,
+ * waardoor je bij het afrekenen drie groene balken boven het formulier kreeg.
+ */
+add_filter('wc_add_to_cart_message_html', '__return_empty_string');
+
+/**
+ * Korte geruststelling onder de bestelknop: levertijd, retourtermijn en het
+ * aantal klanten dat de winkel al heeft geholpen. Dat laatste getal staat ook
+ * in de footer en komt uit de eigen tekst van de winkel.
+ */
+add_action('woocommerce_review_order_after_submit', function () {
+    ?>
+    <div class="dom-co-trust">
+      <span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <?php esc_html_e('Voor 17:00 besteld, morgen in huis', 'dom-theme'); ?>
+      </span>
+      <span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <?php esc_html_e('14 dagen retour', 'dom-theme'); ?>
+      </span>
+      <span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        <?php esc_html_e('1200+ klanten geholpen', 'dom-theme'); ?>
+      </span>
+    </div>
+    <?php
+});

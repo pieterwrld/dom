@@ -288,3 +288,93 @@ ul.woocommerce-error {
 .cart_totals .shop_table td { text-align: right; }
 .cart_totals .order-total td { font-family: var(--mono); font-weight: 700; font-size: 18px; }
 .wc-proceed-to-checkout .checkout-button { width: 100%; }
+
+/* ====== CHECKOUT: ORDERSAMENVATTING ======
+   Stond als een kale tabel onder het formulier. Nu een compact kaartje dat op
+   desktop meeloopt terwijl je de velden invult, met het totaalbedrag als enige
+   grote element zodat duidelijk is wat je gaat betalen. */
+.woocommerce-checkout #order_review_heading {
+  font-size: 15px;
+  letter-spacing: .08em;
+  margin: 28px 0 10px;
+}
+.woocommerce-checkout #order_review {
+  border: 1px solid var(--line);
+  background: var(--off);
+  padding: clamp(14px, 2vw, 22px);
+}
+@media (min-width: 1000px) {
+  .woocommerce-checkout #order_review,
+  .woocommerce-checkout #order_review_heading { position: sticky; top: 92px; }
+  .woocommerce-checkout #order_review_heading { margin-top: 0; }
+}
+.woocommerce-checkout-review-order-table { margin-bottom: 16px; }
+.woocommerce-checkout-review-order-table th,
+.woocommerce-checkout-review-order-table td {
+  padding: 8px 0;
+  font-size: 12.5px;
+  vertical-align: top;
+}
+.woocommerce-checkout-review-order-table thead { display: none; }
+.woocommerce-checkout-review-order-table .product-name {
+  line-height: 1.35;
+  padding-right: 12px;
+}
+.woocommerce-checkout-review-order-table .product-quantity {
+  font-family: var(--mono);
+  color: var(--muted);
+}
+.woocommerce-checkout-review-order-table .product-total,
+.woocommerce-checkout-review-order-table .cart-subtotal td {
+  font-family: var(--mono);
+  text-align: right;
+  white-space: nowrap;
+}
+.woocommerce-checkout-review-order-table .cart-subtotal th,
+.woocommerce-checkout-review-order-table .cart-subtotal td { color: var(--muted); }
+.woocommerce-checkout-review-order-table .order-total th {
+  font-size: 13px;
+  color: var(--ink);
+}
+.woocommerce-checkout-review-order-table .order-total td {
+  font-size: 22px;
+  text-align: right;
+  white-space: nowrap;
+}
+.woocommerce-checkout-review-order-table .order-total th,
+.woocommerce-checkout-review-order-table .order-total td {
+  border-bottom: 0;
+  padding-top: 14px;
+}
+.woocommerce-checkout .woocommerce-checkout-payment {
+  background: transparent;
+  padding: 0;
+  margin-top: 4px;
+}
+.woocommerce-checkout #place_order {
+  width: 100%;
+  height: 58px;
+  font-family: var(--disp);
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--bf);
+  border: 0;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: background .3s;
+}
+.woocommerce-checkout #place_order:hover { background: #B3101F; }
+.dom-co-trust {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  margin-top: 12px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.dom-co-trust span { display: inline-flex; align-items: center; gap: 5px; }
+.dom-co-trust svg { width: 13px; height: 13px; stroke: var(--green); stroke-width: 2; fill: none; }
