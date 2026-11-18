@@ -65,11 +65,17 @@
 .fbtn.on svg{transform:rotate(180deg)}
 .fbtn b{font-family:var(--mono);font-weight:700;font-size:11px;color:var(--muted)}
 .fbtn.act b{color:rgba(255,255,255,.65)}
-.fpop{position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:260px;background:#fff;
+/* Deze panelen zijn ook in gesloten staat opgemaakt (alleen onzichtbaar), dus
+   ze tellen mee voor de paginabreedte. Bij de rechter filterknop stak het
+   paneel 16px buiten beeld, waardoor de hele pagina zijwaarts kon schuiven.
+   Daarom een maximumbreedte, en het laatste paneel lijnt rechts uit. */
+.fpop{position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:260px;
+  max-width:calc(100vw - 2 * var(--gut));background:#fff;
   border:1px solid var(--ink);padding:15px;box-shadow:0 26px 60px -28px rgba(10,10,10,.4);
   opacity:0;visibility:hidden;transform:translateY(-6px);
   transition:opacity .26s,transform .32s var(--e),visibility .26s}
 .fpop.on{opacity:1;visibility:visible;transform:none}
+.fbar > *:last-child .fpop,.fgrp:last-child .fpop{left:auto;right:0}
 /* Heette .ft, net als de footer. Die zet een zwarte achtergrond, waardoor de
    groepskoppen in dit paneel als zwarte balken verschenen. */
 .fpop .fgh{font-family:var(--disp);font-size:12px;font-weight:800;letter-spacing:.11em;
