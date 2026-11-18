@@ -8,6 +8,23 @@
 defined('ABSPATH') || exit;
 
 define('DOM_THEME_VERSION', '1.0.0');
+
+/**
+ * Versie voor de ?ver= achter stylesheets en scripts.
+ *
+ * Met de vaste themaversie kreeg elk bestand altijd ?ver=1.0.0, ook nadat de
+ * inhoud was gewijzigd. Browsers en LiteSpeed hielden daardoor de oude CSS
+ * vast en een uitgerolde aanpassing was simpelweg niet te zien. De wijzigings-
+ * datum van het bestand verandert wel bij elke deploy.
+ *
+ * @param string $relative Pad binnen het thema, bijvoorbeeld /assets/css/core.css
+ * @return string
+ */
+function dom_asset_version($relative) {
+    $file = DOM_THEME_DIR . $relative;
+    $time = file_exists($file) ? filemtime($file) : 0;
+    return $time ? DOM_THEME_VERSION . '.' . $time : DOM_THEME_VERSION;
+}
 define('DOM_THEME_DIR', get_template_directory());
 define('DOM_THEME_URI', get_template_directory_uri());
 
@@ -157,14 +174,14 @@ function dom_enqueue_assets() {
         'dom-fonts',
         DOM_THEME_URI . '/assets/css/fonts.css',
         [],
-        DOM_THEME_VERSION
+        dom_asset_version('/assets/css/fonts.css')
     );
 
     wp_enqueue_style(
         'dom-core',
         DOM_THEME_URI . '/assets/css/core.css',
         ['dom-fonts'],
-        DOM_THEME_VERSION
+        dom_asset_version('/assets/css/core.css')
     );
 
     if (dom_has_woo() && (is_shop() || is_product_category() || is_product_tag())) {
@@ -172,7 +189,7 @@ function dom_enqueue_assets() {
             'dom-collection',
             DOM_THEME_URI . '/assets/css/collection.css',
             ['dom-core'],
-            DOM_THEME_VERSION
+            dom_asset_version('/assets/css/collection.css')
         );
     }
 
@@ -181,7 +198,7 @@ function dom_enqueue_assets() {
             'dom-product',
             DOM_THEME_URI . '/assets/css/product.css',
             ['dom-core'],
-            DOM_THEME_VERSION
+            dom_asset_version('/assets/css/product.css')
         );
     }
 
@@ -190,7 +207,7 @@ function dom_enqueue_assets() {
             'dom-woocommerce',
             DOM_THEME_URI . '/assets/css/woocommerce.css',
             ['dom-core'],
-            DOM_THEME_VERSION
+            dom_asset_version('/assets/css/woocommerce.css')
         );
     }
 
@@ -198,7 +215,7 @@ function dom_enqueue_assets() {
         'dom-core',
         DOM_THEME_URI . '/assets/js/core.js',
         [],
-        DOM_THEME_VERSION,
+        dom_asset_version('/assets/js/core.js'),
         ['strategy' => 'defer', 'in_footer' => true]
     );
 
@@ -206,7 +223,7 @@ function dom_enqueue_assets() {
         'dom-cart',
         DOM_THEME_URI . '/assets/js/cart.js',
         ['dom-core'],
-        DOM_THEME_VERSION,
+        dom_asset_version('/assets/js/cart.js'),
         ['strategy' => 'defer', 'in_footer' => true]
     );
 
@@ -221,7 +238,7 @@ function dom_enqueue_assets() {
             'dom-gallery',
             DOM_THEME_URI . '/assets/js/gallery.js',
             [],
-            DOM_THEME_VERSION,
+            dom_asset_version('/assets/js/gallery.js'),
             ['strategy' => 'defer', 'in_footer' => true]
         );
     }
@@ -231,7 +248,7 @@ function dom_enqueue_assets() {
             'dom-filters',
             DOM_THEME_URI . '/assets/js/filters.js',
             [],
-            DOM_THEME_VERSION,
+            dom_asset_version('/assets/js/filters.js'),
             ['strategy' => 'defer', 'in_footer' => true]
         );
     }
