@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sneakers — De Outfitman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/core.css">
+<link rel="stylesheet" href="/css/collection.css">
+</head>
+<body>
+<div class="grain"></div>
+<div class="cur" id="cur"></div>
+<div class="ann">
+<div class="ann-t" id="annT">
+<div class="ann-g">
+<div class="ann-i hot"><span class="st"></span>Black Friday <b>tot -50%</b></div>
+<div class="ann-i">Voor 17:00 besteld = morgen in huis</div>
+<div class="ann-i hot"><span class="st"></span>Gratis verzending vanaf <b>&euro;200</b></div>
+<div class="ann-i">24/7 klantenservice via WhatsApp</div>
+<div class="ann-i hot"><span class="st"></span>Vanaf &euro;350 <b>gratis mystery shirt</b></div>
+<div class="ann-i">14 dagen gratis retourneren</div>
+<div class="ann-i">100% originele merkkleding</div>
+</div>
+</div>
+</div>
+<header class="hdr" id="hdr">
+<div class="wrap hdr-in">
+<div class="hdr-l">
+<button class="burger" id="menuOpen" aria-label="Menu">
+<span class="bars"><span></span><span></span><span></span></span><em>Menu</em>
+</button>
+</div>
+<a href="index.html" class="brand" id="brand">
+<img class="logo" src="https://deoutfitman.com/wp-content/uploads/2025/03/cropped-Merkkleding-Logo-852-x-210-px-2-removebg-preview.png" alt="De Outfitman">
+<span class="brand-txt">DE OUTF<i>I</i>TMAN</span>
+</a>
+<div class="hdr-r">
+<button class="ic" aria-label="Zoeken">
+<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/></svg>
+</button>
+<button class="cart-b" id="cartOpen">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+<span class="n" id="cartN">3</span>
+</button>
+</div>
+</div>
+</header>
+<div class="bfs" id="bfs">
+<div class="wrap bfs-in">
+<div class="bfs-t"><b>Black Friday</b><s>tot -50% korting</s></div>
+<div class="cd" id="cd">
+<div class="u"><b id="cdD">00</b><span>dgn</span></div>
+<div class="u"><b id="cdH">00</b><span>uur</span></div>
+<div class="u"><b id="cdM">00</b><span>min</span></div>
+<div class="u"><b id="cdS">00</b><span>sec</span></div>
+</div>
+<a href="collectie.html" class="go">Shop de deals <span class="arw">&rarr;</span></a>
+</div>
+<button class="bfs-close" id="bfsX" aria-label="Sluiten"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+</div>
+<!--/TOP-->
+<main>
+<div class="wrap">
+<nav class="crumb"><a href="index.html">Home</a><span>/</span><a href="collectie.html">Shop</a><span>/</span><b id="crumbCat">Sneakers</b></nav>
+<div class="chead">
+<div class="chead-r">
+<div>
+<h1 id="catTitle" class="chars">Sneakers</h1>
+<p id="catCopy" class="tx" style="--d:260ms">Van Hermes bouncing tot Loro Piana week end walk. Maat 40 t/m 46, voor 17:00 besteld is morgen in huis.</p>
+</div>
+</div>
+</div>
+<div class="quickcat">
+<div class="qc-h"><span>Snel naar jouw gewenste categorie</span></div>
+<div class="qc" id="qc">
+<button class="qcb" data-c="jassen"><b>Jassen</b></button>
+<button class="qcb" data-c="jeans"><b>Jeans</b></button>
+<button class="qcb on" data-c="sneakers"><b>Sneakers</b></button>
+<button class="qcb" data-c="tshirts"><b>T-Shirts</b></button>
+<button class="qcb" data-c="sweaters"><b>Sweaters / Hoodies</b></button>
+<button class="qcb" data-c="brillen"><b>Brillen</b></button>
+<button class="qcb" data-c="tassen"><b>Tassen</b></button>
+<button class="qcb" data-c="trainingspakken"><b>Trainingspakken</b></button>
+<button class="qcb" data-c="slippers"><b>Slippers</b></button>
+<button class="qcb" data-c="zwembroeken"><b>Zwembroeken</b></button>
+<button class="qcb" data-c="petten"><b>Petten</b></button>
+<button class="qcb bf" data-c="sale"><b>Sale</b></button>
+</div>
+</div>
+</div>
+<div class="fwrap">
+<div class="wrap">
+<div class="fbar">
+<div class="fgrp">
+<button class="fbtn" id="fpBtn">Prijs <b id="fpVal">Alles</b>
+<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="fpop" id="fpPop">
+<div class="ft">Maximale prijs</div>
+<input type="range" class="rng" id="rng" min="30" max="200" step="5" value="200">
+<div class="rngv"><span>&euro;30</span><span id="rngNow">&euro;200+</span></div>
+<button class="fclear" data-clear="price">Wissen</button>
+</div>
+</div>
+<div class="fgrp">
+<button class="fbtn" id="fsBtn">Maat <b id="fsVal">Alles</b>
+<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="fpop" id="fsPop">
+<div class="ft">Kleding</div><div class="szg" id="szClothes"></div>
+<div class="ft" style="margin-top:13px">Schoenen</div><div class="szg" id="szShoes"></div>
+<button class="fclear" data-clear="size">Wissen</button>
+</div>
+</div>
+<div class="fgrp">
+<button class="fbtn" id="fbBtn">Merk <b id="fbVal">Alles</b>
+<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="fpop" id="fbPop">
+<div class="ft">Merken</div>
+<div class="brg" id="brandList"></div>
+<button class="fclear" data-clear="brand">Wissen</button>
+</div>
+</div>
+<div class="sortw">
+<div class="fgrp">
+<button class="fbtn" id="soBtn"><span id="soVal">Populair</span>
+<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="fpop" id="soPop" style="left:auto;right:0;min-width:215px">
+<div class="ft">Sorteer op</div>
+<div style="display:grid;gap:1px">
+<button class="fclear" style="margin:0;border:0;text-align:left;padding:0 7px;height:32px" data-sort="pop">Populair</button>
+<button class="fclear" style="margin:0;border:0;text-align:left;padding:0 7px;height:32px" data-sort="asc">Prijs laag &rarr; hoog</button>
+<button class="fclear" style="margin:0;border:0;text-align:left;padding:0 7px;height:32px" data-sort="desc">Prijs hoog &rarr; laag</button>
+<button class="fclear" style="margin:0;border:0;text-align:left;padding:0 7px;height:32px" data-sort="new">Nieuwste</button>
+<button class="fclear" style="margin:0;border:0;text-align:left;padding:0 7px;height:32px" data-sort="disc">Hoogste korting</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="chips" id="chips"></div>
+</div>
+</div>
+<div class="wrap">
+<a class="cbanner" id="cbanner" href="#">
+<img id="cbImg" src="https://deoutfitman.com/wp-content/uploads/2025/03/IMG_6820-300x450.jpeg" alt="Sneakers" data-up>
+<div class="cb-in">
+<div>
+<span class="tagred" id="cbTag">Collectie</span>
+<h2 id="cbTitle" style="margin-top:8px">Sneakers</h2>
+<p id="cbCopy">Hermes &middot; Dior &middot; Louis Vuitton &middot; Prada &middot; Loro Piana &middot; Balenciaga</p>
+</div>
+<span class="btn btn-ow">Shop de collectie <span class="arw">&rarr;</span></span>
+</div>
+</a>
+<div class="pgrid" id="grid"></div>
+<div class="empty" id="empty" style="display:none">
+<h3>Geen producten gevonden</h3>
+<p class="cap" style="margin-top:6px">Pas je filters aan of bekijk alle producten.</p>
+<button class="btn btn-o" style="margin-top:16px" id="resetAll">Filters wissen</button>
+</div>
+<div class="loadw" id="loadw">
+<div class="pbar"><i id="loadBar"></i></div>
+<div class="pc"><span id="shown">0</span> van <span id="total">0</span> producten</div>
+<button class="btn btn-o" id="loadMore">Meer laden</button>
+</div>
+</div>
+</main>
+<footer class="ft">
+<div class="ftm"><div class="ftm-t" id="ftmT"><div class="ftm-g">
+<span>De Outfitman</span><span>De Outfitman</span><span>De Outfitman</span>
+</div></div></div>
+<div class="wrap">
+<div class="ft-trust">
+<div class="ftt"><div class="stars">
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+</div><b>4.9</b><span>gemiddeld</span></div>
+<div class="ftt"><b><span data-count="800">0</span>+</b><span>klanten geholpen</span></div>
+<div class="ftt"><b>14 dagen</b><span>gratis retour</span></div>
+<div class="ftt"><b>24/7</b><span>WhatsApp support</span></div>
+</div>
+<div class="ft-top">
+<div class="ft-news" data-rv="up">
+<h4>Eerste toegang tot<br>nieuwe drops</h4>
+<p>Drops, restocks en Black Friday deals als eerste in je inbox.</p>
+<form class="nform" id="nForm" onsubmit="return false">
+<input type="email" placeholder="jouw@email.nl" aria-label="E-mailadres" required>
+<button class="btn btn-bf" type="submit">Aanmelden</button>
+</form>
+<div class="socs">
+<a class="soc" href="https://wa.link/a36gtn" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg></a>
+<a class="soc" href="https://snapchat.com/t/TBLaMlMW" aria-label="Snapchat"><svg viewBox="0 0 24 24"><path d="M12 2c3 0 5 2 5 5v3l2 1-2 2c1 2 3 3 4 3-1 1-3 1-4 2-1 1-3 1-5 1s-4 0-5-1c-1-1-3-1-4-2 1 0 3-1 4-3l-2-2 2-1V7c0-3 2-5 5-5z"/></svg></a>
+<a class="soc" href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M16 3c.4 2.3 1.9 3.9 4 4.2v3c-1.5.1-2.9-.3-4.1-1.1v6.2c0 3.6-2.9 6.2-6.2 5.6-2.5-.5-4.4-2.7-4.4-5.3 0-3.3 3-5.9 6.3-5.3v3.1c-1.4-.5-2.8.5-2.8 2 0 1.2 1 2.2 2.2 2.2s2.2-1 2.2-2.2V3z"/></svg></a>
+<a class="soc" href="mailto:info@deoutfitman.com" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M3 6h18v12H3z"/><path d="M3 7l9 6 9-6"/></svg></a>
+</div>
+</div>
+<div class="ft-col" data-rv="up" style="--d:60ms">
+<h5>Shop</h5>
+<ul><li><a href="collectie.html">Sneakers</a></li><li><a href="collectie.html">Jassen</a></li>
+<li><a href="collectie.html">Jeans</a></li><li><a href="collectie.html">Trainingspakken</a></li>
+<li><a href="collectie.html">T-Shirts</a></li><li><a href="collectie.html">Accessoires</a></li>
+<li><a href="collectie.html" style="color:var(--bf)">Sale</a></li></ul>
+</div>
+<div class="ft-col" data-rv="up" style="--d:120ms">
+<h5>Klantenservice</h5>
+<ul><li><a href="#">Contact</a></li><li><a href="#">Verzending</a></li><li><a href="#">Retourneren</a></li>
+<li><a href="#">Maatadvies</a></li><li><a href="#">FAQ</a></li><li><a href="#">Track &amp; trace</a></li></ul>
+</div>
+<div class="ft-col" data-rv="up" style="--d:180ms">
+<h5>Over ons</h5>
+<ul><li><a href="#">Ons verhaal</a></li><li><a href="https://deklokjesman.com/">De Klokjesman</a></li>
+<li><a href="#">Vacatures</a></li></ul>
+<h5 style="margin-top:18px">Direct contact</h5>
+<ul><li><a href="https://wa.link/a36gtn">WhatsApp 06&#8209;16264544</a></li>
+<li><a href="mailto:info@deoutfitman.com">info@deoutfitman.com</a></li></ul>
+</div>
+</div>
+<div class="ft-bot">
+<span>&copy; 2026 De Outfitman. Alle rechten voorbehouden.</span>
+<span>Nr. 1 in merkkleding</span>
+</div>
+</div>
+</footer>
+<div class="ovl" id="ovl"></div>
+<aside class="drw" id="cart" aria-label="Winkelwagen">
+<div class="drw-h"><b>Winkelwagen (<span id="cartN2">3</span>)</b>
+<button class="ic" id="cartClose" aria-label="Sluiten"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="ship">
+<p id="shipMsg">Nog <b>&euro;0,00</b> tot gratis verzending</p>
+<div class="ladder">
+<i id="shipBar"></i>
+<span class="mile" id="m200" style="left:57.14%"><span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span></span>
+<span class="mile" id="m350" style="left:100%"><span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span></span>
+</div>
+<div class="mile-lbls"><span>&euro;0</span><span id="t200">&euro;200 verzending</span><span id="t350">&euro;350 mystery shirt</span></div>
+<div class="gift" id="gift">
+<span class="gi"><svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7S9 2 6.5 4.5 12 7 12 7zM12 7s3-5 5.5-2.5S12 7 12 7z"/></svg></span>
+<div><b>Gratis mystery shirt</b></div>
+<span class="st" id="giftSt">Nog niet</span>
+</div>
+</div>
+<div class="drw-b">
+<div class="drw-pad" id="cartItems"></div>
+<div class="ctabs">
+<div class="ctabs-h">
+<button class="ctab on" data-p="up">Maak het compleet</button>
+<button class="ctab" data-p="rec">Aanbevolen voor jou</button>
+<button class="ctab" data-p="seen">Recent bekeken</button>
+</div>
+<div class="cpane on" id="pane-up"><div class="crail" id="upRail"></div></div>
+<div class="cpane" id="pane-rec"><div class="crail" id="recRail"></div></div>
+<div class="cpane" id="pane-seen"><div class="crail" id="seenRail"></div></div>
+</div>
+</div>
+<div class="drw-f">
+<div class="row"><span class="lb">Subtotaal</span>
+<span class="vv" id="cartTotal">&euro;0,00<small id="cartSave"></small></span></div>
+<button class="btn btn-chrome"><span>Afrekenen</span> <span class="arw">&rarr;</span></button>
+<div class="ctrust"><div class="stars">
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+<svg viewBox="0 0 24 24" fill="#F59E0B"><path d="M12 2l3 7h7l-5.5 4.3L18.5 21 12 16.8 5.5 21l2-7.7L2 9h7z"/></svg>
+</div><span>4.9 &middot; meer dan 800 klanten geholpen</span></div>
+<div class="cpays">
+<span class="paychip" style="--sd:0s">iDEAL</span>
+<span class="paychip" style="--sd:.5s">VISA</span>
+<span class="paychip" style="--sd:1s">Mastercard</span>
+<span class="paychip" style="--sd:1.5s">Apple Pay</span>
+<span class="paychip" style="--sd:2s">Klarna</span>
+</div>
+</div>
+</aside>
+<nav class="menu" id="menu" aria-label="Hoofdmenu">
+<div class="menu-bf">
+<div class="mb">
+<div><b>Black Friday</b><span>Tot -50% &middot; nog <i id="cdMenu">11d</i></span></div>
+<a href="collectie.html" style="background:#fff;color:var(--bf);height:30px;padding:0 12px;display:inline-flex;align-items:center;font-family:var(--disp);font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.07em">Shop</a>
+</div>
+</div>
+<div class="menu-h"><span class="lbl">Menu</span>
+<button class="ic" id="menuClose" aria-label="Sluiten"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="menu-b" id="menuList"></div>
+<div class="menu-f">
+<a href="https://wa.link/a36gtn">WhatsApp &middot; 06-16264544</a>
+<a href="https://deklokjesman.com/">De Klokjesman &rarr;</a>
+</div>
+</nav>
+<script src="/js/core.js"></script>
+<script src="/js/collection.js"></script>
+</body>
+</html>
