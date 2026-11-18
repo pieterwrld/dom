@@ -39,6 +39,16 @@ function dom_setting($key, $default = '') {
 function dom_setting_image_url($key) {
     $value = dom_setting($key);
 
+    // Het woordmerk staat al in de mediabibliotheek. Zonder deze terugval toont
+    // de header de tekstversie, waarin het mannetje in de i ontbreekt.
+    if ($key === 'header_logo' && empty($value)) {
+        $uploads = wp_get_upload_dir();
+        $file    = '/2025/03/cropped-Merkkleding-Logo-852-x-210-px-2-removebg-preview.png';
+        if (!empty($uploads['basedir']) && file_exists($uploads['basedir'] . $file)) {
+            return $uploads['baseurl'] . $file;
+        }
+    }
+
     if (is_array($value)) {
         return $value['url'] ?? '';
     }

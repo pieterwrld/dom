@@ -42,7 +42,10 @@ $star      = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.
         <h2 class="d2 split">Wat onze klanten zeggen</h2>
       </div>
       <div class="rev-stat">
-        <div class="bigno"><span data-count="<?php echo (int) $review_count; ?>">0</span><small>WhatsApp reviews</small></div>
+        <div>
+          <div class="bigno"><span data-count="<?php echo (int) $review_count; ?>">0</span></div>
+          <span class="lbl">WhatsApp reviews</span>
+        </div>
       </div>
       <div class="rvctl">
         <div class="rvdots" id="rvDots"></div>
