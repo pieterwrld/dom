@@ -271,7 +271,12 @@ $$('.rnav[data-rail]').forEach(function(b){
 
 /* ============ 11. MENU / CART / SEARCH OVERLAYS ============ */
 (function(){
-  var ovl=$('.js-overlay'), menu=$('#siteMenu');
+  /* Deze elementen pas opzoeken wanneer ze nodig zijn, niet bij het laden.
+     Hier stond een vaste verwijzing, die leeg bleef wanneer dit script eerder
+     draaide dan de footer waar de overlay staat. De drawer kreeg dan nooit
+     zijn donkere achtergrond, en klikken naast de drawer deed niets. */
+  function ovlEl(){ return $('.js-overlay'); }
+  var menu=$('#siteMenu');
   var searchOvl=$('.js-search-overlay');
 
   function lockBody(){ document.body.classList.add('lock'); }
@@ -280,7 +285,7 @@ $$('.rnav[data-rail]').forEach(function(b){
   function openMenu(){
     if(!menu) return;
     menu.classList.add('on');
-    if(ovl) ovl.classList.add('on');
+    var o=ovlEl(); if(o) o.classList.add('on');
     lockBody();
     var burger=$('.js-menu-open');
     if(burger) burger.setAttribute('aria-expanded','true');
@@ -289,7 +294,7 @@ $$('.rnav[data-rail]').forEach(function(b){
   function closeMenu(){
     if(!menu) return;
     menu.classList.remove('on');
-    if(ovl) ovl.classList.remove('on');
+    var o=ovlEl(); if(o) o.classList.remove('on');
     unlockBody();
     var burger=$('.js-menu-open');
     if(burger) burger.setAttribute('aria-expanded','false');
@@ -299,7 +304,7 @@ $$('.rnav[data-rail]').forEach(function(b){
     var drw=$('.drw');
     if(!drw) return;
     drw.classList.add('on');
-    if(ovl) ovl.classList.add('on');
+    var o=ovlEl(); if(o) o.classList.add('on');
     lockBody();
   }
 
@@ -307,7 +312,7 @@ $$('.rnav[data-rail]').forEach(function(b){
     var drw=$('.drw');
     if(!drw) return;
     drw.classList.remove('on');
-    if(ovl) ovl.classList.remove('on');
+    var o=ovlEl(); if(o) o.classList.remove('on');
     unlockBody();
   }
 
@@ -349,7 +354,7 @@ $$('.rnav[data-rail]').forEach(function(b){
     for(var i=0;i<ACTIES.length;i++){
       if(e.target.closest(ACTIES[i][0])){ ACTIES[i][1](); return; }
     }
-    if(ovl && e.target === ovl) closeAll();
+    if(e.target.closest('.js-overlay')) closeAll();
   });
 
   document.addEventListener('keydown', function(e){

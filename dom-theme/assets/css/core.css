@@ -690,7 +690,9 @@ input,select{font:inherit}
 .crail{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:13px}
 .crail::-webkit-scrollbar{display:none}
 .cmini{flex:0 0 124px}
-.cmini .im{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--surface)}
+/* .im is een <a>, dus inline: aspect-ratio deed niets en het vakje klapte
+   naar 0x0, waardoor de productfoto's in de winkelwagen onzichtbaar waren. */
+.cmini .im{display:block;position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--surface)}
 .cmini .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cmini .rt{display:flex;align-items:center;gap:4px;margin-top:6px}
 .cmini .rt .stars svg{width:9px;height:9px}
