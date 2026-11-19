@@ -347,6 +347,16 @@ add_action('woocommerce_checkout_create_order_line_item', function ($regel, $sle
     );
 }, 10, 3);
 
+/**
+ * Op de checkout geen "x 1" achter het cadeau.
+ *
+ * Het aantal staat vast op een en WooCommerce zet het achter de naam, dus na
+ * de maatkiezer. Dat leverde een losse "x 1" onder de maatknoppen op.
+ */
+add_filter('woocommerce_checkout_cart_item_quantity', function ($html, $item) {
+    return dom_is_cadeau_regel($item) ? '' : $html;
+}, 10, 2);
+
 /** Op de checkout staat de kiezer onder de naam van het cadeau. */
 add_filter('woocommerce_cart_item_name', function ($naam, $item) {
     if (!dom_is_cadeau_regel($item)) {
