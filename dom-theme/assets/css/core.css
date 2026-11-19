@@ -539,6 +539,9 @@ input,select{font:inherit}
 .cover-sec::before{content:"";position:absolute;inset:0;
   background:radial-gradient(1000px 520px at 50% 0%,rgba(208,20,44,.2),transparent 68%)}
 .cover-head{position:relative;z-index:2;text-align:center;padding-bottom:clamp(14px,2.2vw,26px)}
+/* De eyebrow is een flexrij met een streepje ervoor; die bleef links staan
+   terwijl de kop eronder gecentreerd is. */
+.cover-head .eyebrow{justify-content:center}
 .cover-head h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;line-height:.86;
   font-size:clamp(2.8rem,9vw,7.5rem)}
 .cover-head p{color:rgba(255,255,255,.55);font-size:13.5px;margin-top:8px}
@@ -645,20 +648,20 @@ input,select{font:inherit}
 /* De kopbalk van WhatsApp. Staat precies over de balk in het screenshot, waar
    de naam en de foto van de klant onleesbaar zijn gemaakt. */
 .wabar{position:absolute;left:0;right:0;top:4.8%;height:5.5%;display:flex;align-items:center;
-  gap:.5em;padding:0 .8em;background:#141414;color:#fff}
+  gap:.5em;padding:0 .8em;background:var(--wabar,#141414);color:var(--watxt,#fff)}
 .wab-terug{display:flex;align-items:center;gap:.2em;flex:0 0 auto}
-.wab-terug svg{width:1.15em;height:1.15em;stroke:#fff;stroke-width:2.4;fill:none;
+.wab-terug svg{width:1.15em;height:1.15em;stroke:currentColor;stroke-width:2.4;fill:none;
   stroke-linecap:round;stroke-linejoin:round}
 .wab-terug i{font-style:normal;font-size:.95em;font-weight:500}
-.wab-av{width:2em;height:2em;flex:0 0 auto;border-radius:50%;background:#000;color:#fff;
+.wab-av{width:2em;height:2em;flex:0 0 auto;border-radius:50%;background:#0A0A0A;color:#fff;
   display:grid;place-items:center;font-family:var(--disp);font-size:.78em;font-weight:800;
   letter-spacing:.02em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
 .wab-nm{font-size:1.05em;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis;min-width:0;flex:1}
 .wab-ic{display:flex;align-items:center;gap:.65em;flex:0 0 auto}
 .wab-ic svg{width:1.5em;height:1.5em;display:block}
-.wab-ic svg:first-child{stroke:#fff;stroke-width:1.7;fill:none;stroke-linejoin:round}
-.wab-ic svg:last-child{fill:#fff}
+.wab-ic svg:first-child{stroke:currentColor;stroke-width:1.7;fill:none;stroke-linejoin:round}
+.wab-ic svg:last-child{fill:currentColor}
 
 /* ── Pijlen, bolletjes, keurmerk ── */
 /* Pijlen en bolletjes onder de slider, zodat de pijlen op elke breedte te
@@ -876,6 +879,18 @@ body.cart-open .ovl{opacity:1;pointer-events:auto}
   color:var(--muted);font-weight:700}
 .row .vv{font-family:var(--mono);font-size:17px;font-weight:700;text-align:right}
 .row .vv small{font-size:11px;color:var(--green);display:block;font-family:var(--ui)}
+/* Het totaal in de lade: label links, bedrag groot rechts, de besparing en de
+   btw-regel eronder aan dezelfde rechterkant. Zo is in één oogopslag te zien
+   wat het bedrag is. */
+.totaal{display:grid;grid-template-columns:1fr auto;align-items:baseline;
+  column-gap:12px;row-gap:2px}
+.totaal .lb{grid-column:1;grid-row:1;font-family:var(--disp);font-size:13px;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted);font-weight:700}
+.totaal .vv{grid-column:2;grid-row:1;font-family:var(--mono);font-size:clamp(19px,5vw,23px);
+  font-weight:700;text-align:right;letter-spacing:-.01em}
+.totaal .bespaard{grid-column:2;grid-row:2;text-align:right;font-size:11.5px;font-weight:600;
+  color:var(--green)}
+.totaal .btw{grid-column:1;grid-row:2;font-size:11px;color:var(--muted)}
 .drw-f .btn{width:100%;height:52px}
 .ctrust{display:flex;align-items:center;justify-content:center;gap:7px;font-size:10.5px;
   color:var(--muted)}

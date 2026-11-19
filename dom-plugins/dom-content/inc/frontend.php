@@ -96,10 +96,14 @@ function dom_c_reviews() {
         if (!$url) {
             continue;
         }
+        $balk = dom_content_balkkleur($id);
+
         $uit[] = [
-            'id'   => $id,
-            'url'  => $url,
-            'naam' => (string) ($rij['naam'] ?? ''),
+            'id'    => $id,
+            'url'   => $url,
+            'naam'  => (string) ($rij['naam'] ?? ''),
+            'balk'  => $balk['kleur'],
+            'tekst' => $balk['tekst'],
         ];
     }
     return $uit;
@@ -171,3 +175,92 @@ add_action('admin_bar_menu', function (WP_Admin_Bar $bar) {
         ]);
     }
 }, 80);
+
+/**
+ * De kleur van de WhatsApp-kopbalk in een screenshot.
+ *
+ * Onze eigen balk ligt precies over die van WhatsApp. Een deel van de
+ * screenshots komt uit de lichte stand van WhatsApp, en daar stak een zwarte
+ * balk hard tegen af. Daarom meten we de kleur uit het beeld zelf.
+ *
+ * Gemeten wordt aan de uiterste linker- en rechterrand van de balk: daar zit
+ * geen tekst, geen pictogram en geen zwarte streep over de naam van de klant.
+ * De lichtste van de twee is de schoonste meting. Het resultaat blijft in de
+ * bijlage staan, zodat het maar één keer gebeurt.
+ *
+ * @return array{kleur:string, tekst:string}
+ */
+function dom_content_balkkleur($attachment_id) {
+    $standaard = ['kleur' => '#141414', 'tekst' => '#ffffff'];
+
+    $bewaard = get_post_meta($attachment_id, '_dom_balk', true);
+    if (is_array($bewaard) && isset($bewaard['kleur'], $bewaard['tekst'])) {
+        return $bewaard;
+    }
+
+    $pad = get_attached_file($attachment_id);
+    if (!$pad || !file_exists($pad) || !function_exists('imagecreatetruecolor')) {
+        return $standaard;
+    }
+
+    $soort = wp_check_filetype($pad);
+    switch ($soort['ext'] ?? '') {
+        case 'jpg':
+        case 'jpeg':
+            $bron = @imagecreatefromjpeg($pad);
+            break;
+        case 'png':
+            $bron = @imagecreatefrompng($pad);
+            break;
+        case 'webp':
+            $bron = function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($pad) : false;
+            break;
+        default:
+            $bron = false;
+    }
+    if (!$bron) {
+        return $standaard;
+    }
+
+    $b = imagesx($bron);
+    $h = imagesy($bron);
+
+    /** Eén monster: een stukje beeld teruggebracht tot één pixel. */
+    $monster = static function ($x, $breedte) use ($bron, $b, $h) {
+        $doel = imagecreatetruecolor(1, 1);
+        imagecopyresampled(
+            $doel, $bron,
+            0, 0,
+            (int) round($b * $x), (int) round($h * 0.056),
+            1, 1,
+            max(1, (int) round($b * $breedte)), max(1, (int) round($h * 0.039))
+        );
+        $kleur = imagecolorat($doel, 0, 0);
+        imagedestroy($doel);
+        return [
+            ($kleur >> 16) & 0xFF,
+            ($kleur >> 8) & 0xFF,
+            $kleur & 0xFF,
+        ];
+    };
+
+    $links  = $monster(0.005, 0.030);
+    $rechts = $monster(0.955, 0.040);
+    imagedestroy($bron);
+
+    $helder = static function ($rgb) {
+        return 0.2126 * $rgb[0] + 0.7152 * $rgb[1] + 0.0722 * $rgb[2];
+    };
+
+    $rgb = $helder($links) >= $helder($rechts) ? $links : $rechts;
+    $lum = $helder($rgb);
+
+    $uit = [
+        'kleur' => sprintf('#%02x%02x%02x', $rgb[0], $rgb[1], $rgb[2]),
+        'tekst' => $lum > 125 ? '#0b141a' : '#ffffff',
+    ];
+
+    update_post_meta($attachment_id, '_dom_balk', $uit);
+
+    return $uit;
+}

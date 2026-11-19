@@ -174,9 +174,17 @@ $eur = function ($v) {
   <!-- Footer -->
   <?php if ($cart_count > 0) : ?>
   <div class="drw-f">
-    <div class="row">
-      <span class="lb">Subtotaal</span>
-      <span class="vv" id="cartTotal"><?php echo $eur($cart_total); ?><?php if ($saved > 0) : ?><small>Je bespaart <?php echo $eur($saved); ?></small><?php endif; ?></span>
+    <?php
+    // Het totaal stond links onder de lijst met de besparing eronder, waardoor
+    // niet duidelijk was wat nu het bedrag is. Label links, bedrag rechts.
+    ?>
+    <div class="totaal">
+      <span class="lb"><?php esc_html_e('Totaal', 'dom-theme'); ?></span>
+      <span class="vv" id="cartTotal"><?php echo $eur($cart_total); ?></span>
+      <?php if ($saved > 0) : ?>
+        <span class="bespaard"><?php printf(esc_html__('Je bespaart %s', 'dom-theme'), $eur($saved)); ?></span>
+      <?php endif; ?>
+      <span class="btw"><?php esc_html_e('incl. btw', 'dom-theme'); ?></span>
     </div>
     <a href="<?php echo esc_url(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : dom_shop_url()); ?>" class="btn btn-chrome">
       <span><?php echo esc_html(dom_c('winkelwagen.teksten.knop', 'Afrekenen')); ?></span>

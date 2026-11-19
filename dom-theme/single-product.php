@@ -177,7 +177,8 @@ while (have_posts()) : the_post();
           </div>
           <span class="glow"></span>
           <?php if ($on_sale && $save_pct > 0) : ?>
-            <span class="gal-bf">Black Friday &middot; -<?php echo $save_pct; ?>%</span>
+            <?php // Zelfde badge als op de collectiepagina, met het streepje ertussen. ?>
+            <span class="gal-bf"><?php echo dom_korting_badge($save_pct); // phpcs:ignore ?></span>
           <?php endif; ?>
           <span class="gal-cnt"><span id="galI">1</span>/<span id="galN"><?php echo max(1, count($gal_full)); ?></span></span>
           <?php if (count($gal_full) > 1) : ?>

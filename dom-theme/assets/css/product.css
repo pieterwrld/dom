@@ -24,11 +24,11 @@
 .gal-arw:disabled{opacity:0!important}
 .gal-cnt{position:absolute;top:10px;right:10px;z-index:4;font-family:var(--mono);font-size:10px;
   background:rgba(255,255,255,.92);padding:4px 8px}
-.gal-bf{position:absolute;top:10px;left:10px;z-index:4;display:inline-flex;align-items:center;gap:7px;
-  height:26px;padding:0 10px;color:#fff;font-family:var(--disp);font-size:13px;font-weight:800;
-  letter-spacing:.07em;text-transform:uppercase;
-  background-image:linear-gradient(135deg,#8C0C1C,#D0142C,#FF5566,#D0142C);
-  background-size:300% 300%;animation:shim 5s ease infinite}
+/* De badge zelf komt uit dom_korting_badge(), dezelfde als op de
+   collectiepagina. Dit plaatst hem alleen over de foto. */
+.gal-bf{position:absolute;top:10px;left:10px;z-index:4}
+.gal-bf .pb{height:26px;padding:0 11px;font-size:12px}
+.gal-bf .pb-bf i{font-size:9.5px}
 /* min-width:0 is hier nodig: een rij met overflow:auto krijgt standaard een
    minimumbreedte gelijk aan al zijn knoppen samen. Acht miniaturen maakten de
    kolom 506px breed op een scherm van 390px, waardoor de hele productpagina
