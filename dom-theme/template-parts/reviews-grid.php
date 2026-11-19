@@ -2,19 +2,19 @@
 defined('ABSPATH') || exit;
 
 /**
- * Reviews: echte WhatsApp-screenshots.
+ * Reviews: echte WhatsApp-screenshots, één tegelijk in een telefoon.
  *
- * De bron is het berichttype Reviews in wp-admin; staat daar niets, dan vallen
- * we terug op de afbeeldingen die met het thema meekomen. Er worden nooit namen
- * of teksten verzonnen: de kaart toont het gesprek zoals het is, met De
- * Outfitman als afzender.
+ * De screenshots zijn hele telefoonschermen (946 × 2048, dezelfde verhouding
+ * als een iPhone 15 Pro). Ze gaan dus schermvullend in de behuizing, zonder
+ * kader eromheen. Over de kopbalk van WhatsApp — waar in het origineel de naam
+ * en de foto van de klant onleesbaar zijn gemaakt — ligt onze eigen kopbalk met
+ * De Outfitman erin, zodat het leest als een gesprek met de winkel.
+ *
+ * Er worden nooit teksten of namen verzonnen: het gesprek is het screenshot.
+ *
+ * Beheer: De Outfitman > Reviews.
  */
 
-/**
- * De screenshots komen uit het beheerscherm (De Outfitman > Reviews). Staat
- * daar nog niets, dan vallen we terug op de afbeeldingen die het thema zelf
- * meelevert, zodat de sectie nooit leeg is.
- */
 $reviews = dom_c_reviews();
 if (!$reviews && function_exists('dom_review_screenshots')) {
     $reviews = dom_review_screenshots();
@@ -25,81 +25,232 @@ if (!$review_count) {
 }
 
 $wa_number = preg_replace('/\D+/', '', (string) dom_c('algemeen.contact.whatsapp', '31616264544'));
-$star      = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 17.2 6.1 20.3l1.2-6.6L2.5 9.1l6.6-.9z"/></svg>';
+
+$ster = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.2 6.6.9-4.8 4.6 1.2 6.6L12 17.2 6.1 20.3l1.2-6.6L2.5 9.1l6.6-.9z"/></svg>';
+
+/**
+ * De cijfers in de twee blokken. Ze staan hier zodat ze met de echte aantallen
+ * meebewegen als die veranderen, en zodat de teller precies op deze waarde
+ * eindigt in plaats van op een afronding.
+ */
+$stat_klanten = (string) dom_c('footer.trust.klanten', '1.200+');
+$klanten_getal = (float) preg_replace('/[^0-9]/', '', $stat_klanten);
+$klanten_plus  = str_contains($stat_klanten, '+');
+$stat_score    = 4.9;
 ?>
-<section class="sec" id="reviews" style="background:var(--off);border-bottom:1px solid var(--line)">
+<section class="sec revsec" id="reviews">
   <div class="wrap">
+
     <div class="sec-t" data-rv="up">
-      <div class="eyebrow"><i></i><span class="lbl">Reviews</span></div>
-      <div class="sec-h">
-        <div>
-          <h2 class="d2 split"><?php echo esc_html(dom_c('home.reviews.titel', 'Wat onze klanten zeggen')); ?></h2>
-          <p class="rev-sub">
-            <?php
-            // %s in de beheerde zin wordt het aantal screenshots.
-            $rev_sub = (string) dom_c('home.reviews.subtitel', '%s echte gesprekken, rechtstreeks uit WhatsApp');
-            printf(
-                esc_html($rev_sub),
-                '<b>' . esc_html(number_format_i18n($review_count)) . '</b>'
-            );
-            ?>
-          </p>
-        </div>
+      <div class="eyebrow"><i></i><span class="lbl"><?php echo esc_html(dom_c('home.reviews.eyebrow', 'Reviews')); ?></span></div>
+      <h2 class="d2 split"><?php echo esc_html(dom_c('home.reviews.titel', 'Wat onze klanten zeggen')); ?></h2>
+      <p class="rev-sub">
+        <?php
+        $rev_sub = (string) dom_c('home.reviews.subtitel', '%s echte gesprekken, rechtstreeks uit WhatsApp');
+        printf(esc_html($rev_sub), '<b>' . esc_html(number_format_i18n($review_count)) . '</b>');
+        ?>
+      </p>
+    </div>
+
+    <!-- Twee cijferblokken. De tellers lopen één keer op zodra ze in beeld komen. -->
+    <div class="rstats" id="rstats">
+      <div class="rstat">
+        <b class="rstat-no" data-doel="<?php echo esc_attr($klanten_getal); ?>"
+           data-plus="<?php echo $klanten_plus ? '1' : '0'; ?>"><?php echo esc_html($stat_klanten); ?></b>
+        <span class="rstat-lbl"><?php esc_html_e('Tevreden klanten', 'dom-theme'); ?></span>
       </div>
-      <div class="rvctl">
-        <div class="rvdots" id="rvDots"></div>
-        <div style="display:flex;gap:6px">
-          <button class="cvnav" id="rvPrev" aria-label="Vorige reviews">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-          <button class="cvnav" id="rvNext" aria-label="Volgende reviews">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
+      <div class="rstat">
+        <div class="rstat-sterren" aria-hidden="true">
+          <?php for ($i = 0; $i < 5; $i++) : ?>
+            <span style="--i:<?php echo $i; ?>"><?php echo $ster; // phpcs:ignore ?></span>
+          <?php endfor; ?>
         </div>
+        <b class="rstat-no" data-doel="<?php echo esc_attr($stat_score); ?>" data-decimaal="1">
+          <?php echo esc_html(number_format_i18n($stat_score, 1)); ?></b><span class="rstat-max">/5</span>
+        <span class="rstat-lbl"><?php esc_html_e('Gemiddelde score', 'dom-theme'); ?></span>
       </div>
     </div>
 
-    <div class="rvwrap">
-      <div class="rvtrack" id="rvTrack">
-        <?php foreach ($reviews as $r) :
-            $img = $r['url'] ?? '';
-            if (!$img) {
-                continue;
-            }
-            $afzender = trim((string) ($r['naam'] ?? '')) ?: 'De Outfitman';
+    <!-- Eén review tegelijk -->
+    <div class="rview" id="rview">
+      <button class="rnav rnav-l" type="button" aria-label="<?php esc_attr_e('Vorige review', 'dom-theme'); ?>">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+
+      <div class="rstage" id="rstage">
+        <?php foreach ($reviews as $i => $r) :
+          $img = $r['url'] ?? '';
+          if (!$img) {
+              continue;
+          }
+          $afzender = trim((string) ($r['naam'] ?? '')) ?: 'De Outfitman';
         ?>
-          <div class="rev">
-            <div class="rev-top">
-              <span class="rev-av">DO</span>
-              <div>
-                <div class="nm"><?php echo esc_html($afzender); ?></div>
-                <div class="on">online</div>
+          <figure class="rslide<?php echo 0 === $i ? ' on' : ''; ?>"<?php echo 0 === $i ? '' : ' aria-hidden="true"'; ?>>
+            <div class="rphone">
+              <div class="rphone-screen">
+                <img src="<?php echo esc_url($img); ?>"
+                     alt="<?php esc_attr_e('WhatsApp-gesprek met een klant', 'dom-theme'); ?>"
+                     width="946" height="2048"
+                     loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async">
+
+                <!-- Onze kopbalk, precies over die van WhatsApp heen -->
+                <div class="wabar">
+                  <span class="wab-terug">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                    <i>1</i>
+                  </span>
+                  <span class="wab-av">DO</span>
+                  <span class="wab-nm"><?php echo esc_html($afzender); ?></span>
+                  <span class="wab-ic">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6.5" width="13" height="11" rx="2.6"/><path d="M15 11l6-3.4v8.8L15 13z"/></svg>
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5l2.6.6 1 3.6-2 1.5a12 12 0 0 0 6 6l1.5-2 3.6 1 .6 2.6c-.2 1-1 1.7-2 1.7A15.4 15.4 0 0 1 4.9 5.5c0-1 .7-1.8 1.7-2z"/></svg>
+                  </span>
+                </div>
+
+                <!-- Dynamic Island -->
+                <span class="rphone-island" aria-hidden="true"></span>
               </div>
-              <svg class="wa" viewBox="0 0 32 32" fill="#25D366" aria-hidden="true"><path d="M16 3C8.8 3 3 8.8 3 16c0 2.3.6 4.5 1.7 6.4L3 29l6.8-1.8A13 13 0 1 0 16 3zm0 23.7c-2 0-4-.5-5.7-1.6l-.4-.2-4 1 1.1-3.9-.3-.4A10.7 10.7 0 1 1 16 26.7zm6.1-7.9c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2s-.9 1.1-1.1 1.3c-.2.2-.4.3-.8.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.5-.3.4-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.8 6 5.3 2.2.9 3.1 1 4.2.8.7-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.3-.3-.6-.4z"/></svg>
             </div>
-            <div class="rev-phone">
-              <div class="rev-shot">
-                <img src="<?php echo esc_url($img); ?>" alt="WhatsApp bericht van een klant" loading="lazy" decoding="async" width="620" height="1066">
-              </div>
-            </div>
-            <div class="rev-foot">
-              <div class="stars" aria-label="5 van de 5 sterren"><?php echo str_repeat($star, 5); ?></div>
-              <span class="vf">
-                <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
-                Geverifieerd
-              </span>
-            </div>
-          </div>
+          </figure>
         <?php endforeach; ?>
       </div>
+
+      <button class="rnav rnav-r" type="button" aria-label="<?php esc_attr_e('Volgende review', 'dom-theme'); ?>">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
     </div>
 
-    <div style="text-align:center;margin-top:40px" data-rv="up">
+    <div class="rdots" id="rdots" role="tablist" aria-label="<?php esc_attr_e('Kies een review', 'dom-theme'); ?>"></div>
+
+    <div class="rverify">
+      <div class="stars" aria-label="<?php esc_attr_e('5 van de 5 sterren', 'dom-theme'); ?>"><?php echo str_repeat($ster, 5); // phpcs:ignore ?></div>
+      <span class="vf">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
+        <?php esc_html_e('Geverifieerd', 'dom-theme'); ?>
+      </span>
+    </div>
+
+    <div class="rcta">
       <a href="https://wa.me/<?php echo esc_attr($wa_number); ?>" class="btn btn-bf" target="_blank" rel="noopener">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="margin-right:8px"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg>
         <?php echo esc_html(dom_c('home.reviews.knop', 'Stuur ons een bericht')); ?>
       </a>
     </div>
+
   </div>
 </section>
-<script>document.addEventListener('DOMContentLoaded',function(){if(window.DOM&&DOM.buildReviews)DOM.buildReviews('#rvTrack','#rvDots','#rvPrev','#rvNext')});</script>
+
+<script>
+(function () {
+  'use strict';
+
+  var rustig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── Tellers ─────────────────────────────────────────────
+     Lopen één keer op zodra de blokken in beeld komen. Het laatste beeld zet
+     de exacte eindwaarde, zodat er nooit 1.199 of 4,8 blijft staan. */
+  function nlGetal(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  function telOp(el) {
+    var doel     = parseFloat(el.dataset.doel || '0');
+    var decimaal = parseInt(el.dataset.decimaal || '0', 10);
+    var plus     = el.dataset.plus === '1';
+
+    var eind = decimaal
+      ? doel.toFixed(decimaal).replace('.', ',')
+      : nlGetal(Math.round(doel)) + (plus ? '+' : '');
+
+    if (rustig || !doel) { el.textContent = eind; return; }
+
+    var duur = 1500, start = null;
+    el.textContent = decimaal ? (0).toFixed(decimaal).replace('.', ',') : '0';
+
+    function stap(nu) {
+      if (start === null) start = nu;
+      var p = Math.min(1, (nu - start) / duur);
+      var e = 1 - Math.pow(1 - p, 3);
+      if (p < 1) {
+        var w = doel * e;
+        el.textContent = decimaal
+          ? w.toFixed(decimaal).replace('.', ',')
+          : nlGetal(Math.round(w)) + (plus ? '+' : '');
+        requestAnimationFrame(stap);
+      } else {
+        el.textContent = eind;
+      }
+    }
+    requestAnimationFrame(stap);
+  }
+
+  var statsEl = document.getElementById('rstats');
+  if (statsEl) {
+    // Pas als het script draait mogen de sterren beginnen met wegblijven;
+    // zonder JS staan ze er meteen.
+    statsEl.classList.add('js');
+    var getallen = statsEl.querySelectorAll('.rstat-no');
+    var starten = function () {
+      statsEl.classList.add('zichtbaar');
+      Array.prototype.forEach.call(getallen, telOp);
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      starten();
+    } else {
+      var waker = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { starten(); waker.disconnect(); }
+        });
+      }, { threshold: 0.4 });
+      waker.observe(statsEl);
+    }
+  }
+
+  /* ── Eén review tegelijk ───────────────────────────────── */
+  var stage = document.getElementById('rstage');
+  var view  = document.getElementById('rview');
+  if (!stage || !view) return;
+
+  var slides = Array.prototype.slice.call(stage.querySelectorAll('.rslide'));
+  if (!slides.length) return;
+
+  var dotsEl = document.getElementById('rdots');
+  var nu = 0;
+
+  slides.forEach(function (_, i) {
+    var d = document.createElement('button');
+    d.type = 'button';
+    d.className = 'rdot' + (i === 0 ? ' on' : '');
+    d.setAttribute('role', 'tab');
+    d.setAttribute('aria-label', 'Review ' + (i + 1));
+    d.addEventListener('click', function () { toon(i); });
+    if (dotsEl) dotsEl.appendChild(d);
+  });
+
+  var dots = dotsEl ? Array.prototype.slice.call(dotsEl.children) : [];
+
+  function toon(i) {
+    nu = (i + slides.length) % slides.length;
+    slides.forEach(function (s, k) {
+      var aan = k === nu;
+      s.classList.toggle('on', aan);
+      if (aan) { s.removeAttribute('aria-hidden'); } else { s.setAttribute('aria-hidden', 'true'); }
+    });
+    dots.forEach(function (d, k) { d.classList.toggle('on', k === nu); });
+  }
+
+  view.querySelector('.rnav-l').addEventListener('click', function () { toon(nu - 1); });
+  view.querySelector('.rnav-r').addEventListener('click', function () { toon(nu + 1); });
+
+  // Vegen op een telefoon.
+  var x0 = null;
+  stage.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
+  stage.addEventListener('pointerup', function (e) {
+    if (x0 === null) return;
+    var dx = e.clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 40) toon(nu + (dx < 0 ? 1 : -1));
+  });
+})();
+</script>

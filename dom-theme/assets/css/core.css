@@ -332,7 +332,20 @@ input,select{font:inherit}
   display:inline-flex;align-items:center;font-family:var(--disp);font-size:11px;font-weight:800;
   letter-spacing:.06em;text-transform:uppercase;background:#fff;color:var(--ink)}
 .ctile .cbadge.bf{background:var(--bf);color:#fff}
-.ctile.saletile .shade{background:linear-gradient(to top,rgba(140,12,28,.9),rgba(208,20,44,.35) 48%,transparent 80%)}
+.ctile.saletile .shade{background:linear-gradient(to top,rgba(90,6,16,.82),rgba(208,20,44,.22) 55%,transparent 85%)}
+/* Sale heeft geen foto: een rood vlak met een glans die er doorheen loopt. */
+.sale-vlak{position:absolute;inset:0;overflow:hidden;
+  background:linear-gradient(145deg,#8C0C1C 0%,#D0142C 42%,#F03048 56%,#D0142C 70%,#8C0C1C 100%);
+  background-size:260% 260%;animation:saleGloed 7s linear infinite}
+.sale-vlak::after{content:"";position:absolute;top:-55%;bottom:-55%;width:42%;left:-60%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.34),transparent);
+  transform:skewX(-18deg);animation:saleVeeg 4.6s var(--e) infinite}
+@keyframes saleGloed{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes saleVeeg{0%{left:-60%}55%,100%{left:125%}}
+@media(prefers-reduced-motion:reduce){
+  .sale-vlak{animation:none;background-position:50% 50%}
+  .sale-vlak::after{animation:none;opacity:0}
+}
 @media(max-width:860px){.ctile .cbadge{font-size:9px;height:17px;padding:0 5px;top:5px;left:5px}}
 
 /* deal bar */
@@ -349,24 +362,28 @@ input,select{font:inherit}
 /* ============================================================
    ACCESSOIRES BLOK
    ============================================================ */
-.accblk{position:relative;overflow:hidden;background:var(--ink);color:#fff;
-  min-height:clamp(300px,34vw,440px);display:flex;align-items:flex-end}
-.acc-ims{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr)}
-.acc-ims figure{position:relative;overflow:hidden}
+/* Een compacte band: de drie foto's horizontaal naast elkaar, daaronder op de
+   donkere achtergrond de kop met drie kleine knoppen. De foto's zijn
+   productshots op wit, dus ze worden maar licht gedempt — anders blijft er
+   van bril, pet en tas niets over. */
+.accblk{position:relative;overflow:hidden;background:var(--ink);color:#fff;display:block}
+.acc-ims{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  height:clamp(132px,21vw,240px);background:rgba(255,255,255,.08)}
+.acc-ims figure{position:relative;overflow:hidden;margin:0;background:#111}
 .acc-ims img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  object-position:var(--op,50% 35%);filter:grayscale(.25) brightness(.6);
+  object-position:var(--op,50% 50%);filter:brightness(.92);
   transition:transform 1.1s var(--e),filter .6s}
-.accblk:hover .acc-ims img{transform:scale(1.04)}
-.accblk::after{content:"";position:absolute;inset:0;z-index:1;
-  background:linear-gradient(to top,rgba(10,10,10,.94) 6%,rgba(10,10,10,.46) 48%,rgba(10,10,10,.22))}
-.acc-in{position:relative;z-index:2;width:100%;padding:clamp(18px,3vw,44px);display:flex;
-  align-items:flex-end;justify-content:space-between;gap:clamp(16px,3vw,40px);flex-wrap:wrap}
-.acc-in h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;line-height:.86;
-  font-size:clamp(2rem,5.6vw,4.6rem)}
-.acc-in p{font-size:13px;color:rgba(255,255,255,.6);margin-top:8px;max-width:38ch}
-.acc-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;flex:1 1 340px;max-width:560px}
-.accb{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;
-  padding:11px 12px;min-height:70px;border:1px solid rgba(255,255,255,.22);
+.accblk:hover .acc-ims img{transform:scale(1.04);filter:brightness(1)}
+.accblk::after{content:"";position:absolute;left:0;right:0;z-index:1;pointer-events:none;
+  top:calc(clamp(132px,21vw,240px) - 70px);height:70px;
+  background:linear-gradient(to bottom,rgba(10,10,10,0),rgba(10,10,10,.85))}
+.acc-in{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  gap:clamp(12px,2.4vw,32px);flex-wrap:wrap;padding:clamp(13px,2vw,24px) clamp(14px,2.4vw,30px)}
+.acc-in h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;line-height:.88;
+  font-size:clamp(1.5rem,4.2vw,3rem)}
+.acc-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;flex:1 1 280px;max-width:420px}
+.accb{position:relative;display:flex;align-items:center;justify-content:center;
+  padding:9px 10px;min-height:0;border:1px solid rgba(255,255,255,.22);
   background:rgba(255,255,255,.04);overflow:hidden;
   transition:border-color .35s,transform .4s var(--e)}
 .accb::before{content:"";position:absolute;inset:0;z-index:0;opacity:0;transition:opacity .4s;
@@ -374,19 +391,14 @@ input,select{font:inherit}
   animation:shim 5s ease infinite}
 .accb:hover::before{opacity:1}
 .accb:hover{border-color:transparent;transform:translateY(-2px)}
-.accb b,.accb span{position:relative;z-index:1}
-.accb b{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:clamp(14px,1.8vw,21px);
-  line-height:1}
-.accb span{font-family:var(--mono);font-size:9px;opacity:.62}
-.accb .ar{position:absolute;top:9px;right:10px;z-index:1;opacity:.5;transition:transform .4s var(--e)}
-.accb:hover .ar{transform:translate(3px,-3px);opacity:1}
-@media(max-width:860px){
-  .accblk{min-height:0;display:block}
-  .acc-ims{position:relative;height:170px}
-  .accblk::after{height:170px;bottom:auto}
-  .acc-in{padding:15px}
-  .accb{min-height:56px;padding:8px 9px}
-  .accb span{display:none}
+.accb b{position:relative;z-index:1;font-family:var(--disp);font-weight:800;text-transform:uppercase;
+  font-size:clamp(12px,1.5vw,16px);line-height:1;letter-spacing:.02em}
+/* De merknamen en het pijltje zijn eruit: op een knop van deze hoogte werd het
+   te druk, en de categorienaam zegt genoeg. */
+.accb span,.accb .ar{display:none}
+@media(max-width:620px){
+  .acc-in{flex-direction:column;align-items:stretch;gap:12px;text-align:center}
+  .acc-btns{max-width:none}
 }
 
 /* ============================================================
@@ -543,56 +555,98 @@ input,select{font:inherit}
 .cvdot.on{width:24px;border-radius:3px;background:var(--bf)}
 
 /* ============================================================
-   REVIEWS CAROUSEL
+   REVIEWS — één gesprek tegelijk in een telefoon
    ============================================================ */
-.rvwrap{position:relative;overflow:hidden}
-.rvtrack{display:flex;gap:clamp(9px,1.1vw,16px);transition:transform .85s var(--e);will-change:transform}
-.rev{flex:0 0 calc((100% - 3*clamp(9px,1.1vw,16px))/4);position:relative;overflow:hidden;background:#fff;
-  border:1px solid var(--line);transition:box-shadow .45s,border-color .4s}
-@media(max-width:1080px){.rev{flex-basis:calc((100% - 2*12px)/3)}}
-@media(max-width:760px){.rev{flex-basis:calc((100% - 10px)/2)}}
-@media(max-width:430px){.rev{flex-basis:calc((100% - 10px)/2)}}
-.rev:hover{box-shadow:0 18px 38px -24px rgba(10,10,10,.3);border-color:#D5D5D3}
-.rev-top{position:relative;z-index:3;display:flex;align-items:center;gap:8px;padding:9px 11px;
-  background:var(--off);border-bottom:1px solid var(--line)}
-.rev-av{width:25px;height:25px;border-radius:50%;background:var(--ink);color:#fff;display:grid;
-  place-items:center;font-family:var(--disp);font-size:10px;font-weight:800;flex:0 0 auto}
-.rev-top .nm{font-size:11px;font-weight:700;line-height:1.2}
-.rev-top .on{font-size:8.5px;color:var(--green);letter-spacing:.08em;text-transform:uppercase;font-weight:700}
-.rev-top .wa{margin-left:auto;width:16px;height:16px;flex:0 0 auto}
-/* De screenshots zijn hele telefoonschermen (verhouding 1:1,72). Met 3/4 werd
-   het gesprek grotendeels weggesneden; nu staat de kaart op de verhouding van
-   het beeld zelf, zodat het bericht leesbaar is. De blur over de bovenrand
-   verborgen het telefoonnummer: dat is er nu uitgesneden, dus die kan weg. */
-/* De screenshot in een telefoonlijst, zodat het leest als een echt gesprek
-   op een toestel in plaats van een losse afbeelding. De witte sluier die hier
-   overheen lag is weg: die maakte de bovenste en onderste berichten vaag. */
-.rev-phone{position:relative;margin:12px;padding:7px;background:#0A0A0A;border-radius:26px;
-  box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 16px 32px -20px rgba(10,10,10,.6)}
-/* De notch is eruit: op een kaart van deze breedte oogde het streepje als een
-   vlek in plaats van als een telefoon. */
-.rev-island{display:none}
-.rev-shot{position:relative;aspect-ratio:62/107;overflow:hidden;background:#111;border-radius:19px}
-.rev-shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0;
-  transition:transform 1s var(--e)}
-.rev:hover .rev-shot img{transform:scale(1.03)}
-.rev-foot{position:relative;z-index:3;display:flex;align-items:center;gap:8px;padding:9px 11px;
-  border-top:1px solid var(--line)}
-.stars{display:flex;gap:1.5px}
-.stars svg{width:11px;height:11px;fill:var(--amber)}
-.rev-foot .vf{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:8.5px;font-weight:700;
-  letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-.rev-foot .vf svg{width:11px;height:11px;stroke:var(--green);stroke-width:2.6;fill:none}
-.rvctl{display:flex;align-items:center;gap:8px}
-.rvdots{display:flex;gap:5px;margin-right:4px}
-.rvdot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:all .4s}
-.rvdot.on{width:20px;border-radius:3px;background:var(--bf)}
+.revsec{background:var(--off);border-bottom:1px solid var(--line)}
 .rev-sub{margin-top:10px;font-size:14px;color:var(--muted)}
 .rev-sub b{font-family:var(--mono);font-weight:700;color:var(--ink)}
-.rev-stat{display:flex;align-items:center;gap:clamp(16px,3vw,40px);flex-wrap:wrap}
-.rev-stat .bigno{font-family:var(--disp);font-size:clamp(2.4rem,5.4vw,4.4rem);font-weight:900;line-height:.9}
-.rev-stat .lbl{display:block;margin-top:4px;font-size:11px;font-weight:700;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--muted)}
+
+/* ── Twee cijferblokken ── */
+.rstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.6vw,18px);
+  max-width:620px;margin:clamp(22px,3vw,34px) auto 0}
+.rstat{background:#fff;border:1px solid var(--line);padding:clamp(16px,2.2vw,24px) clamp(10px,1.6vw,18px);
+  text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px}
+.rstat-no{font-family:var(--disp);font-size:clamp(1.9rem,6.4vw,2.9rem);font-weight:900;line-height:1;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.rstat-max{font-family:var(--disp);font-size:clamp(.95rem,2.6vw,1.2rem);font-weight:800;color:var(--muted);
+  margin-left:2px}
+.rstat-lbl{margin-top:7px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);line-height:1.3}
+.rstat-sterren{display:flex;gap:2px;margin-bottom:9px}
+.rstat-sterren svg{width:clamp(13px,3.4vw,16px);height:clamp(13px,3.4vw,16px);fill:var(--amber);display:block}
+/* De sterren verschijnen pas als het blok in beeld komt. Zonder JS staan ze
+   er gewoon, dus de sectie blijft zonder scripts compleet. */
+.rstats.js .rstat-sterren span{opacity:0;transform:translateY(5px)}
+.rstats.js.zichtbaar .rstat-sterren span{animation:sterIn .45s var(--e) forwards;animation-delay:calc(var(--i)*.09s)}
+@keyframes sterIn{to{opacity:1;transform:none}}
+
+/* ── De telefoon ── */
+.rview{display:flex;align-items:center;justify-content:center;gap:clamp(10px,2.4vw,30px);
+  margin-top:clamp(26px,3.6vw,42px)}
+.rstage{display:grid;flex:0 0 auto;width:clamp(248px,76vw,310px)}
+.rslide{grid-area:1/1;margin:0;opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .45s var(--e);touch-action:pan-y}
+.rslide.on{opacity:1;visibility:visible;pointer-events:auto}
+
+.rphone{position:relative;padding:clamp(7px,2.2vw,10px);background:#0A0A0A;border-radius:clamp(34px,9vw,46px);
+  box-shadow:inset 0 0 0 1.4px #3A3A3C,0 1px 0 rgba(255,255,255,.1) inset,
+    0 34px 60px -34px rgba(10,10,10,.65)}
+.rphone-screen{position:relative;aspect-ratio:946/2048;overflow:hidden;background:#000;
+  border-radius:clamp(27px,7.2vw,37px);font-size:13px}
+@supports (width:1cqw){.rphone-screen{container-type:inline-size;font-size:4.6cqw}}
+.rphone-screen>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0;
+  display:block}
+.rphone-island{position:absolute;top:2.3%;left:50%;transform:translateX(-50%);width:25%;height:3.3%;
+  border-radius:99px;background:#000}
+
+/* De kopbalk van WhatsApp. Staat precies over de balk in het screenshot, waar
+   de naam en de foto van de klant onleesbaar zijn gemaakt. */
+.wabar{position:absolute;left:0;right:0;top:4.8%;height:5.5%;display:flex;align-items:center;
+  gap:.55em;padding:0 .9em;background:#141414;color:#fff}
+.wab-terug{display:flex;align-items:center;gap:.2em;flex:0 0 auto}
+.wab-terug svg{width:1.25em;height:1.25em;stroke:#fff;stroke-width:2.4;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.wab-terug i{font-style:normal;font-size:.95em;font-weight:500}
+.wab-av{width:2.05em;height:2.05em;flex:0 0 auto;border-radius:50%;background:#000;color:#fff;
+  display:grid;place-items:center;font-family:var(--disp);font-size:.78em;font-weight:800;
+  letter-spacing:.02em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.wab-nm{font-size:1.05em;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;min-width:0;flex:1}
+.wab-ic{display:flex;align-items:center;gap:.75em;flex:0 0 auto}
+.wab-ic svg{width:1.55em;height:1.55em;display:block}
+.wab-ic svg:first-child{stroke:#fff;stroke-width:1.7;fill:none;stroke-linejoin:round}
+.wab-ic svg:last-child{fill:#fff}
+
+/* ── Pijlen, bolletjes, keurmerk ── */
+.rnav{width:44px;height:44px;flex:0 0 auto;border-radius:50%;border:1px solid var(--line);
+  background:#fff;display:grid;place-items:center;cursor:pointer;transition:all .3s var(--e)}
+.rnav svg{width:17px;height:17px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;
+  stroke-linejoin:round}
+.rnav:hover{background:var(--bf);border-color:var(--bf)}
+.rnav:hover svg{stroke:#fff}
+@media(max-width:760px){.rnav{display:none}}
+
+.rdots{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin-top:clamp(16px,2.2vw,24px)}
+.rdot{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:var(--line);cursor:pointer;
+  transition:all .35s var(--e)}
+.rdot.on{width:22px;border-radius:4px;background:var(--bf)}
+
+.rverify{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:clamp(16px,2.2vw,22px)}
+.rverify .stars{display:flex;gap:2px}
+.rverify .stars svg{width:15px;height:15px;fill:var(--amber);display:block}
+.rverify .vf{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);padding-left:12px;border-left:1px solid var(--line)}
+.rverify .vf svg{width:13px;height:13px;stroke:var(--green);stroke-width:2.6;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+
+.rcta{text-align:center;margin-top:clamp(20px,3vw,30px)}
+.rcta .btn{min-width:min(100%,300px)}
+
+@media(prefers-reduced-motion:reduce){
+  .rstats.js .rstat-sterren span{opacity:1;transform:none}
+  .rstats.js.zichtbaar .rstat-sterren span{animation:none}
+  .rslide{transition:none}
+}
 
 /* ============================================================
    USP + FOOTER

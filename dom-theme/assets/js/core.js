@@ -365,53 +365,10 @@ $$('.rnav[data-rail]').forEach(function(b){
   window.DOM.closeCart = closeCart;
 })();
 
-/* ============ 12. REVIEWS CAROUSEL ============ */
-window.DOM.buildReviews = function(trackSel, dotsSel, prevSel, nextSel){
-  var track=$(trackSel); if(!track) return;
-  var cards = $$('.rev', track);
-  var N = cards.length; if(!N) return;
-  var page=0, timer=null;
-  function per(){ var w=innerWidth; return w<=760?2:(w<=1080?3:4); }
-  function pages(){ return Math.max(1, Math.ceil(N/per())); }
-  var dots=$(dotsSel);
-  function paint(){
-    var p=per(), tot=pages();
-    page = Math.max(0, Math.min(tot-1, page));
-    var card=track.firstElementChild;
-    if(!card) return;
-    var gap=parseFloat(getComputedStyle(track).gap)||12;
-    var step=(card.getBoundingClientRect().width+gap)*p;
-    track.style.transform='translate3d('+(-page*step)+'px,0,0)';
-    if(dots){
-      if(dots.children.length!==tot){
-        dots.innerHTML=''; for(var j=0;j<tot;j++){
-          var d=document.createElement('span'); d.className='rvdot'; d.dataset.k=j; dots.appendChild(d); }
-      }
-      Array.prototype.forEach.call(dots.children,function(d,j){ d.classList.toggle('on', j===page); });
-    }
-  }
-  function go(i){ page=(i+pages())%pages(); paint(); }
-  paint();
-  addEventListener('resize', paint);
-  if(prevSel) $(prevSel).addEventListener('click',function(){ go(page-1); restart(); });
-  if(nextSel) $(nextSel).addEventListener('click',function(){ go(page+1); restart(); });
-  if(dots) dots.addEventListener('click',function(e){
-    var d=e.target.closest('.rvdot'); if(d){ go(parseInt(d.dataset.k,10)); restart(); } });
-  function play(){ if(!RM) timer=setInterval(function(){ go(page+1); }, 4200); }
-  function stop(){ clearInterval(timer); }
-  function restart(){ stop(); play(); }
-  play();
-  var wrap=track.closest('.rvwrap');
-  if(wrap){ wrap.addEventListener('mouseenter',stop); wrap.addEventListener('mouseleave',play); }
-  var x0=null;
-  track.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; stop(); },{passive:true});
-  track.addEventListener('touchend',function(e){
-    if(x0===null) return;
-    var dx=e.changedTouches[0].clientX-x0;
-    if(Math.abs(dx)>40) go(page+(dx<0?1:-1));
-    x0=null; play();
-  });
-};
+/* ============ 12. REVIEWS ============
+   De reviewsectie toont sinds de herbouw één gesprek tegelijk en regelt dat
+   zelf in template-parts/reviews-grid.php. De carrousel die hier stond reed
+   vier kaarten tegelijk op en werd nergens meer aangeroepen. */
 
 /* ============ 13. COVERFLOW ============ */
 window.DOM.buildCover = function(hostSel){

@@ -100,7 +100,10 @@ $shop_url = dom_shop_url();
     <a href="<?php echo esc_url($link); ?>"
        class="ctile<?php echo $is_sale ? ' saletile' : ''; ?>"
        data-rv="scale"<?php if ($delay) echo ' style="--d:' . $delay . 'ms"'; ?>>
-      <?php if ($img_url) : ?>
+      <?php if ($is_sale) : ?>
+        <?php // Sale krijgt geen foto maar een rood vlak met een doorlopende glans. ?>
+        <span class="cim sale-vlak" aria-hidden="true"></span>
+      <?php elseif ($img_url) : ?>
         <img class="cim" src="<?php echo esc_url($img_url); ?>" alt="<?php echo esc_attr($cat->name); ?>" loading="lazy">
       <?php else : ?>
         <div class="cim ph"><span class="ph-l"><?php echo esc_html($cat->name); ?></span></div>

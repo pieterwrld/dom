@@ -30,7 +30,6 @@ foreach ($acc_rijen as $rij) {
         'slug'   => $slug,
         'url'    => dom_term_url($term),
         'img'    => dom_c_cat_img($term->term_id, 'raster', 'product-card'),
-        'brands' => (string) ($rij['merken'] ?? ''),
     ];
 }
 
@@ -53,15 +52,12 @@ if (!$acc_data) {
   <div class="acc-in">
     <div>
       <span class="tagred"><?php echo esc_html(dom_c('home.accessoires.label', 'Accessoires')); ?></span>
-      <h2 style="margin-top:10px" class="split"><?php echo esc_html(dom_c('home.accessoires.titel', 'Maak je look compleet')); ?></h2>
-      <p class="tx" style="--d:300ms"><?php echo esc_html(dom_c('home.accessoires.tekst', 'Het verschil tussen een outfit en een look. Bril, pet en tas uit dezelfde collectie.')); ?></p>
+      <h2 style="margin-top:8px" class="split"><?php echo esc_html(dom_c('home.accessoires.titel', 'Maak je look compleet')); ?></h2>
     </div>
     <div class="acc-btns">
       <?php foreach ($acc_data as $a) : ?>
         <a href="<?php echo esc_url($a['url']); ?>" class="accb">
-          <svg class="ar" width="12" height="12" viewBox="0 0 24 24" stroke="#fff" stroke-width="2" fill="none"><path d="M7 17L17 7M9 7h8v8"/></svg>
           <b><?php echo esc_html($a['name']); ?></b>
-          <?php if ($a['brands']) : ?><span><?php echo esc_html(html_entity_decode($a['brands'], ENT_QUOTES, 'UTF-8')); ?></span><?php endif; ?>
         </a>
       <?php endforeach; ?>
     </div>

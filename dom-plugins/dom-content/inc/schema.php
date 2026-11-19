@@ -181,24 +181,22 @@ function dom_content_schema() {
 
                 'accessoires' => [
                     'titel'  => 'Accessoireblok',
-                    'uitleg' => 'De brede band met bril, pet en tas. De foto\'s komen van de categorieën zelf, die stel je in op het tabblad Categorieën.',
+                    'uitleg' => 'De band met bril, pet en tas. De foto\'s komen van de categorieën zelf, die stel je in op het tabblad Categorieën.',
                     'velden' => [
                         'label'  => ['type' => 'text', 'label' => 'Label', 'default' => 'Accessoires'],
                         'titel'  => ['type' => 'text', 'label' => 'Kop', 'default' => 'Maak je look compleet'],
-                        'tekst'  => ['type' => 'textarea', 'label' => 'Tekst', 'default' => 'Het verschil tussen een outfit en een look. Bril, pet en tas uit dezelfde collectie.'],
                         'items'  => [
                             'type'      => 'repeater',
                             'label'     => 'Categorieën in dit blok',
                             'knop'      => 'Categorie toevoegen',
                             'rij_label' => 'slug',
                             'velden'    => [
-                                'slug'  => ['type' => 'categorie', 'label' => 'Categorie'],
-                                'merken'=> ['type' => 'text', 'label' => 'Merken eronder', 'help' => 'Bijvoorbeeld: Dita · Cartier'],
+                                'slug' => ['type' => 'categorie', 'label' => 'Categorie'],
                             ],
                             'default' => [
-                                ['slug' => 'brillen', 'merken' => 'Dita · Cartier'],
-                                ['slug' => 'petten',  'merken' => 'Loro Piana'],
-                                ['slug' => 'tassen',  'merken' => 'Hermes · Goyard'],
+                                ['slug' => 'brillen'],
+                                ['slug' => 'petten'],
+                                ['slug' => 'tassen'],
                             ],
                         ],
                     ],
