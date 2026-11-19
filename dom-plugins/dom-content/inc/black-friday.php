@@ -26,13 +26,14 @@ const DOM_BF_TERM        = '_dom_bf_sale_term_toegevoegd';
  * De korting per categorie, in procenten.
  *
  * De sleutel is de slug van de productcategorie. Categorieën die hier niet in
- * staan krijgen geen korting; trainingspakken en petten dus niet.
+ * staan krijgen geen korting; petten dus niet.
  *
  * @return array<string,int>
  */
 function dom_bf_kortingen() {
     return apply_filters('dom_bf_kortingen', [
         't-shirts'         => 20,
+        'trainingspakken'  => 20,
         'jeans'            => 20,
         'sweaters-hoodies' => 20,
         'truien-vesten'    => 20,
@@ -55,10 +56,23 @@ function dom_bf_is_actief() {
  *
  * @return int[]
  */
-function dom_bf_product_ids() {
-    static $ids = null;
-    if ($ids !== null) {
-        return $ids;
+function dom_bf_product_ids($alleen_slug = '') {
+    static $cache = [];
+
+    $kortingen = dom_bf_kortingen();
+    $slugs     = array_keys($kortingen);
+
+    // Een losse categorie bijwerken zonder de rest opnieuw langs te lopen.
+    if ($alleen_slug !== '') {
+        if (!isset($kortingen[$alleen_slug])) {
+            return [];
+        }
+        $slugs = [$alleen_slug];
+    }
+
+    $sleutel = $alleen_slug !== '' ? $alleen_slug : '*';
+    if (isset($cache[$sleutel])) {
+        return $cache[$sleutel];
     }
 
     $ids = get_posts([
@@ -72,9 +86,11 @@ function dom_bf_product_ids() {
         'tax_query'      => [[
             'taxonomy' => 'product_cat',
             'field'    => 'slug',
-            'terms'    => array_keys(dom_bf_kortingen()),
+            'terms'    => $slugs,
         ]],
     ]);
+
+    $cache[$sleutel] = $ids;
 
     return $ids;
 }
@@ -148,8 +164,8 @@ function dom_bf_prijsdragers(WC_Product $product) {
  *
  * @return array tellers voor deze portie
  */
-function dom_bf_toepassen($offset, $limit) {
-    $ids   = array_slice(dom_bf_product_ids(), $offset, $limit);
+function dom_bf_toepassen($offset, $limit, $alleen_slug = '') {
+    $ids   = array_slice(dom_bf_product_ids($alleen_slug), $offset, $limit);
     $sale_term = get_term_by('slug', 'sale', 'product_cat');
 
     $t = dom_bf_lege_telling();
@@ -255,8 +271,8 @@ function dom_bf_toepassen($offset, $limit) {
  *  Uitzetten
  * =================================================================== */
 
-function dom_bf_terugdraaien($offset, $limit) {
-    $ids = array_slice(dom_bf_product_ids(), $offset, $limit);
+function dom_bf_terugdraaien($offset, $limit, $alleen_slug = '') {
+    $ids = array_slice(dom_bf_product_ids($alleen_slug), $offset, $limit);
     $sale_term = get_term_by('slug', 'sale', 'product_cat');
 
     $t = dom_bf_lege_telling();
@@ -324,8 +340,8 @@ function dom_bf_terugdraaien($offset, $limit) {
  *  Proefdraaien: tellen zonder iets te wijzigen
  * =================================================================== */
 
-function dom_bf_rapport($offset, $limit) {
-    $ids = array_slice(dom_bf_product_ids(), $offset, $limit);
+function dom_bf_rapport($offset, $limit, $alleen_slug = '') {
+    $ids = array_slice(dom_bf_product_ids($alleen_slug), $offset, $limit);
     $t   = dom_bf_lege_telling();
 
     foreach ($ids as $id) {
@@ -394,8 +410,8 @@ function dom_bf_rapport($offset, $limit) {
  * Een momentopname vóór de actie, zodat er buiten de database om een kopie
  * bestaat van wat er stond. Wijzigt niets.
  */
-function dom_bf_momentopname($offset, $limit) {
-    $ids = array_slice(dom_bf_product_ids(), $offset, $limit);
+function dom_bf_momentopname($offset, $limit, $alleen_slug = '') {
+    $ids = array_slice(dom_bf_product_ids($alleen_slug), $offset, $limit);
     $rijen = [];
 
     foreach ($ids as $id) {
@@ -449,6 +465,8 @@ add_action('rest_api_init', function () {
             'actie'  => ['type' => 'string', 'required' => true],
             'offset' => ['type' => 'integer', 'default' => 0],
             'limit'  => ['type' => 'integer', 'default' => 25],
+            // Leeg = alle kortingscategorieen; anders alleen deze slug.
+            'categorie' => ['type' => 'string', 'default' => ''],
         ],
     ]);
 });
@@ -463,20 +481,28 @@ function dom_bf_rest(WP_REST_Request $request) {
     $actie  = $request->get_param('actie');
     $offset = max(0, (int) $request->get_param('offset'));
     $limit  = min(100, max(1, (int) $request->get_param('limit')));
-    $totaal = count(dom_bf_product_ids());
+    $alleen = sanitize_title((string) $request->get_param('categorie'));
+    $totaal = count(dom_bf_product_ids($alleen));
+
+    if ($alleen !== '' && $totaal === 0) {
+        return new WP_REST_Response(
+            ['ok' => false, 'fout' => 'onbekende of kortingloze categorie: ' . $alleen],
+            400
+        );
+    }
 
     switch ($actie) {
         case 'rapport':
-            $t = dom_bf_rapport($offset, $limit);
+            $t = dom_bf_rapport($offset, $limit, $alleen);
             break;
         case 'momentopname':
-            $t = ['rijen' => dom_bf_momentopname($offset, $limit)];
+            $t = ['rijen' => dom_bf_momentopname($offset, $limit, $alleen)];
             break;
         case 'aan':
-            $t = dom_bf_toepassen($offset, $limit);
+            $t = dom_bf_toepassen($offset, $limit, $alleen);
             break;
         case 'uit':
-            $t = dom_bf_terugdraaien($offset, $limit);
+            $t = dom_bf_terugdraaien($offset, $limit, $alleen);
             break;
         default:
             return new WP_REST_Response(['ok' => false, 'fout' => 'onbekende actie'], 400);
@@ -485,10 +511,11 @@ function dom_bf_rest(WP_REST_Request $request) {
     $volgende = $offset + $limit;
     $klaar    = $volgende >= $totaal;
 
-    if ($klaar && $actie === 'aan') {
+    // Een ronde over een enkele categorie zegt niets over de hele actie.
+    if ($klaar && $alleen === '' && $actie === 'aan') {
         update_option(DOM_BF_ACTIEF, '1');
     }
-    if ($klaar && $actie === 'uit') {
+    if ($klaar && $alleen === '' && $actie === 'uit') {
         update_option(DOM_BF_ACTIEF, '');
     }
 
