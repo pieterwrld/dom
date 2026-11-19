@@ -526,6 +526,7 @@ $dom_includes = [
     '/inc/content-api.php',
     '/inc/theme-setup.php',
     '/inc/woocommerce.php',
+    '/inc/maten.php',
     '/inc/enqueue.php',
     '/inc/content-settings.php',
     '/inc/acf-fields.php',

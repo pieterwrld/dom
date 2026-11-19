@@ -118,34 +118,31 @@ while (have_posts()) : the_post();
     $gal_full   = array_values(array_filter(array_map(fn($id) => wp_get_attachment_image_url($id, 'product-gallery') ?: '', $all_images)));
     $gal_thumbs = array_values(array_filter(array_map(fn($id) => wp_get_attachment_image_url($id, 'product-card') ?: '', $all_images)));
 
-    /* upsell + cross-sell */
-    $combined_ids = array_unique(array_merge($product->get_upsell_ids(), $product->get_cross_sell_ids()));
-    if (empty($combined_ids) && $primary_cat) {
-        $fb = new WP_Query([
-            'post_type' => 'product', 'posts_per_page' => 6, 'post__not_in' => [$product->get_id()],
-            'tax_query' => [['taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => [$primary_cat->term_id]]],
-            'orderby' => 'rand',
-        ]);
-        $combined_ids = wp_list_pluck($fb->posts, 'ID');
-        wp_reset_postdata();
-    }
-    $upsell_products = [];
-    foreach (array_slice($combined_ids, 0, 6) as $uid) {
-        $up = wc_get_product($uid);
-        if ($up && $up->is_visible()) $upsell_products[] = $up;
-    }
-
-    /* same category */
+    /**
+     * Meest verkocht.
+     *
+     * WooCommerce telt per product bij hoe vaak het verkocht is in total_sales.
+     * Daar sorteren we op, zodat dit echt de bestsellers zijn en niet een
+     * willekeurige greep uit dezelfde categorie.
+     */
     $same_cat = [];
-    if ($primary_cat) {
-        $sq = new WP_Query([
-            'post_type' => 'product', 'posts_per_page' => 8, 'post__not_in' => [$product->get_id()],
-            'tax_query' => [['taxonomy' => 'product_cat', 'field' => 'term_id', 'terms' => [$primary_cat->term_id]]],
-            'orderby' => 'rand',
-        ]);
-        $same_cat = $sq->posts;
-        wp_reset_postdata();
-    }
+    $bq = new WP_Query([
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => 10,
+        'post__not_in'   => [$product->get_id()],
+        'meta_key'       => 'total_sales',
+        'orderby'        => ['meta_value_num' => 'DESC', 'date' => 'DESC'],
+        'no_found_rows'  => true,
+        'tax_query'      => [[
+            'taxonomy' => 'product_visibility',
+            'field'    => 'name',
+            'terms'    => ['exclude-from-catalog'],
+            'operator' => 'NOT IN',
+        ]],
+    ]);
+    $same_cat = $bq->posts;
+    wp_reset_postdata();
 
     /* pass data to gallery.js */
     wp_localize_script('dom-gallery', 'domProd', [
@@ -236,7 +233,6 @@ while (have_posts()) : the_post();
             <?php // Geen bruikbare prijs: liever WooCommerce zelf laten schrijven dan € 0,00. ?>
             <span class="now"><?php echo wp_kses_post($product->get_price_html()); ?></span>
           <?php endif; ?>
-          <span class="tax">Incl. btw &middot; excl. verzending</span>
         </div>
 
         <!-- BF deal timer (sale only) -->
@@ -341,7 +337,7 @@ while (have_posts()) : the_post();
         <!-- 10. 4 USP'S -->
         <div class="usp4">
           <div class="u4"><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/></svg>Snelle levering</div>
-          <div class="u4"><svg viewBox="0 0 24 24"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 0 10H9"/></svg>14 dagen retour</div>
+          <div class="u4"><svg viewBox="0 0 24 24"><path d="M4 18h16"/><path d="M4 16l-1.4-8.2 5 3.2L12 4l4.4 7 5-3.2L20 16z"/></svg>Gegarandeerde kwaliteit</div>
           <div class="u4"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Veilig betalen</div>
           <div class="u4"><svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-4.2-7.6"/><path d="M12 7v5l3 2"/></svg>24/7 WhatsApp</div>
         </div>
@@ -389,60 +385,20 @@ while (have_posts()) : the_post();
     </div><!-- /.pdp -->
   </div><!-- /.wrap -->
 
-  <!-- ══════ 12. UPSELL ══════ -->
-  <?php if (!empty($upsell_products)) : ?>
-    <section class="sec">
-      <div class="wrap">
-        <div class="sec-t" data-rv="up">
-          <div class="eyebrow"><i></i><span class="lbl">Compleet maken</span></div>
-          <div class="sec-h">
-            <h2 class="d3 split">Maak je outfit compleet</h2>
-            <div class="rail-nav">
-              <button class="rnav" data-rail="up" data-dir="-1" aria-label="Vorige"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-              <button class="rnav" data-rail="up" data-dir="1" aria-label="Volgende"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
-            </div>
-          </div>
-        </div>
-        <div class="rail" id="railUp">
-          <?php foreach ($upsell_products as $up) :
-            $up_thumb = get_the_post_thumbnail_url($up->get_id(), 'product-card');
-            $up_prijs = dom_prices($up);
-            $up_sale  = $up_prijs['sale'];
-            $up_pct   = $up_prijs['pct'];
-          ?>
-            <a class="pcard pcard-sm" href="<?php echo esc_url($up->get_permalink()); ?>" data-rv="up">
-              <div class="pmedia">
-                <img class="p1" src="<?php echo esc_url($up_thumb ?: wc_placeholder_img_src('product-card')); ?>" alt="<?php echo esc_attr($up->get_name()); ?>" loading="lazy">
-                <span class="sheen"></span>
-                <?php if ($up_pct) : ?><div class="pbadges"><span class="pb pb-sale">-<?php echo $up_pct; ?>%</span></div><?php endif; ?>
-              </div>
-              <div class="pinfo">
-                <div class="ptitle"><?php echo esc_html($up->get_name()); ?></div>
-                <div class="pprice<?php echo $up_sale ? ' sale' : ''; ?>">
-                  <?php echo dom_price_html($up); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-                </div>
-              </div>
-            </a>
-          <?php endforeach; ?>
-        </div>
-      </div>
-    </section>
-  <?php endif; ?>
-
   <!-- ══════ 13. GEDRAGEN DOOR (coverflow) ══════ -->
   <?php get_template_part('template-parts/influencer-scroll'); ?>
 
   <!-- ══════ 14. REVIEWS ══════ -->
   <?php get_template_part('template-parts/reviews-grid'); ?>
 
-  <!-- ══════ 15. MEER UIT DEZE COLLECTIE ══════ -->
+  <!-- ══════ MEEST VERKOCHT ══════ -->
   <?php if (!empty($same_cat)) : ?>
     <section class="sec" style="padding-top:0">
       <div class="wrap">
         <div class="sec-t" data-rv="up">
-          <div class="eyebrow"><i></i><span class="lbl"><?php echo $primary_cat ? esc_html($primary_cat->name) : 'Collectie'; ?></span></div>
+          <div class="eyebrow"><i></i><span class="lbl">Bestsellers</span></div>
           <div class="sec-h">
-            <h2 class="d3 split">Meer uit deze collectie</h2>
+            <h2 class="d3 split">Meest verkochte producten</h2>
             <div style="display:flex;align-items:center;gap:16px">
               <div class="rail-nav">
                 <button class="rnav" data-rail="sim" data-dir="-1" aria-label="Vorige"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -467,7 +423,7 @@ while (have_posts()) : the_post();
               <div class="pmedia">
                 <img class="p1" src="<?php echo esc_url($rp_thumb ?: wc_placeholder_img_src('product-card')); ?>" alt="<?php echo esc_attr($rp->get_name()); ?>" loading="lazy">
                 <span class="sheen"></span>
-                <?php if ($rp_pct) : ?><div class="pbadges"><span class="pb pb-sale">-<?php echo $rp_pct; ?>%</span></div><?php endif; ?>
+                <?php if ($rp_pct) : ?><div class="pbadges"><?php echo dom_korting_badge($rp_pct); // phpcs:ignore ?></div><?php endif; ?>
               </div>
               <div class="pinfo">
                 <div class="ptitle"><?php echo esc_html($rp->get_name()); ?></div>

@@ -473,7 +473,11 @@ input,select{font:inherit}
   font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 .pb-new{background:var(--ink);color:#fff}
 .pb-bf{color:#fff;background-image:linear-gradient(135deg,#8C0C1C,#D0142C,#FF5566,#D0142C);
-  background-size:300% 300%;animation:shim 5s ease infinite}
+  background-size:300% 300%;animation:shim 5s ease infinite;gap:5px}
+.pb-bf i{font-style:normal;font-size:8.5px;font-weight:700;letter-spacing:.1em;opacity:.92;
+  padding-right:5px;border-right:1px solid rgba(255,255,255,.4)}
+.pb-bf b{font-weight:800}
+@media(max-width:380px){.pb-bf i{display:none}}
 .pb-out{background:rgba(255,255,255,.93);color:var(--muted)}
 .pinfo{padding:10px 1px 0}
 .ptitle{font-size:12.5px;font-weight:500;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;
@@ -492,10 +496,12 @@ input,select{font:inherit}
 .psizes span{font-family:var(--mono);font-size:9.5px;color:var(--muted);border:1px solid var(--line);
   text-transform:uppercase;
   padding:2px 5px;line-height:1}
-@media(min-width:861px){
-  .psizes{opacity:0;transform:translateY(4px);transition:opacity .35s,transform .4s var(--e)}
-  .pcard:hover .psizes{opacity:1;transform:none}
-}
+/* Een maat die niet meer leverbaar is: doorgestreept, net als op de
+   productpagina, in plaats van weggelaten. */
+.psizes span.uit{color:#B6B6B4;border-color:#EFEFEE;text-decoration:line-through;
+  text-decoration-thickness:1px}
+/* De maten stonden op desktop verstopt tot je over de kaart ging. Nu ze laten
+   zien wat er niet meer leverbaar is, horen ze gewoon zichtbaar te zijn. */
 .slidebars{position:absolute;left:9px;right:9px;bottom:9px;z-index:3;display:flex;gap:4px}
 .slidebars i{flex:1;height:2px;background:rgba(255,255,255,.4);position:relative;overflow:hidden}
 .slidebars i::after{content:"";position:absolute;inset:0;background:#fff;transform:scaleX(0);

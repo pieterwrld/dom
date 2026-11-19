@@ -1,128 +1,93 @@
 /**
- * De Outfitman — Shop Filters (Black Friday Chrome)
- * Popover filters for prijs/maat/merk + sort + card carousel
+ * De Outfitman — filters en sliders op de collectiepagina.
+ *
+ * Het filter liep via het adres: elke maat is een gewone link en de server
+ * filtert de lijst. Eerder gebeurde hier alleen het bijwerken van een label,
+ * waardoor klikken op een maat niets deed. De JavaScript hieronder opent en
+ * sluit alleen de panelen en vertaalt de prijsschuif naar een adres.
  */
 (function () {
   'use strict';
 
   var $ = function (s, c) { return (c || document).querySelector(s); };
   var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
-  var eur = function (v) { return '€' + v.toFixed(2).replace('.', ','); };
 
-  /* ============ SIZE DATA ============ */
-  var SZ_CLOTHES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  var SZ_SHOES = ['40', '41', '42', '43', '44', '45', '46'];
-
-  function populateSizes() {
-    var cl = $('#szClothes');
-    var sh = $('#szShoes');
-    if (cl) {
-      cl.innerHTML = SZ_CLOTHES.map(function (s) {
-        return '<button class="szb" data-sz="' + s + '">' + s + '</button>';
-      }).join('');
-    }
-    if (sh) {
-      sh.innerHTML = SZ_SHOES.map(function (s) {
-        return '<button class="szb" data-sz="' + s + '">' + s + '</button>';
-      }).join('');
-    }
-  }
-  populateSizes();
-
-  /* ============ POPOVER TOGGLE ============ */
-  var pairs = [['#fpBtn', '#fpPop'], ['#fsBtn', '#fsPop'], ['#fbBtn', '#fbPop'], ['#soBtn', '#soPop']];
-  pairs.forEach(function (pr) {
+  /* ============ PANELEN OPENEN EN SLUITEN ============ */
+  var paren = [['#fpBtn', '#fpPop'], ['#fsBtn', '#fsPop'], ['#fbBtn', '#fbPop'], ['#soBtn', '#soPop']];
+  paren.forEach(function (pr) {
     var b = $(pr[0]), p = $(pr[1]);
     if (!b || !p) return;
     b.addEventListener('click', function (e) {
       e.stopPropagation();
       var was = p.classList.contains('on');
-      closeAllPops();
-      if (!was) { p.classList.add('on'); b.classList.add('on'); }
+      sluitAlles();
+      if (!was) { p.classList.add('on'); b.classList.add('open'); }
     });
     p.addEventListener('click', function (e) { e.stopPropagation(); });
   });
-  document.addEventListener('click', closeAllPops);
-  function closeAllPops() {
-    pairs.forEach(function (q) {
+  document.addEventListener('click', sluitAlles);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') sluitAlles(); });
+
+  function sluitAlles() {
+    paren.forEach(function (q) {
       var b = $(q[0]), p = $(q[1]);
-      if (b) b.classList.remove('on');
+      if (b) b.classList.remove('open');
       if (p) p.classList.remove('on');
     });
   }
 
-  /* ============ PRICE RANGE ============ */
+  /* ============ PRIJSSCHUIF ============
+     Tijdens het schuiven verandert alleen het label; bij loslaten gaat de
+     pagina naar het gefilterde adres. Het adressjabloon komt van de server en
+     bevat __p__ op de plek van het bedrag. */
   var rng = $('#rng');
   if (rng) {
-    rng.addEventListener('input', function () {
-      var v = parseInt(this.value, 10);
-      var max = parseInt(this.max, 10);
-      var label = v >= max ? '€' + max + '+' : eur(v);
-      var valEl = $('#rngNow');
-      if (valEl) valEl.textContent = label;
-      var fpVal = $('#fpVal');
-      if (fpVal) fpVal.textContent = v >= max ? 'Alles' : '≤ ' + eur(v);
-      var fpBtn = $('#fpBtn');
-      if (fpBtn) fpBtn.classList.toggle('act', v < max);
-    });
+    var toon = function () {
+      var v = parseInt(rng.value, 10);
+      var max = parseInt(rng.max, 10);
+      var label = v >= max ? '€' + max + '+' : '€' + v;
+      var nu = $('#rngNow');
+      if (nu) nu.textContent = label;
+      var val = $('#fpVal');
+      if (val) val.textContent = v >= max ? 'Alles' : '≤ €' + v;
+    };
+
+    var ga = function () {
+      var basis = rng.dataset.basis;
+      if (!basis) return;
+      var v = parseInt(rng.value, 10);
+      var max = parseInt(rng.max, 10);
+      // Helemaal rechts betekent geen prijsgrens.
+      window.location = v >= max
+        ? basis.replace(/[?&]max_prijs=__p__/, '').replace(/\?$/, '')
+        : basis.replace('__p__', String(v));
+    };
+
+    rng.addEventListener('input', toon);
+    rng.addEventListener('change', ga);
+    toon();
   }
 
-  /* ============ SIZE SELECT ============ */
-  document.addEventListener('click', function (e) {
-    var szb = e.target.closest('.szb');
-    if (!szb) return;
-    var was = szb.classList.contains('on');
-    $$('.szb').forEach(function (s) { s.classList.remove('on'); });
-    if (!was) szb.classList.add('on');
-    var fsVal = $('#fsVal');
-    var fsBtn = $('#fsBtn');
-    if (fsVal) fsVal.textContent = was ? 'Alles' : szb.dataset.sz;
-    if (fsBtn) fsBtn.classList.toggle('act', !was);
-  });
-
-  /* ============ BRAND SELECT ============ */
-  document.addEventListener('click', function (e) {
-    var brb = e.target.closest('.brb');
-    if (!brb) return;
-    brb.classList.toggle('on');
-    var chosen = $$('.brb.on');
-    var fbVal = $('#fbVal');
-    var fbBtn = $('#fbBtn');
-    if (fbVal) fbVal.textContent = chosen.length ? chosen.length + ' gekozen' : 'Alles';
-    if (fbBtn) fbBtn.classList.toggle('act', chosen.length > 0);
-  });
-
-  /* ============ SORT ============ */
+  /* ============ SORTEREN ============ */
   $$('[data-sort]').forEach(function (b) {
     b.addEventListener('click', function () {
-      var sort = b.dataset.sort;
       var url = new URL(window.location);
-      url.searchParams.set('orderby', sort);
+      url.searchParams.set('orderby', b.dataset.sort);
       window.location = url.toString();
     });
   });
 
-  /* ============ CLEAR BUTTONS ============ */
-  $$('[data-clear]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var type = b.dataset.clear;
-      if (type === 'price' && rng) {
-        rng.value = rng.max;
-        rng.dispatchEvent(new Event('input'));
-      }
-      if (type === 'size') {
-        $$('.szb').forEach(function (s) { s.classList.remove('on'); });
-        var fsVal = $('#fsVal'), fsBtn = $('#fsBtn');
-        if (fsVal) fsVal.textContent = 'Alles';
-        if (fsBtn) fsBtn.classList.remove('act');
-      }
-      if (type === 'brand') {
-        $$('.brb').forEach(function (s) { s.classList.remove('on'); });
-        var fbVal = $('#fbVal'), fbBtn = $('#fbBtn');
-        if (fbVal) fbVal.textContent = 'Alles';
-        if (fbBtn) fbBtn.classList.remove('act');
-      }
-    });
+  /* ============ MERKEN ============
+     Nog geen serverfilter; de knoppen houden alleen hun eigen stand bij. */
+  document.addEventListener('click', function (e) {
+    var brb = e.target.closest('.brb');
+    if (!brb) return;
+    brb.classList.toggle('on');
+    var gekozen = $$('.brb.on');
+    var val = $('#fbVal');
+    var btn = $('#fbBtn');
+    if (val) val.textContent = gekozen.length ? gekozen.length + ' gekozen' : 'Alles';
+    if (btn) btn.classList.toggle('act', gekozen.length > 0);
   });
 
   /* ============ FOTOSLIDER OP DE KAART ============ */

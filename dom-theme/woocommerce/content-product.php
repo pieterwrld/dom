@@ -22,17 +22,24 @@ $all_images   = array_slice($all_images, 0, 5);
 // variaties, en dan geeft get_regular_price() een lege waarde.
 $prijs    = dom_prices($product);
 $on_sale  = $prijs['sale'];
-$sale_pct = $prijs['pct'] > 0 ? '-' . $prijs['pct'] . '%' : '';
+$sale_pct = $prijs['pct'];
 
 $is_new = (strtotime($product->get_date_created()) > strtotime('-14 days'));
 $is_out = !$product->is_in_stock();
 
+/**
+ * De maten met per maat of hij nog leverbaar is. Dat komt uit de index die
+ * inc/maten.php bijhoudt, zodat er per kaart geen varianten geladen hoeven te
+ * worden. Uitverkochte maten blijven staan maar worden doorgestreept: dat
+ * zegt meer dan ze weglaten.
+ */
 $sizes = [];
-if ($product->is_type('variable')) {
-    $attrs = $product->get_variation_attributes();
-    foreach ($attrs as $attr => $vals) {
-        $sizes = array_values(array_filter($vals));
-        break;
+if (function_exists('dom_maten_van_product')) {
+    foreach (dom_maten_van_product($product->get_id()) as $taxonomie => $slugs) {
+        foreach ($slugs as $slug => $leverbaar) {
+            $term = get_term_by('slug', $slug, $taxonomie);
+            $sizes[] = ['naam' => $term ? $term->name : $slug, 'voorraad' => $leverbaar];
+        }
     }
 }
 
@@ -59,9 +66,7 @@ if ($product->is_type('variable')) {
     </div>
     <!-- Badges -->
     <div class="pbadges">
-      <?php if ($sale_pct) : ?>
-        <span class="pb pb-bf"><?php echo esc_html($sale_pct); ?></span>
-      <?php endif; ?>
+      <?php echo dom_korting_badge($sale_pct); // phpcs:ignore WordPress.Security.EscapeOutput ?>
       <?php if ($is_new && !$sale_pct) : ?>
         <span class="pb pb-new">Nieuw</span>
       <?php endif; ?>
@@ -88,7 +93,7 @@ if ($product->is_type('variable')) {
     <?php if (!empty($sizes)) : ?>
       <div class="psizes">
         <?php foreach (array_slice($sizes, 0, 6) as $sz) : ?>
-          <span><?php echo esc_html($sz); ?></span>
+          <span<?php echo $sz['voorraad'] ? '' : ' class="uit"'; ?>><?php echo esc_html($sz['naam']); ?></span>
         <?php endforeach; ?>
       </div>
     <?php endif; ?>

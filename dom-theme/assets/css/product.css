@@ -4,7 +4,7 @@
    ============================================================ */
 .pdp{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(18px,3vw,58px);
   padding-top:clamp(12px,1.8vw,24px)}
-@media(max-width:980px){.pdp{grid-template-columns:1fr;gap:20px}}
+@media(max-width:980px){.pdp{grid-template-columns:minmax(0,1fr);gap:20px}}
 
 .gal{position:relative}
 .gal-stage{position:relative;overflow:hidden;background:var(--surface);aspect-ratio:4/5;cursor:zoom-in}
@@ -29,7 +29,11 @@
   letter-spacing:.07em;text-transform:uppercase;
   background-image:linear-gradient(135deg,#8C0C1C,#D0142C,#FF5566,#D0142C);
   background-size:300% 300%;animation:shim 5s ease infinite}
-.thumbs{display:flex;gap:6px;margin-top:6px;overflow-x:auto;scrollbar-width:none}
+/* min-width:0 is hier nodig: een rij met overflow:auto krijgt standaard een
+   minimumbreedte gelijk aan al zijn knoppen samen. Acht miniaturen maakten de
+   kolom 506px breed op een scherm van 390px, waardoor de hele productpagina
+   zijwaarts wegschoof en liet inzoomen. */
+.thumbs{display:flex;gap:6px;margin-top:6px;overflow-x:auto;scrollbar-width:none;min-width:0}
 .thumbs::-webkit-scrollbar{display:none}
 .thumbs button{flex:0 0 auto;width:58px;aspect-ratio:3/4;overflow:hidden;background:var(--surface);
   opacity:.5;transition:opacity .3s,box-shadow .3s}

@@ -121,3 +121,28 @@ function dom_icon($sleutel, $class = '') {
         . ($class ? ' class="' . esc_attr($class) . '"' : '')
         . ' aria-hidden="true">' . $paden[$sleutel] . '</svg>';
 }
+
+/**
+ * De kortingsbadge op een productkaart.
+ *
+ * Staat de Black Friday-actie aan, dan komt die naam erbij te staan; anders
+ * blijft het alleen het percentage. Eén functie, zodat de badge er in het
+ * collectieraster en in de carrousels op de productpagina hetzelfde uitziet —
+ * daar stond eerder een klasse zonder opmaak, waardoor het percentage als
+ * kale tekst over de foto liep.
+ *
+ * @param int $pct Hele procenten korting.
+ * @return string Lege string als er geen korting is.
+ */
+function dom_korting_badge($pct) {
+    $pct = (int) $pct;
+    if ($pct <= 0) {
+        return '';
+    }
+
+    $actie = function_exists('dom_bf_is_actief') && dom_bf_is_actief();
+
+    return '<span class="pb pb-bf">'
+        . ($actie ? '<i>' . esc_html__('Black Friday', 'dom-theme') . '</i>' : '')
+        . '<b>-' . $pct . '%</b></span>';
+}

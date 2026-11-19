@@ -42,6 +42,36 @@ $brands = get_terms([
     'orderby'    => 'name',
 ]);
 if (is_wp_error($brands)) $brands = [];
+
+/**
+ * Het filter werkt via het adres, zodat een gefilterde lijst te delen is en
+ * het doorladen bij het scrollen de filters meeneemt.
+ */
+$maat_groepen   = function_exists('dom_beschikbare_maten') ? dom_beschikbare_maten() : [];
+$maat_gekozen   = function_exists('dom_gekozen_maten') ? dom_gekozen_maten() : [];
+$prijs_gekozen  = function_exists('dom_gekozen_maxprijs') ? dom_gekozen_maxprijs() : 0;
+$filter_basis   = $is_category ? dom_term_url($current_cat) : $shop_url;
+$prijs_max      = 500;
+$heeft_filter   = $maat_gekozen || $prijs_gekozen;
+
+/** Het huidige adres met één parameter aangepast. */
+$filter_url = static function (array $wijziging) use ($filter_basis, $maat_gekozen, $prijs_gekozen) {
+    $args = [];
+    if ($maat_gekozen) {
+        $args['maat'] = implode(',', $maat_gekozen);
+    }
+    if ($prijs_gekozen) {
+        $args['max_prijs'] = $prijs_gekozen;
+    }
+    foreach ($wijziging as $k => $v) {
+        if ($v === null || $v === '' || $v === []) {
+            unset($args[$k]);
+        } else {
+            $args[$k] = is_array($v) ? implode(',', $v) : $v;
+        }
+    }
+    return $args ? add_query_arg($args, $filter_basis) : $filter_basis;
+};
 ?>
 
 <main>
@@ -90,27 +120,60 @@ if (is_wp_error($brands)) $brands = [];
       <div class="fbar">
         <!-- Prijs -->
         <div class="fgrp">
-          <button class="fbtn" id="fpBtn">Prijs <b id="fpVal">Alles</b>
+          <button class="fbtn<?php echo $prijs_gekozen ? ' act' : ''; ?>" id="fpBtn">Prijs <b id="fpVal"><?php echo $prijs_gekozen ? '&le; &euro;' . (int) $prijs_gekozen : 'Alles'; ?></b>
             <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="fpop" id="fpPop">
             <div class="fgh">Maximale prijs</div>
-            <input type="range" class="rng" id="rng" min="30" max="500" step="10" value="500">
-            <div class="rngv"><span>&euro;30</span><span id="rngNow">&euro;500+</span></div>
-            <button class="fclear" data-clear="price">Wissen</button>
+            <input type="range" class="rng" id="rng" min="30" max="<?php echo (int) $prijs_max; ?>" step="10"
+                   value="<?php echo (int) ($prijs_gekozen ?: $prijs_max); ?>"
+                   data-basis="<?php echo esc_url($filter_url(['max_prijs' => '__p__'])); ?>">
+            <div class="rngv">
+              <span>&euro;30</span>
+              <span id="rngNow"><?php echo $prijs_gekozen ? '&euro;' . (int) $prijs_gekozen : '&euro;' . (int) $prijs_max . '+'; ?></span>
+            </div>
+            <a class="fclear" href="<?php echo esc_url($filter_url(['max_prijs' => null])); ?>">Wissen</a>
           </div>
         </div>
         <!-- Maat -->
         <div class="fgrp">
-          <button class="fbtn" id="fsBtn">Maat <b id="fsVal">Alles</b>
+          <button class="fbtn<?php echo $maat_gekozen ? ' act' : ''; ?>" id="fsBtn">Maat <b id="fsVal"><?php
+            if (!$maat_gekozen) {
+                echo 'Alles';
+            } elseif (count($maat_gekozen) === 1) {
+                [$mt, $ms] = explode(':', $maat_gekozen[0], 2);
+                $mterm = get_term_by('slug', $ms, $mt);
+                echo esc_html($mterm ? $mterm->name : $ms);
+            } else {
+                echo (int) count($maat_gekozen) . ' gekozen';
+            }
+          ?></b>
             <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="fpop" id="fsPop">
-            <div class="fgh">Kleding</div>
-            <div class="szg" id="szClothes"></div>
-            <div class="fgh" style="margin-top:13px">Schoenen</div>
-            <div class="szg" id="szShoes"></div>
-            <button class="fclear" data-clear="size">Wissen</button>
+            <?php if (!$maat_groepen) : ?>
+              <div class="fgh"><?php esc_html_e('Geen maten bekend', 'dom-theme'); ?></div>
+            <?php else : ?>
+              <?php $eerste = true; foreach ($maat_groepen as $taxonomie => $groep) : ?>
+                <div class="fgh"<?php echo $eerste ? '' : ' style="margin-top:13px"'; ?>><?php echo esc_html($groep['label']); ?></div>
+                <div class="szg">
+                  <?php foreach ($groep['maten'] as $slug => $maat) :
+                    $sleutel = $taxonomie . ':' . $slug;
+                    $aan     = in_array($sleutel, $maat_gekozen, true);
+                    $nieuw   = $aan
+                        ? array_values(array_diff($maat_gekozen, [$sleutel]))
+                        : array_merge($maat_gekozen, [$sleutel]);
+                  ?>
+                    <a class="szb<?php echo $aan ? ' on' : ''; ?><?php echo $maat['voorraad'] ? '' : ' uit'; ?>"
+                       href="<?php echo esc_url($filter_url(['maat' => $nieuw])); ?>"
+                       <?php if (!$maat['voorraad']) : ?>title="<?php esc_attr_e('Nergens meer op voorraad', 'dom-theme'); ?>"<?php endif; ?>>
+                      <?php echo esc_html($maat['naam']); ?>
+                    </a>
+                  <?php endforeach; ?>
+                </div>
+              <?php $eerste = false; endforeach; ?>
+            <?php endif; ?>
+            <a class="fclear" href="<?php echo esc_url($filter_url(['maat' => null])); ?>">Wissen</a>
           </div>
         </div>
         <!-- Merk -->
@@ -152,7 +215,27 @@ if (is_wp_error($brands)) $brands = [];
           </div>
         </div>
       </div>
-      <div class="chips" id="chips" style="display:none"></div>
+      <?php if ($heeft_filter) : ?>
+        <div class="chips" id="chips">
+          <?php foreach ($maat_gekozen as $sleutel) :
+            [$mt, $ms] = explode(':', $sleutel, 2);
+            $mterm = get_term_by('slug', $ms, $mt);
+            $zonder = array_values(array_diff($maat_gekozen, [$sleutel]));
+          ?>
+            <a class="chip" href="<?php echo esc_url($filter_url(['maat' => $zonder])); ?>">
+              <?php echo esc_html($mterm ? $mterm->name : $ms); ?>
+              <span aria-hidden="true">&times;</span>
+            </a>
+          <?php endforeach; ?>
+          <?php if ($prijs_gekozen) : ?>
+            <a class="chip" href="<?php echo esc_url($filter_url(['max_prijs' => null])); ?>">
+              &le; &euro;<?php echo (int) $prijs_gekozen; ?>
+              <span aria-hidden="true">&times;</span>
+            </a>
+          <?php endif; ?>
+          <a class="chip chip--wis" href="<?php echo esc_url($filter_basis); ?>"><?php esc_html_e('Alles wissen', 'dom-theme'); ?></a>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
 
