@@ -325,6 +325,14 @@ function dom_content_schema() {
             'uitleg' => 'Per categorie de foto in het raster, het plaatje in het menu en de banner bovenaan de categoriepagina.',
         ],
 
+        /* ─────────────── BLACK FRIDAY ─────────────── */
+        'blackfriday' => [
+            'titel'  => 'Black Friday',
+            'icoon'  => 'dashicons-tickets-alt',
+            'soort'  => 'black-friday',
+            'uitleg' => 'De actie met één knop aan en uit. Aanzetten geeft elk product in de categorieën hieronder een echte aanbiedingsprijs; de normale prijs blijft als vergelijkingsprijs staan en wordt doorgestreept getoond.',
+        ],
+
         /* ─────────────── PRODUCTPAGINA ─────────────── */
         'product' => [
             'titel'  => 'Productpagina',

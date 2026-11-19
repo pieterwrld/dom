@@ -241,3 +241,18 @@
   padding-left: 11px;
   border-left: 3px solid #dcdcde;
 }
+
+/* ── Black Friday ── */
+.domc-bf-status{display:inline-block;margin-left:10px;padding:2px 9px;border-radius:3px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle}
+.domc-bf-status.aan{background:#D0142C;color:#fff}
+.domc-bf-status.uit{background:#e5e5e4;color:#50575e}
+.domc-bf-tabel{border-collapse:collapse;min-width:280px}
+.domc-bf-tabel th,.domc-bf-tabel td{text-align:left;padding:5px 18px 5px 0;border-bottom:1px solid #f0f0f1;
+  font-size:13px}
+.domc-bf-tabel th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#646970}
+.domc-bf-knoppen{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 12px}
+.domc-bf-balk{height:8px;background:#f0f0f1;border-radius:4px;overflow:hidden;margin-bottom:12px}
+.domc-bf-balk i{display:block;height:100%;width:0;background:#D0142C;transition:width .3s}
+.domc-bf-uit{background:#1d2327;color:#f0f0f1;padding:12px 14px;border-radius:4px;font-size:12.5px;
+  line-height:1.6;white-space:pre-wrap;max-height:340px;overflow:auto}

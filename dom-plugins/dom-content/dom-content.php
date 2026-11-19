@@ -27,5 +27,7 @@ require_once DOM_CONTENT_DIR . 'inc/store.php';
 require_once DOM_CONTENT_DIR . 'inc/fields.php';
 require_once DOM_CONTENT_DIR . 'inc/admin.php';
 require_once DOM_CONTENT_DIR . 'inc/categories.php';
+require_once DOM_CONTENT_DIR . 'inc/black-friday.php';
+require_once DOM_CONTENT_DIR . 'inc/black-friday-scherm.php';
 require_once DOM_CONTENT_DIR . 'inc/frontend.php';
 require_once DOM_CONTENT_DIR . 'inc/install.php';

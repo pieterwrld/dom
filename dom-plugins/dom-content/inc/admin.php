@@ -155,24 +155,30 @@ function dom_content_render_page() {
             <?php if (!empty($def['uitleg'])) : ?>
                 <p class="domc-uitleg"><?php echo esc_html($def['uitleg']); ?></p>
             <?php endif; ?>
-            <p class="domc-uitleg domc-uitleg--klein">
-                <?php esc_html_e('Een veld leeg laten betekent: gebruik de standaardtekst die er nu staat. Je hoeft dus alleen in te vullen wat je wilt veranderen.', 'dom-content'); ?>
-            </p>
+            <?php if (($def['soort'] ?? '') !== 'black-friday') : ?>
+                <p class="domc-uitleg domc-uitleg--klein">
+                    <?php esc_html_e('Een veld leeg laten betekent: gebruik de standaardtekst die er nu staat. Je hoeft dus alleen in te vullen wat je wilt veranderen.', 'dom-content'); ?>
+                </p>
+            <?php endif; ?>
 
             <?php
             if (($def['soort'] ?? '') === 'categorieen') {
                 dom_content_render_categories();
+            } elseif (($def['soort'] ?? '') === 'black-friday') {
+                dom_content_render_black_friday();
             } else {
                 dom_content_render_groups($tab, $def);
             }
             ?>
 
-            <div class="domc-balk">
-                <button type="submit" class="button button-primary button-hero">
-                    <?php esc_html_e('Opslaan', 'dom-content'); ?>
-                </button>
-                <span class="domc-balk__hint"><?php esc_html_e('De site is meteen bijgewerkt.', 'dom-content'); ?></span>
-            </div>
+            <?php if (($def['soort'] ?? '') !== 'black-friday') : ?>
+                <div class="domc-balk">
+                    <button type="submit" class="button button-primary button-hero">
+                        <?php esc_html_e('Opslaan', 'dom-content'); ?>
+                    </button>
+                    <span class="domc-balk__hint"><?php esc_html_e('De site is meteen bijgewerkt.', 'dom-content'); ?></span>
+                </div>
+            <?php endif; ?>
         </form>
     </div>
     <?php
