@@ -30,12 +30,13 @@ if ($dom_bf_claim === '') {
 ?>
 <div class="bfs" id="bf-strip" data-end="<?php echo esc_attr($dom_bf_einde); ?>">
 	<div class="bfs-in wrap">
+		<?php // "eindigt over" hoort recht onder de naam te staan, als één blok
+		      // links van de klok; los eronder zwierf het midden in de balk. ?>
 		<div class="bfs-t">
 			<b><?php echo esc_html($dom_bf_label); ?></b>
+			<span class="bfs-eind"><?php esc_html_e('eindigt over', 'dom-theme'); ?></span>
 			<?php if ($dom_bf_claim) : ?><s><?php echo esc_html($dom_bf_claim); ?></s><?php endif; ?>
 		</div>
-		<?php // Zonder deze regel staan er alleen vier getallen en is niet te zien waar ze over gaan. ?>
-		<span class="bfs-eind"><?php esc_html_e('eindigt over', 'dom-theme'); ?></span>
 		<div class="cd" id="bf-cd">
 			<div class="u" data-unit="d">
 				<b>00</b>

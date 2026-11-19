@@ -112,14 +112,14 @@ $stat_score    = 4.9;
                   ?>
 
                   <?php
-                  // De balk krijgt de kleur van de kopbalk in het screenshot
-                  // zelf. Een deel van de gesprekken komt uit de lichte stand
-                  // van WhatsApp; daar stak een zwarte balk hard tegen af.
-                  $balk_kleur = $r['balk'] ?? '#141414';
-                  $balk_tekst = $r['tekst'] ?? '#ffffff';
+                  // De kopbalk is altijd zwart, ook als het screenshot uit de
+                  // lichte stand van WhatsApp komt: de reviews horen er als
+                  // één reeks uit te zien. Onder de balk loopt een korte
+                  // overgang, zodat de rand op een licht gesprek niet hard
+                  // afsnijdt.
                   ?>
                   <!-- Onze kopbalk, precies over die van WhatsApp heen -->
-                  <div class="wabar" style="--wabar:<?php echo esc_attr($balk_kleur); ?>;--watxt:<?php echo esc_attr($balk_tekst); ?>">
+                  <div class="wabar">
                     <span class="wab-terug">
                       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
                       <i>1</i>

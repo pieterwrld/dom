@@ -74,9 +74,25 @@ $shop_url = dom_shop_url();
         <?php // Sale krijgt geen foto maar een rood vlak met een draaiend sale-zegel. ?>
         <span class="cim sale-vlak" aria-hidden="true">
           <span class="sale-zegel">
-            <svg viewBox="0 0 120 120" aria-hidden="true">
-              <path class="sz-ring" d="M60 6 69 17l14-5 4 14 14 4-5 14 11 12-11 9 5 14-14 4-4 14-14-5-9 11-9-11-14 5-4-14-14-4 5-14L6 60l11-12-5-14 14-4 4-14 14 5z"/>
-              <text class="sz-tekst" x="60" y="68" text-anchor="middle">SALE</text>
+            <svg viewBox="0 0 200 200" aria-hidden="true">
+              <?php
+              /**
+               * Een getande sticker, zoals een prijskaartje in een etalage.
+               * De punten worden hier uitgerekend zodat ze precies gelijk
+               * verdeeld staan; met de hand geschreven punten liepen scheef.
+               */
+              $punten = [];
+              $tanden = 20;
+              for ($i = 0; $i < $tanden * 2; $i++) {
+                  $straal = $i % 2 === 0 ? 94 : 80;
+                  $hoek   = M_PI * $i / $tanden - M_PI_2;
+                  $punten[] = round(100 + $straal * cos($hoek), 1) . ',' . round(100 + $straal * sin($hoek), 1);
+              }
+              ?>
+              <polygon class="sz-ster" points="<?php echo esc_attr(implode(' ', $punten)); ?>"/>
+              <circle class="sz-ring" cx="100" cy="100" r="68"/>
+              <text class="sz-tekst" x="100" y="92" text-anchor="middle">SALE</text>
+              <text class="sz-sub" x="100" y="122" text-anchor="middle">NU OF NOOIT</text>
             </svg>
           </span>
         </span>

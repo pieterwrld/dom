@@ -154,18 +154,22 @@ input,select{font:inherit}
 .bfs-in{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;
   gap:clamp(10px,2.2vw,30px);padding:9px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
 .bfs-in::-webkit-scrollbar{display:none}
-.bfs-t{display:flex;align-items:baseline;gap:9px;white-space:nowrap}
-.bfs-t b{font-family:var(--disp);font-weight:900;font-size:clamp(16px,2.4vw,23px);
-  text-transform:uppercase;line-height:1}
-.bfs-t s{text-decoration:none;font-family:var(--disp);font-weight:700;font-size:clamp(13px,1.8vw,17px);
-  opacity:.85;text-transform:uppercase}
+/* De naam en "eindigt over" vormen één blok links van de klok: de regel staat
+   recht onder de naam, in hetzelfde lettertype, zodat alles op één lijn blijft. */
+.bfs-t{display:grid;grid-template-columns:auto auto;align-items:baseline;
+  column-gap:9px;row-gap:1px;white-space:nowrap}
+.bfs-t b{grid-column:1;grid-row:1;font-family:var(--disp);font-weight:900;
+  font-size:clamp(16px,2.4vw,23px);text-transform:uppercase;line-height:1}
+.bfs-t s{grid-column:2;grid-row:1;text-decoration:none;font-family:var(--disp);font-weight:700;
+  font-size:clamp(13px,1.8vw,17px);opacity:.85;text-transform:uppercase}
 .cd{display:flex;align-items:center;gap:5px;white-space:nowrap}
 .cd .u{display:grid;justify-items:center;min-width:34px;padding:3px 5px;background:rgba(0,0,0,.26)}
 .cd .u b{font-family:var(--mono);font-size:14px;font-weight:700;line-height:1.05}
 .cd .u span{font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.72}
-/* "eindigt over" vlak voor de klok: vier losse getallen zeggen niets. */
-.bfs-eind{font-family:var(--body);font-size:clamp(11px,1.3vw,13px);font-weight:500;
-  color:rgba(255,255,255,.82);white-space:nowrap;letter-spacing:.01em}
+/* "eindigt over" recht onder de naam: vier losse getallen zeggen niets. */
+.bfs-eind{grid-column:1;grid-row:2;font-family:var(--disp);font-weight:700;
+  font-size:clamp(10.5px,1.25vw,13px);letter-spacing:.07em;text-transform:uppercase;
+  color:rgba(255,255,255,.78);white-space:nowrap}
 .bfs .go{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 13px;background:#fff;
   color:var(--bf);font-family:var(--disp);font-weight:800;font-size:13px;text-transform:uppercase;
   letter-spacing:.08em;white-space:nowrap;transition:transform .3s var(--e)}
@@ -184,7 +188,6 @@ input,select{font:inherit}
     gap:8px 12px;padding:9px var(--gut)}
   .bfs-t{flex:0 0 auto}
   .bfs-t s{display:none}
-  .bfs-eind{font-size:11px;order:2}
   .cd{gap:4px}
   .cd .u{min-width:30px;padding:2px 4px}
   .cd .u b{font-size:13px}
@@ -352,19 +355,30 @@ input,select{font:inherit}
 .sale-vlak{position:absolute;inset:0;overflow:hidden;
   background:linear-gradient(145deg,#8C0C1C 0%,#D0142C 42%,#F03048 56%,#D0142C 70%,#8C0C1C 100%);
   background-size:260% 260%;animation:saleGloed 7s linear infinite}
-/* Het zegel midden op de tegel. Het draait langzaam en pompt een beetje, zodat
-   het vlak niet als een leeg rood blok leest. */
-.sale-zegel{position:absolute;top:50%;left:50%;width:46%;max-width:160px;aspect-ratio:1;
+/* Het zegel op de Sale-tegel.
+   Het staat in het midden van de ruimte bóven de naam en de knop, niet in het
+   midden van de hele tegel: daar zou het half onder de tekst vallen. De ster
+   draait langzaam, de ring draait de andere kant op. */
+.sale-zegel{position:absolute;top:40%;left:50%;width:min(62%,210px);aspect-ratio:1;
   transform:translate(-50%,-50%);display:grid;place-items:center;
-  animation:zegelPomp 3.4s ease-in-out infinite}
+  filter:drop-shadow(0 6px 18px rgba(0,0,0,.28))}
 .sale-zegel svg{width:100%;height:100%;overflow:visible}
-.sale-zegel .sz-ring{fill:rgba(255,255,255,.14);stroke:rgba(255,255,255,.85);stroke-width:2;
-  transform-origin:60px 60px;animation:zegelDraai 16s linear infinite}
-.sale-zegel .sz-tekst{fill:#fff;font-family:var(--disp);font-size:27px;font-weight:900;
-  letter-spacing:.06em}
+.sale-zegel .sz-ster{fill:rgba(255,255,255,.17);stroke:rgba(255,255,255,.95);stroke-width:2.4;
+  transform-origin:100px 100px;animation:zegelDraai 22s linear infinite}
+.sale-zegel .sz-ring{fill:none;stroke:rgba(255,255,255,.45);stroke-width:1.4;
+  stroke-dasharray:7 9;transform-origin:100px 100px;animation:zegelTerug 14s linear infinite}
+.sale-zegel .sz-tekst{fill:#fff;font-family:var(--disp);font-size:46px;font-weight:900;
+  letter-spacing:.04em}
+.sale-zegel .sz-sub{fill:rgba(255,255,255,.82);font-family:var(--disp);font-size:14px;
+  font-weight:800;letter-spacing:.22em}
 @keyframes zegelDraai{to{transform:rotate(360deg)}}
-@keyframes zegelPomp{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.06)}}
-.ctile:hover .sale-zegel{animation-duration:1.8s}
+@keyframes zegelTerug{to{transform:rotate(-360deg)}}
+.ctile:hover .sale-zegel .sz-ster{animation-duration:9s}
+@media(max-width:860px){
+  .sale-zegel{width:min(72%,180px);top:38%}
+  .sale-zegel .sz-tekst{font-size:48px}
+  .sale-zegel .sz-sub{font-size:15px;letter-spacing:.18em}
+}
 .sale-vlak::after{content:"";position:absolute;top:-55%;bottom:-55%;width:42%;left:-60%;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.34),transparent);
   transform:skewX(-18deg);animation:saleVeeg 4.6s var(--e) infinite}
@@ -373,7 +387,7 @@ input,select{font:inherit}
 @media(prefers-reduced-motion:reduce){
   .sale-vlak{animation:none;background-position:50% 50%}
   .sale-vlak::after{animation:none;opacity:0}
-  .sale-zegel,.sale-zegel .sz-ring{animation:none}
+  .sale-zegel .sz-ster,.sale-zegel .sz-ring{animation:none}
 }
 @media(max-width:860px){.ctile .cbadge{font-size:9px;height:17px;padding:0 5px;top:5px;left:5px}}
 
@@ -648,9 +662,14 @@ input,select{font:inherit}
 /* De kopbalk van WhatsApp. Staat precies over de balk in het screenshot, waar
    de naam en de foto van de klant onleesbaar zijn gemaakt. */
 .wabar{position:absolute;left:0;right:0;top:4.8%;height:5.5%;display:flex;align-items:center;
-  gap:.5em;padding:0 .8em;background:var(--wabar,#141414);color:var(--watxt,#fff)}
+  gap:.5em;padding:0 .8em;background:#101b20;color:#fff}
+/* Korte overgang onder de balk. Drie van de vijftien gesprekken zijn in de
+   lichte stand van WhatsApp gemaakt; zonder deze fade sneed de zwarte balk
+   daar met een harde lijn af. */
+.wabar::after{content:"";position:absolute;left:0;right:0;top:100%;height:10px;
+  background:linear-gradient(to bottom,rgba(16,27,32,.75),rgba(16,27,32,0))}
 .wab-terug{display:flex;align-items:center;gap:.2em;flex:0 0 auto}
-.wab-terug svg{width:1.15em;height:1.15em;stroke:currentColor;stroke-width:2.4;fill:none;
+.wab-terug svg{width:1.15em;height:1.15em;stroke:#fff;stroke-width:2.4;fill:none;
   stroke-linecap:round;stroke-linejoin:round}
 .wab-terug i{font-style:normal;font-size:.95em;font-weight:500}
 .wab-av{width:2em;height:2em;flex:0 0 auto;border-radius:50%;background:#0A0A0A;color:#fff;
@@ -660,8 +679,8 @@ input,select{font:inherit}
   text-overflow:ellipsis;min-width:0;flex:1}
 .wab-ic{display:flex;align-items:center;gap:.65em;flex:0 0 auto}
 .wab-ic svg{width:1.5em;height:1.5em;display:block}
-.wab-ic svg:first-child{stroke:currentColor;stroke-width:1.7;fill:none;stroke-linejoin:round}
-.wab-ic svg:last-child{fill:currentColor}
+.wab-ic svg:first-child{stroke:#fff;stroke-width:1.7;fill:none;stroke-linejoin:round}
+.wab-ic svg:last-child{fill:#fff}
 
 /* ── Pijlen, bolletjes, keurmerk ── */
 /* Pijlen en bolletjes onder de slider, zodat de pijlen op elke breedte te
