@@ -283,6 +283,40 @@ ul.woocommerce-error {
 .woocommerce-cart-form .quantity input { width: 56px; text-align: center; padding: 8px; border: 1.5px solid var(--line); }
 .woocommerce-cart-form .product-remove a { color: var(--muted); font-size: 18px; text-decoration: none; }
 
+/* De rij onderaan de tabel met de waardebon en de bijwerkknop.
+   WooCommerce zet die twee in dezelfde cel, de een links en de ander rechts
+   zwevend. Zonder opmaak schoven ze over elkaar heen. */
+.woocommerce-cart-form .actions { padding: 16px 0; }
+.woocommerce-cart-form .actions::after { content: ""; display: block; clear: both; }
+.woocommerce-cart-form .coupon {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  float: none;
+  margin-bottom: 12px;
+}
+.woocommerce-cart-form .coupon label { display: none; }
+.woocommerce-cart-form .coupon #coupon_code {
+  flex: 1 1 160px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 1.5px solid var(--line);
+  font-size: 14px;
+}
+.woocommerce-cart-form .actions .button {
+  float: none;
+  height: 44px;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .woocommerce-cart-form .actions .button[name="update_cart"] { width: 100%; }
+}
+
+/* Het cadeau heeft geen kruisje; zonder deze regel bleef er een lege kolom. */
+.woocommerce-cart-form .product-remove { width: 28px; }
+
 .cart-collaterals { margin-top: 32px; }
 .cart_totals { max-width: 420px; margin-left: auto; }
 .cart_totals .shop_table td { text-align: right; }
