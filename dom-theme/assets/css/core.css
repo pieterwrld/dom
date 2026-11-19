@@ -603,7 +603,15 @@ input,select{font:inherit}
     0 34px 60px -34px rgba(10,10,10,.65)}
 .rphone-screen{position:relative;aspect-ratio:946/2048;overflow:hidden;background:#000;
   border-radius:clamp(27px,7.2vw,37px);font-size:13px}
-@supports (width:1cqw){.rphone-screen{container-type:inline-size;font-size:4.6cqw}}
+/* De maten in de kopbalk volgen de breedte van het scherm, zodat de balk er op
+   elke telefoongrootte hetzelfde uitziet. De eenheid cqw hoort op een kind van
+   de container te staan: een element bevraagt zichzelf niet, dus op de
+   container zelf zou 4.6cqw terugvallen op de breedte van het vénster en werd
+   de balk op desktop vier keer te groot. */
+@supports (width:1cqw){
+  .rphone-screen{container-type:inline-size}
+  .wabar{font-size:4.6cqw}
+}
 .rphone-screen>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0;
   display:block}
 .rphone-island{position:absolute;top:2.3%;left:50%;transform:translateX(-50%);width:25%;height:3.3%;
@@ -612,18 +620,18 @@ input,select{font:inherit}
 /* De kopbalk van WhatsApp. Staat precies over de balk in het screenshot, waar
    de naam en de foto van de klant onleesbaar zijn gemaakt. */
 .wabar{position:absolute;left:0;right:0;top:4.8%;height:5.5%;display:flex;align-items:center;
-  gap:.42em;padding:0 .7em;background:#141414;color:#fff}
+  gap:.5em;padding:0 .8em;background:#141414;color:#fff}
 .wab-terug{display:flex;align-items:center;gap:.2em;flex:0 0 auto}
 .wab-terug svg{width:1.15em;height:1.15em;stroke:#fff;stroke-width:2.4;fill:none;
   stroke-linecap:round;stroke-linejoin:round}
 .wab-terug i{font-style:normal;font-size:.95em;font-weight:500}
-.wab-av{width:1.85em;height:1.85em;flex:0 0 auto;border-radius:50%;background:#000;color:#fff;
+.wab-av{width:2em;height:2em;flex:0 0 auto;border-radius:50%;background:#000;color:#fff;
   display:grid;place-items:center;font-family:var(--disp);font-size:.78em;font-weight:800;
   letter-spacing:.02em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
-.wab-nm{font-size:.98em;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;
+.wab-nm{font-size:1.05em;font-weight:600;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis;min-width:0;flex:1}
-.wab-ic{display:flex;align-items:center;gap:.6em;flex:0 0 auto}
-.wab-ic svg{width:1.4em;height:1.4em;display:block}
+.wab-ic{display:flex;align-items:center;gap:.65em;flex:0 0 auto}
+.wab-ic svg{width:1.5em;height:1.5em;display:block}
 .wab-ic svg:first-child{stroke:#fff;stroke-width:1.7;fill:none;stroke-linejoin:round}
 .wab-ic svg:last-child{fill:#fff}
 
