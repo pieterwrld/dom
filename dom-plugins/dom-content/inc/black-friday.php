@@ -388,6 +388,35 @@ function dom_bf_rapport($offset, $limit) {
     return $t;
 }
 
+/**
+ * Alle prijzen uitlezen zoals ze nu staan.
+ *
+ * Een momentopname vóór de actie, zodat er buiten de database om een kopie
+ * bestaat van wat er stond. Wijzigt niets.
+ */
+function dom_bf_momentopname($offset, $limit) {
+    $ids = array_slice(dom_bf_product_ids(), $offset, $limit);
+    $rijen = [];
+
+    foreach ($ids as $id) {
+        $product = wc_get_product($id);
+        if (!$product) {
+            continue;
+        }
+        foreach (dom_bf_prijsdragers($product) as $drager) {
+            $rijen[] = [
+                'id'      => $drager->get_id(),
+                'ouder'   => $id,
+                'naam'    => $product->get_name(),
+                'regular' => (string) $drager->get_regular_price('edit'),
+                'sale'    => (string) $drager->get_sale_price('edit'),
+            ];
+        }
+    }
+
+    return $rijen;
+}
+
 function dom_bf_lege_telling() {
     return [
         'producten'           => 0,
@@ -439,6 +468,9 @@ function dom_bf_rest(WP_REST_Request $request) {
     switch ($actie) {
         case 'rapport':
             $t = dom_bf_rapport($offset, $limit);
+            break;
+        case 'momentopname':
+            $t = ['rijen' => dom_bf_momentopname($offset, $limit)];
             break;
         case 'aan':
             $t = dom_bf_toepassen($offset, $limit);
