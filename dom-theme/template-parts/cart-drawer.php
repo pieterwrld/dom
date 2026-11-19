@@ -179,7 +179,7 @@ $eur = function ($v) {
     // niet duidelijk was wat nu het bedrag is. Label links, bedrag rechts.
     ?>
     <div class="totaal">
-      <span class="lb"><?php esc_html_e('Totaal', 'dom-theme'); ?></span>
+      <span class="tot-lb"><?php esc_html_e('Totaal', 'dom-theme'); ?></span>
       <span class="vv" id="cartTotal"><?php echo $eur($cart_total); ?></span>
       <?php if ($saved > 0) : ?>
         <span class="bespaard"><?php printf(esc_html__('Je bespaart %s', 'dom-theme'), $eur($saved)); ?></span>
