@@ -119,30 +119,17 @@ while (have_posts()) : the_post();
     $gal_thumbs = array_values(array_filter(array_map(fn($id) => wp_get_attachment_image_url($id, 'product-card') ?: '', $all_images)));
 
     /**
-     * Meest verkocht.
-     *
-     * WooCommerce telt per product bij hoe vaak het verkocht is in total_sales.
-     * Daar sorteren we op, zodat dit echt de bestsellers zijn en niet een
-     * willekeurige greep uit dezelfde categorie.
+     * Meest verkocht. De volgorde komt uit dom_bestsellers(), dat de
+     * verkoopaantallen zelf uitleest omdat de sorteerplugins op deze site
+     * de orderby van een WP_Query overschrijven.
      */
     $same_cat = [];
-    $bq = new WP_Query([
-        'post_type'      => 'product',
-        'post_status'    => 'publish',
-        'posts_per_page' => 10,
-        'post__not_in'   => [$product->get_id()],
-        'meta_key'       => 'total_sales',
-        'orderby'        => ['meta_value_num' => 'DESC', 'date' => 'DESC'],
-        'no_found_rows'  => true,
-        'tax_query'      => [[
-            'taxonomy' => 'product_visibility',
-            'field'    => 'name',
-            'terms'    => ['exclude-from-catalog'],
-            'operator' => 'NOT IN',
-        ]],
-    ]);
-    $same_cat = $bq->posts;
-    wp_reset_postdata();
+    foreach (dom_bestsellers(10, [$product->get_id()]) as $bs_id) {
+        $bs_post = get_post($bs_id);
+        if ($bs_post) {
+            $same_cat[] = $bs_post;
+        }
+    }
 
     /* pass data to gallery.js */
     wp_localize_script('dom-gallery', 'domProd', [

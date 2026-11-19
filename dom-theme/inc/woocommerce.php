@@ -170,3 +170,69 @@ add_action('woocommerce_review_order_after_submit', function () {
     </div>
     <?php
 });
+
+
+/**
+ * De best verkochte producten.
+ *
+ * WP_Query op total_sales sorteren werkt hier niet: de winkel heeft twee
+ * sorteerplugins actief (Post Types Order en Intuitive Custom Post Order) die
+ * de volgorde van elke query naar hun eigen handmatige volgorde trekken.
+ * Daardoor kwamen er wel producten terug, maar niet de bestsellers.
+ *
+ * Daarom halen we de cijfers zelf op en sorteren we in PHP. Het resultaat
+ * blijft een uur staan, want het verandert alleen bij een bestelling.
+ *
+ * @param int   $aantal
+ * @param int[] $overslaan
+ * @return int[] product-id's, meest verkocht eerst
+ */
+function dom_bestsellers($aantal = 10, array $overslaan = []) {
+    $cache = get_transient('dom_bestsellers');
+
+    if (!is_array($cache)) {
+        global $wpdb;
+
+        // Eén query: de verkoopaantallen van gepubliceerde producten.
+        $rijen = $wpdb->get_results(
+            "SELECT p.ID, CAST(m.meta_value AS UNSIGNED) AS verkocht
+               FROM {$wpdb->posts} p
+               INNER JOIN {$wpdb->postmeta} m ON m.post_id = p.ID AND m.meta_key = 'total_sales'
+              WHERE p.post_type = 'product' AND p.post_status = 'publish'
+              ORDER BY verkocht DESC
+              LIMIT 60"
+        );
+
+        $cache = [];
+        foreach ((array) $rijen as $rij) {
+            if ((int) $rij->verkocht > 0) {
+                $cache[] = (int) $rij->ID;
+            }
+        }
+
+        set_transient('dom_bestsellers', $cache, HOUR_IN_SECONDS);
+    }
+
+    $uit = [];
+    foreach ($cache as $id) {
+        if (in_array($id, $overslaan, true)) {
+            continue;
+        }
+        $product = wc_get_product($id);
+        if ($product && $product->is_visible()) {
+            $uit[] = $id;
+        }
+        if (count($uit) >= $aantal) {
+            break;
+        }
+    }
+    return $uit;
+}
+
+/** Na een bestelling klopt de lijst niet meer. */
+add_action('woocommerce_order_status_completed', function () {
+    delete_transient('dom_bestsellers');
+});
+add_action('woocommerce_payment_complete', function () {
+    delete_transient('dom_bestsellers');
+});
