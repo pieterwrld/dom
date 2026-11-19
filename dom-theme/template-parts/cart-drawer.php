@@ -135,15 +135,26 @@ $eur = function ($v) {
             <?php if ($meta) : ?>
               <div class="m"><?php echo esc_html($meta); ?></div>
             <?php endif; ?>
-            <div class="qty">
-              <button data-a="-" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Minder">&minus;</button>
-              <span><?php echo $quantity; ?></span>
-              <button data-a="+" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Meer">+</button>
-            </div>
+            <?php
+            // Het cadeau komt er vanzelf bij en gaat er vanzelf weer af; een
+            // aantalkiezer en een verwijderknop zouden alleen verwarren.
+            $is_cadeau = function_exists('dom_is_cadeau_regel') && dom_is_cadeau_regel($cart_item);
+            ?>
+            <?php if ($is_cadeau) : ?>
+              <div class="cadeau-regel"><?php esc_html_e('Cadeau van ons', 'dom-theme'); ?></div>
+            <?php else : ?>
+              <div class="qty">
+                <button data-a="-" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Minder">&minus;</button>
+                <span><?php echo $quantity; ?></span>
+                <button data-a="+" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Meer">+</button>
+              </div>
+            <?php endif; ?>
           </div>
           <div>
             <div class="p"><?php echo $eur($line_total); ?><?php if ($line_was > 0) : ?><s><?php echo $eur($line_was); ?></s><?php endif; ?></div>
-            <button class="rm" data-rm="<?php echo esc_attr($cart_item_key); ?>">Verwijder</button>
+            <?php if (!$is_cadeau) : ?>
+              <button class="rm" data-rm="<?php echo esc_attr($cart_item_key); ?>">Verwijder</button>
+            <?php endif; ?>
           </div>
         </div>
       <?php endforeach;

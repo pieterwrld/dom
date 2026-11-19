@@ -787,6 +787,8 @@ body.cart-open .ovl{opacity:1;pointer-events:auto}
   stroke-linecap:round;stroke-linejoin:round}
 .gift.on .st{color:var(--bf)}
 /* Het cadeau in de wagen: duidelijk dat het niets kost. */
+.cadeau-regel{margin-top:4px;font-family:var(--disp);font-size:10.5px;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--bf)}
 .dom-gratis{display:inline-block;margin-left:6px;padding:1px 6px;background:var(--bf);color:#fff;
   font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
   vertical-align:middle}
