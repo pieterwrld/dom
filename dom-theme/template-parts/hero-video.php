@@ -42,7 +42,7 @@ $trust_items = dom_c_rows('home.trust.items', [
     ['icoon' => 'shield',   'tekst' => 'Nr. 1 in kwaliteit'],
     ['icoon' => 'check',    'tekst' => 'Voor verzending nagekeken'],
     ['icoon' => 'whatsapp', 'tekst' => 'Persoonlijk advies, 24/7 via WhatsApp'],
-    ['icoon' => 'truck',    'tekst' => 'Gratis verzending vanaf €200'],
+    ['icoon' => 'truck',    'tekst' => 'Gratis verzending vanaf €220'],
 ]);
 
 if ($banner_m || $banner_d) :

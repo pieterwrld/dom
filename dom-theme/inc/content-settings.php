@@ -129,7 +129,7 @@ function dom_marquee_default() {
     return implode("\n", [
         '!Black Friday deals',
         'Voor 17:00 besteld = morgen in huis',
-        'Gratis verzending vanaf €200',
+        'Gratis verzending vanaf €220',
         '24/7 klantenservice via WhatsApp',
         'Vanaf €350 gratis mystery shirt',
         '14 dagen gratis retourneren',

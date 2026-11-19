@@ -116,7 +116,7 @@ class DOM_Announcement_Bar {
     private function get_defaults() {
         return [
             ['text' => 'BLACK FRIDAY — Tot 50% korting op alles', 'link' => '/shop/', 'active' => true],
-            ['text' => 'Gratis verzending vanaf €200', 'link' => '', 'active' => true],
+            ['text' => 'Gratis verzending vanaf €220', 'link' => '', 'active' => true],
             ['text' => '14 dagen gratis retourneren', 'link' => '', 'active' => true],
             ['text' => '100% originele merkkleding', 'link' => '', 'active' => true],
             ['text' => 'Hulp nodig? WhatsApp ons!', 'link' => 'https://wa.me/31612345678', 'active' => true],

@@ -6,7 +6,7 @@ $cart_total = 0;
 $cart_items = [];
 $saved = 0;
 // Beheer: De Outfitman > Winkelwagen & checkout.
-$FREE = (float) dom_c('winkelwagen.drempels.verzending', 200);
+$FREE = (float) dom_c('winkelwagen.drempels.verzending', 220);
 $GIFT = (float) dom_c('winkelwagen.drempels.cadeau', 350);
 $FREE_LBL = dom_c('winkelwagen.drempels.verzending_label', 'Gratis verzending');
 $GIFT_LBL = dom_c('winkelwagen.drempels.cadeau_label', 'Gratis mystery shirt');
@@ -59,11 +59,18 @@ $eur = function ($v) {
     </p>
     <div class="ladder">
       <i id="shipBar" style="width:<?php echo $bar_pct; ?>%"></i>
+      <?php
+      // Eigen iconen per mijlpaal: een bezorgwagen voor de verzending en een
+      // shirt voor het cadeau. Twee keer hetzelfde vinkje zei niets over wat
+      // je bij dat bedrag krijgt.
+      $ic_truck = '<svg viewBox="0 0 24 24"><path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.7"/><circle cx="17" cy="18" r="1.7"/></svg>';
+      $ic_shirt = '<svg viewBox="0 0 24 24"><path d="M8.5 3.5 12 5.6l3.5-2.1 5 2.4-2 4.1-2-.8V20H7.5V9.2l-2 .8-2-4.1z"/></svg>';
+      ?>
       <span class="mile<?php echo $hit200 ? ' hit' : ''; ?>" id="m200" style="left:<?php echo esc_attr(round($mile_pct, 2)); ?>%">
-        <span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
+        <span class="dot"><?php echo $ic_truck; // phpcs:ignore ?></span>
       </span>
       <span class="mile<?php echo $hit350 ? ' hit' : ''; ?>" id="m350" style="left:100%">
-        <span class="dot"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
+        <span class="dot"><?php echo $ic_shirt; // phpcs:ignore ?></span>
       </span>
     </div>
     <div class="mile-lbls">
@@ -72,11 +79,21 @@ $eur = function ($v) {
       <span id="t350"<?php echo $hit350 ? ' class="hit"' : ''; ?>>&euro;<?php echo esc_html(number_format_i18n($GIFT)); ?> cadeau</span>
     </div>
     <div class="gift<?php echo $hit350 ? ' on' : ''; ?>" id="gift">
-      <span class="gi">
-        <svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7S9 2 6.5 4.5 12 7 12 7zM12 7s3-5 5.5-2.5S12 7 12 7z"/></svg>
+      <span class="gi"><?php echo $ic_shirt; // phpcs:ignore ?></span>
+      <div>
+        <b><?php echo esc_html($GIFT_LBL); ?></b>
+        <?php if ($hit350) : ?>
+          <span class="sub"><?php esc_html_e('Toegevoegd aan je bestelling', 'dom-theme'); ?></span>
+        <?php endif; ?>
+      </div>
+      <span class="st" id="giftSt">
+        <?php if ($hit350) : ?>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
+          <?php esc_html_e('Gratis', 'dom-theme'); ?>
+        <?php else : ?>
+          <?php echo 'Nog ' . $eur($rem_gift); ?>
+        <?php endif; ?>
       </span>
-      <div><b><?php echo esc_html($GIFT_LBL); ?></b></div>
-      <span class="st" id="giftSt"><?php echo $hit350 ? esc_html__('Gehaald', 'dom-theme') : 'Nog ' . $eur($rem_gift); ?></span>
     </div>
   </div>
 
@@ -141,93 +158,6 @@ $eur = function ($v) {
       <?php endif; ?>
     </div>
 
-    <!-- Tabs -->
-    <div class="ctabs">
-      <div class="ctabs-h">
-        <button class="ctab on" data-p="up"><?php echo esc_html(dom_c('winkelwagen.teksten.tab_1', 'Maak het compleet')); ?></button>
-        <button class="ctab" data-p="rec"><?php echo esc_html(dom_c('winkelwagen.teksten.tab_2', 'Aanbevolen voor jou')); ?></button>
-        <button class="ctab" data-p="seen"><?php echo esc_html(dom_c('winkelwagen.teksten.tab_3', 'Recent bekeken')); ?></button>
-      </div>
-      <?php
-      /**
-       * Drie panelen met dezelfde kaart. "Aanbevolen voor jou" en "Recent
-       * bekeken" waren lege divs, waardoor die tabbladen niets leken te doen.
-       */
-      $in_cart = array_map(static function ($ci) { return (int) $ci['product_id']; }, $cart_items);
-
-      // Maak het compleet: zelfde categorieën als wat er in de wagen zit.
-      $cat_ids = [];
-      foreach ($cart_items as $ci) {
-          $terms = get_the_terms($ci['product_id'], 'product_cat');
-          if ($terms && !is_wp_error($terms)) {
-              foreach ($terms as $term) {
-                  $cat_ids[] = (int) $term->term_id;
-              }
-          }
-      }
-
-      $compleet = [];
-      if ($cat_ids) {
-          $compleet = get_posts([
-              'post_type'      => 'product',
-              'post_status'    => 'publish',
-              'posts_per_page' => 8,
-              'post__not_in'   => $in_cart ?: [0],
-              'orderby'        => 'rand',
-              'fields'         => 'ids',
-              'tax_query'      => [[
-                  'taxonomy' => 'product_cat',
-                  'field'    => 'term_id',
-                  'terms'    => array_unique($cat_ids),
-              ]],
-          ]);
-      }
-
-      // Aanbevolen: best verkocht in de hele winkel.
-      $aanbevolen = get_posts([
-          'post_type'      => 'product',
-          'post_status'    => 'publish',
-          'posts_per_page' => 8,
-          'post__not_in'   => array_merge($in_cart, $compleet) ?: [0],
-          'meta_key'       => 'total_sales',
-          'orderby'        => 'meta_value_num',
-          'order'          => 'DESC',
-          'fields'         => 'ids',
-      ]);
-
-      // Recent bekeken: WooCommerce houdt dit in een cookie bij.
-      $recent = [];
-      if (!empty($_COOKIE['woocommerce_recently_viewed'])) {
-          $recent = array_filter(array_map('absint', explode('|', wp_unslash($_COOKIE['woocommerce_recently_viewed']))));
-          $recent = array_slice(array_reverse(array_unique($recent)), 0, 8);
-      }
-
-      $panelen = [
-          'up'   => $compleet,
-          'rec'  => $aanbevolen,
-          'seen' => $recent,
-      ];
-      $leeg_tekst = [
-          'up'   => __('Nog niets om bij te combineren.', 'dom-theme'),
-          'rec'  => __('Nog geen aanbevelingen.', 'dom-theme'),
-          'seen' => __('Je hebt nog geen producten bekeken.', 'dom-theme'),
-      ];
-
-      foreach ($panelen as $naam => $ids) :
-      ?>
-        <div class="cpane<?php echo 'up' === $naam ? ' on' : ''; ?>" id="pane-<?php echo esc_attr($naam); ?>">
-          <?php if ($ids) : ?>
-            <div class="crail">
-              <?php foreach ($ids as $pid) {
-                  get_template_part('template-parts/cart-mini', 'card', ['id' => $pid]);
-              } ?>
-            </div>
-          <?php else : ?>
-            <p class="cpane-leeg"><?php echo esc_html($leeg_tekst[$naam]); ?></p>
-          <?php endif; ?>
-        </div>
-      <?php endforeach; ?>
-    </div>
   </div>
 
   <!-- Footer -->

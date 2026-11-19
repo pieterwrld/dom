@@ -137,7 +137,7 @@ function dom_content_schema() {
                             'default' => [
                                 ['tekst' => 'Black Friday deals', 'uitgelicht' => true],
                                 ['tekst' => 'Voor 17:00 besteld = morgen in huis', 'uitgelicht' => false],
-                                ['tekst' => 'Gratis verzending vanaf €200', 'uitgelicht' => false],
+                                ['tekst' => 'Gratis verzending vanaf €220', 'uitgelicht' => false],
                                 ['tekst' => '24/7 klantenservice via WhatsApp', 'uitgelicht' => false],
                                 ['tekst' => 'Vanaf €350 gratis mystery shirt', 'uitgelicht' => false],
                                 ['tekst' => '14 dagen gratis retourneren', 'uitgelicht' => false],
@@ -164,7 +164,7 @@ function dom_content_schema() {
                                 ['icoon' => 'shield',   'tekst' => 'Nr. 1 in kwaliteit'],
                                 ['icoon' => 'check',    'tekst' => 'Voor verzending nagekeken'],
                                 ['icoon' => 'whatsapp', 'tekst' => 'Persoonlijk advies, 24/7 via WhatsApp'],
-                                ['icoon' => 'truck',    'tekst' => 'Gratis verzending vanaf €200'],
+                                ['icoon' => 'truck',    'tekst' => 'Gratis verzending vanaf €220'],
                             ],
                         ],
                     ],
@@ -254,7 +254,7 @@ function dom_content_schema() {
                             ],
                             'default' => [
                                 ['icoon' => 'shield',   'titel' => 'Kwaliteitsgarantie', 'tekst' => 'Elk product wordt voor verzending gecontroleerd. Topkwaliteit, zonder compromis.'],
-                                ['icoon' => 'truck',    'titel' => 'Morgen in huis',     'tekst' => 'Voor 17:00 besteld, morgen bezorgd. Gratis verzending vanaf €200.'],
+                                ['icoon' => 'truck',    'titel' => 'Morgen in huis',     'tekst' => 'Voor 17:00 besteld, morgen bezorgd. Gratis verzending vanaf €220.'],
                                 ['icoon' => 'card',     'titel' => 'Veilig betalen',     'tekst' => 'iDEAL, Bancontact, creditcard en Apple Pay — altijd via een beveiligde omgeving.'],
                                 ['icoon' => 'whatsapp', 'titel' => '24/7 WhatsApp',      'tekst' => 'Vragen over maten, bestellingen of advies? We staan altijd voor je klaar.'],
                             ],
@@ -351,7 +351,7 @@ function dom_content_schema() {
                         'verzending' => [
                             'type'    => 'richtext',
                             'label'   => 'Verzending & retourneren',
-                            'default' => '<p><b>Verzending.</b> Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Gratis verzending vanaf €200. Je ontvangt altijd een trackingcode.</p><p><b>Retourneren.</b> Niet goed? Je hebt 14 dagen om te ruilen of te retourneren, zolang het product ongebruikt is en in de originele verpakking zit. Meld je retour aan via WhatsApp en je hoort binnen enkele minuten wat je moet doen.</p>',
+                            'default' => '<p><b>Verzending.</b> Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Gratis verzending vanaf €220. Je ontvangt altijd een trackingcode.</p><p><b>Retourneren.</b> Niet goed? Je hebt 14 dagen om te ruilen of te retourneren, zolang het product ongebruikt is en in de originele verpakking zit. Meld je retour aan via WhatsApp en je hoort binnen enkele minuten wat je moet doen.</p>',
                         ],
                         'geen_details' => [
                             'type'    => 'text',
@@ -402,9 +402,9 @@ function dom_content_schema() {
             'groepen' => [
                 'drempels' => [
                     'titel'  => 'Voortgangsbalk',
-                    'uitleg' => 'De bedragen die klanten halen om iets gratis te krijgen. Pas deze alleen aan als de winkel die regel echt voert.',
+                    'uitleg' => 'De bedragen die klanten halen om iets gratis te krijgen. Het bedrag voor gratis verzending staat ook in WooCommerce bij Verzending; pas je het hier aan, pas het daar dan ook aan, anders beloven de balk en de afrekenpagina iets anders.',
                     'velden' => [
-                        'verzending'       => ['type' => 'number', 'label' => 'Gratis verzending vanaf', 'default' => 200],
+                        'verzending'       => ['type' => 'number', 'label' => 'Gratis verzending vanaf', 'default' => 220],
                         'verzending_label' => ['type' => 'text', 'label' => 'Label', 'default' => 'Gratis verzending'],
                         'cadeau'           => ['type' => 'number', 'label' => 'Gratis cadeau vanaf', 'default' => 350],
                         'cadeau_label'     => ['type' => 'text', 'label' => 'Label', 'default' => 'Gratis mystery shirt'],
@@ -417,9 +417,6 @@ function dom_content_schema() {
                         'knop'    => ['type' => 'text', 'label' => 'Tekst op de afrekenknop', 'default' => 'Afrekenen'],
                         'leeg'    => ['type' => 'text', 'label' => 'Tekst bij een lege winkelwagen', 'default' => 'Je winkelwagen is nog leeg.'],
                         'trust'   => ['type' => 'text', 'label' => 'Regel onder de knop', 'default' => '1.200+ tevreden klanten'],
-                        'tab_1'   => ['type' => 'text', 'label' => 'Tabblad 1', 'default' => 'Maak het compleet'],
-                        'tab_2'   => ['type' => 'text', 'label' => 'Tabblad 2', 'default' => 'Aanbevolen voor jou'],
-                        'tab_3'   => ['type' => 'text', 'label' => 'Tabblad 3', 'default' => 'Recent bekeken'],
                     ],
                 ],
             ],

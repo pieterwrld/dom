@@ -361,7 +361,7 @@ while (have_posts()) : the_post();
               <?php
               echo wp_kses_post(dom_c(
                   'product.blokken.verzending',
-                  '<p><b>Verzending.</b> Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Gratis verzending vanaf €200. Je ontvangt altijd een trackingcode.</p><p><b>Retourneren.</b> Niet goed? Je hebt 14 dagen om te ruilen of te retourneren, zolang het product ongebruikt is en in de originele verpakking zit. Meld je retour aan via WhatsApp en je hoort binnen enkele minuten wat je moet doen.</p>'
+                  '<p><b>Verzending.</b> Voor 17:00 besteld is doorgaans de volgende dag in huis, uiterlijk binnen 2 dagen. Gratis verzending vanaf €220. Je ontvangt altijd een trackingcode.</p><p><b>Retourneren.</b> Niet goed? Je hebt 14 dagen om te ruilen of te retourneren, zolang het product ongebruikt is en in de originele verpakking zit. Meld je retour aan via WhatsApp en je hoort binnen enkele minuten wat je moet doen.</p>'
               ));
               ?>
             </div></div>

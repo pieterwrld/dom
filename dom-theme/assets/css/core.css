@@ -765,11 +765,11 @@ body.cart-open .ovl{opacity:1;pointer-events:auto}
   background-image:linear-gradient(90deg,#8C0C1C,#D0142C,#FF5566,#D0142C);background-size:300% 300%;
   animation:shim 4s ease infinite}
 .mile{position:absolute;top:50%;transform:translate(-50%,-50%)}
-.mile .dot{width:13px;height:13px;border-radius:50%;background:#fff;border:1.5px solid var(--line);
-  display:grid;place-items:center;transition:all .4s}
-.mile .dot svg{width:7px;height:7px;stroke:#fff;stroke-width:3.4;fill:none;opacity:0;transition:opacity .3s}
+.mile .dot{width:22px;height:22px;border-radius:50%;background:#fff;border:1.5px solid var(--line);
+  display:grid;place-items:center;transition:background .3s,border-color .3s}
+.mile .dot svg{width:12px;height:12px;fill:var(--muted);stroke:none;transition:fill .3s}
 .mile.hit .dot{background:var(--bf);border-color:var(--bf)}
-.mile.hit .dot svg{opacity:1}
+.mile.hit .dot svg{fill:#fff}
 .mile-lbls{display:flex;justify-content:space-between;font-family:var(--disp);font-size:11px;
   font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:8px}
 .mile-lbls span.hit{color:var(--bf)}
@@ -778,11 +778,18 @@ body.cart-open .ovl{opacity:1;pointer-events:auto}
 .gift.on{border-color:var(--bf);border-style:solid;background:var(--bf-tint)}
 .gift .gi{width:24px;height:24px;display:grid;place-items:center;background:var(--surface);flex:0 0 auto}
 .gift.on .gi{background:var(--bf)}
-.gift .gi svg{width:13px;height:13px;stroke:var(--muted);stroke-width:1.7;fill:none}
-.gift.on .gi svg{stroke:#fff}
-.gift .st{margin-left:auto;font-family:var(--disp);font-size:11px;font-weight:800;text-transform:uppercase;
-  color:var(--muted)}
+.gift .gi svg{width:14px;height:14px;fill:var(--muted);stroke:none}
+.gift.on .gi svg{fill:#fff}
+.gift .sub{display:block;margin-top:1px;font-size:10.5px;color:var(--bf);font-weight:600}
+.gift .st{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font-family:var(--disp);
+  font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.gift .st svg{width:11px;height:11px;stroke:var(--bf);stroke-width:3;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
 .gift.on .st{color:var(--bf)}
+/* Het cadeau in de wagen: duidelijk dat het niets kost. */
+.dom-gratis{display:inline-block;margin-left:6px;padding:1px 6px;background:var(--bf);color:#fff;
+  font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  vertical-align:middle}
 
 .drw-b{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .drw-pad{padding:0 16px}

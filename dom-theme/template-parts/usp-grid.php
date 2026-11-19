@@ -8,7 +8,7 @@ defined('ABSPATH') || exit;
 
 $usp_items = dom_c_rows('home.usp.items', [
     ['icoon' => 'shield',   'titel' => 'Kwaliteitsgarantie', 'tekst' => 'Elk product wordt voor verzending gecontroleerd. Topkwaliteit, zonder compromis.'],
-    ['icoon' => 'truck',    'titel' => 'Morgen in huis',     'tekst' => 'Voor 17:00 besteld, morgen bezorgd. Gratis verzending vanaf €200.'],
+    ['icoon' => 'truck',    'titel' => 'Morgen in huis',     'tekst' => 'Voor 17:00 besteld, morgen bezorgd. Gratis verzending vanaf €220.'],
     ['icoon' => 'card',     'titel' => 'Veilig betalen',     'tekst' => 'iDEAL, Bancontact, creditcard en Apple Pay — altijd via een beveiligde omgeving.'],
     ['icoon' => 'whatsapp', 'titel' => '24/7 WhatsApp',      'tekst' => 'Vragen over maten, bestellingen of advies? We staan altijd voor je klaar.'],
 ]);

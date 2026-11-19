@@ -308,7 +308,7 @@ if (function_exists('acf_add_options_page')) {
                 'type'  => 'wysiwyg',
                 'toolbar' => 'basic',
                 'media_upload' => 0,
-                'default_value' => '<p><strong>Verzending</strong><br>Gratis verzending vanaf €200. Onder €200 bedragen de verzendkosten €5,95. Bestellingen voor 17:00 worden dezelfde dag verzonden.</p><p><strong>Retourneren</strong><br>Niet tevreden? Retourneer je bestelling binnen 14 dagen gratis. Stuur een bericht via WhatsApp en wij regelen het voor je.</p>',
+                'default_value' => '<p><strong>Verzending</strong><br>Gratis verzending vanaf €220. Onder €220 bedragen de verzendkosten €5,95. Bestellingen voor 17:00 worden dezelfde dag verzonden.</p><p><strong>Retourneren</strong><br>Niet tevreden? Retourneer je bestelling binnen 14 dagen gratis. Stuur een bericht via WhatsApp en wij regelen het voor je.</p>',
             ],
             [
                 'key'   => 'field_newsletter_heading',
