@@ -211,10 +211,17 @@ if (is_wp_error($brands)) $brands = [];
     <?php if ($wp_query->max_num_pages > 1) :
       $current_page = max(1, get_query_var('paged'));
       $total_pages  = $wp_query->max_num_pages;
-      $total_shown  = min($wp_query->found_posts, $current_page * get_option('posts_per_page'));
+      // Het aantal per pagina komt uit de query zelf. get_option('posts_per_page')
+      // is de blogwaarde (10) en die klopt niet met het productraster, waardoor
+      // er "10 van 445" onder 24 producten stond.
+      $per_pagina   = (int) $wp_query->get('posts_per_page');
+      $total_shown  = min(
+          (int) $wp_query->found_posts,
+          ($current_page - 1) * max(1, $per_pagina) + (int) $wp_query->post_count
+      );
     ?>
       <div class="loadw">
-        <div class="pbar"><i style="width:<?php echo round($total_shown / $wp_query->found_posts * 100); ?>%"></i></div>
+        <div class="pbar"><i style="width:<?php echo $wp_query->found_posts ? round($total_shown / $wp_query->found_posts * 100) : 0; ?>%"></i></div>
         <div class="pc"><?php echo $total_shown; ?> van <?php echo $wp_query->found_posts; ?> producten</div>
         <?php if ($current_page < $total_pages) : ?>
           <a href="<?php echo esc_url(get_pagenum_link($current_page + 1)); ?>" class="btn btn-o">Meer laden</a>
