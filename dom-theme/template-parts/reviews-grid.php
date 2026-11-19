@@ -55,8 +55,10 @@ $stat_score    = 4.9;
     <!-- Twee cijferblokken. De tellers lopen één keer op zodra ze in beeld komen. -->
     <div class="rstats" id="rstats">
       <div class="rstat">
-        <b class="rstat-no" data-doel="<?php echo esc_attr($klanten_getal); ?>"
-           data-plus="<?php echo $klanten_plus ? '1' : '0'; ?>"><?php echo esc_html($stat_klanten); ?></b>
+        <span class="rstat-waarde">
+          <b class="rstat-no" data-doel="<?php echo esc_attr($klanten_getal); ?>"
+             data-plus="<?php echo $klanten_plus ? '1' : '0'; ?>"><?php echo esc_html($stat_klanten); ?></b>
+        </span>
         <span class="rstat-lbl"><?php esc_html_e('Tevreden klanten', 'dom-theme'); ?></span>
       </div>
       <div class="rstat">
@@ -65,8 +67,9 @@ $stat_score    = 4.9;
             <span style="--i:<?php echo $i; ?>"><?php echo $ster; // phpcs:ignore ?></span>
           <?php endfor; ?>
         </div>
-        <b class="rstat-no" data-doel="<?php echo esc_attr($stat_score); ?>" data-decimaal="1">
-          <?php echo esc_html(number_format_i18n($stat_score, 1)); ?></b><span class="rstat-max">/5</span>
+        <span class="rstat-waarde">
+          <b class="rstat-no" data-doel="<?php echo esc_attr($stat_score); ?>" data-decimaal="1"><?php echo esc_html(number_format_i18n($stat_score, 1)); ?></b><span class="rstat-max">/5</span>
+        </span>
         <span class="rstat-lbl"><?php esc_html_e('Gemiddelde score', 'dom-theme'); ?></span>
       </div>
     </div>
