@@ -380,7 +380,8 @@ while (have_posts()) : the_post();
 
   <!-- ══════ MEEST VERKOCHT ══════ -->
   <?php if (!empty($same_cat)) : ?>
-    <section class="sec" style="padding-top:0">
+    <?php // Geen padding-top:0 meer: de sectie plakte tegen de reviews erboven. ?>
+    <section class="sec sec-best">
       <div class="wrap">
         <div class="sec-t" data-rv="up">
           <div class="eyebrow"><i></i><span class="lbl">Bestsellers</span></div>
@@ -391,9 +392,8 @@ while (have_posts()) : the_post();
                 <button class="rnav" data-rail="sim" data-dir="-1" aria-label="Vorige"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
                 <button class="rnav" data-rail="sim" data-dir="1" aria-label="Volgende"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
               </div>
-              <?php if ($primary_cat) : ?>
-                <a href="<?php echo esc_url(dom_term_url($primary_cat)); ?>" class="lk">Alle <?php echo esc_html(strtolower($primary_cat->name)); ?> <span class="arw">&rarr;</span></a>
-              <?php endif; ?>
+              <?php // De lijst is niet langer categoriegebonden, dus de link gaat naar de hele winkel. ?>
+              <a href="<?php echo esc_url(dom_shop_url()); ?>" class="lk"><?php esc_html_e('Alle producten', 'dom-theme'); ?> <span class="arw">&rarr;</span></a>
             </div>
           </div>
         </div>
@@ -409,7 +409,6 @@ while (have_posts()) : the_post();
             <a class="pcard pcard-sm" href="<?php echo esc_url($rp->get_permalink()); ?>" data-rv="up">
               <div class="pmedia">
                 <img class="p1" src="<?php echo esc_url($rp_thumb ?: wc_placeholder_img_src('product-card')); ?>" alt="<?php echo esc_attr($rp->get_name()); ?>" loading="lazy">
-                <span class="sheen"></span>
                 <?php if ($rp_pct) : ?><div class="pbadges"><?php echo dom_korting_badge($rp_pct); // phpcs:ignore ?></div><?php endif; ?>
               </div>
               <div class="pinfo">

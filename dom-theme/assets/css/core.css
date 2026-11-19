@@ -163,6 +163,9 @@ input,select{font:inherit}
 .cd .u{display:grid;justify-items:center;min-width:34px;padding:3px 5px;background:rgba(0,0,0,.26)}
 .cd .u b{font-family:var(--mono);font-size:14px;font-weight:700;line-height:1.05}
 .cd .u span{font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.72}
+/* "eindigt over" vlak voor de klok: vier losse getallen zeggen niets. */
+.bfs-eind{font-family:var(--body);font-size:clamp(11px,1.3vw,13px);font-weight:500;
+  color:rgba(255,255,255,.82);white-space:nowrap;letter-spacing:.01em}
 .bfs .go{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 13px;background:#fff;
   color:var(--bf);font-family:var(--disp);font-weight:800;font-size:13px;text-transform:uppercase;
   letter-spacing:.08em;white-space:nowrap;transition:transform .3s var(--e)}
@@ -181,6 +184,7 @@ input,select{font:inherit}
     gap:8px 12px;padding:9px var(--gut)}
   .bfs-t{flex:0 0 auto}
   .bfs-t s{display:none}
+  .bfs-eind{font-size:11px;order:2}
   .cd{gap:4px}
   .cd .u{min-width:30px;padding:2px 4px}
   .cd .u b{font-size:13px}
@@ -348,6 +352,19 @@ input,select{font:inherit}
 .sale-vlak{position:absolute;inset:0;overflow:hidden;
   background:linear-gradient(145deg,#8C0C1C 0%,#D0142C 42%,#F03048 56%,#D0142C 70%,#8C0C1C 100%);
   background-size:260% 260%;animation:saleGloed 7s linear infinite}
+/* Het zegel midden op de tegel. Het draait langzaam en pompt een beetje, zodat
+   het vlak niet als een leeg rood blok leest. */
+.sale-zegel{position:absolute;top:50%;left:50%;width:46%;max-width:160px;aspect-ratio:1;
+  transform:translate(-50%,-50%);display:grid;place-items:center;
+  animation:zegelPomp 3.4s ease-in-out infinite}
+.sale-zegel svg{width:100%;height:100%;overflow:visible}
+.sale-zegel .sz-ring{fill:rgba(255,255,255,.14);stroke:rgba(255,255,255,.85);stroke-width:2;
+  transform-origin:60px 60px;animation:zegelDraai 16s linear infinite}
+.sale-zegel .sz-tekst{fill:#fff;font-family:var(--disp);font-size:27px;font-weight:900;
+  letter-spacing:.06em}
+@keyframes zegelDraai{to{transform:rotate(360deg)}}
+@keyframes zegelPomp{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.06)}}
+.ctile:hover .sale-zegel{animation-duration:1.8s}
 .sale-vlak::after{content:"";position:absolute;top:-55%;bottom:-55%;width:42%;left:-60%;
   background:linear-gradient(100deg,transparent,rgba(255,255,255,.34),transparent);
   transform:skewX(-18deg);animation:saleVeeg 4.6s var(--e) infinite}
@@ -356,6 +373,7 @@ input,select{font:inherit}
 @media(prefers-reduced-motion:reduce){
   .sale-vlak{animation:none;background-position:50% 50%}
   .sale-vlak::after{animation:none;opacity:0}
+  .sale-zegel,.sale-zegel .sz-ring{animation:none}
 }
 @media(max-width:860px){.ctile .cbadge{font-size:9px;height:17px;padding:0 5px;top:5px;left:5px}}
 
@@ -449,7 +467,13 @@ input,select{font:inherit}
 @media(max-width:760px){
   .rail{margin-inline:calc(-1 * var(--gut));padding-inline:var(--gut);
     scroll-padding-inline:var(--gut)}
+  /* De bestsellers blijven binnen de marge. Doorlopen tot de schermrand liet
+     het laatste kaartje half afgesneden tegen de rand plakken, waardoor het
+     leek alsof de pagina zelf meeschoof. */
+  .sec-best .rail{margin-inline:0;padding-inline:0;scroll-padding-inline:0}
 }
+/* Lucht tussen de reviews erboven en de bestsellers. */
+.sec-best{padding-top:clamp(36px,5vw,72px)}
 .rail-nav{display:flex;gap:6px}
 .rnav{width:38px;height:38px;border:1px solid var(--line);display:grid;place-items:center;
   transition:border-color .3s,background .3s}

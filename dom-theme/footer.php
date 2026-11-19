@@ -77,11 +77,13 @@
     <?php endif; ?>
 
     <?php
-    foreach (['kolom_1' => 'Klantenservice', 'kolom_2' => 'Over ons'] as $kolom => $standaard_kop) :
+    foreach (['kolom_1' => 'Klantenservice', 'kolom_2' => ''] as $kolom => $standaard_kop) :
         $links = dom_c_rows('footer.' . $kolom . '.links', []);
+        $kop   = (string) dom_c('footer.' . $kolom . '.kop', $standaard_kop);
     ?>
       <div class="ft-col">
-        <h5><?php echo esc_html(dom_c('footer.' . $kolom . '.kop', $standaard_kop)); ?></h5>
+        <?php // Een lege kop wordt niet getoond; de tweede kolom heeft er geen. ?>
+        <?php if ($kop !== '') : ?><h5><?php echo esc_html($kop); ?></h5><?php endif; ?>
         <?php if ($links) : ?>
           <ul>
             <?php foreach ($links as $link) : ?>

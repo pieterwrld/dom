@@ -34,6 +34,8 @@ if ($dom_bf_claim === '') {
 			<b><?php echo esc_html($dom_bf_label); ?></b>
 			<?php if ($dom_bf_claim) : ?><s><?php echo esc_html($dom_bf_claim); ?></s><?php endif; ?>
 		</div>
+		<?php // Zonder deze regel staan er alleen vier getallen en is niet te zien waar ze over gaan. ?>
+		<span class="bfs-eind"><?php esc_html_e('eindigt over', 'dom-theme'); ?></span>
 		<div class="cd" id="bf-cd">
 			<div class="u" data-unit="d">
 				<b>00</b>

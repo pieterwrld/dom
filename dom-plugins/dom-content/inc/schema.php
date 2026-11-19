@@ -183,6 +183,7 @@ function dom_content_schema() {
                     'titel'  => 'Accessoireblok',
                     'uitleg' => 'De band met bril, pet en tas. De foto\'s komen van de categorieën zelf, die stel je in op het tabblad Categorieën.',
                     'velden' => [
+                        'label'  => ['type' => 'text', 'label' => 'Label boven de kop', 'default' => 'Accessoires'],
                         'titel'  => ['type' => 'text', 'label' => 'Kop', 'default' => 'Maak je look compleet'],
                         'items'  => [
                             'type'      => 'repeater',
@@ -473,8 +474,9 @@ function dom_content_schema() {
                 ],
                 'kolom_2' => [
                     'titel'  => 'Kolom 2',
+                    'uitleg' => 'Laat de kop leeg om hem weg te laten.',
                     'velden' => [
-                        'kop'   => ['type' => 'text', 'label' => 'Kop', 'default' => 'Over ons'],
+                        'kop'   => ['type' => 'text', 'label' => 'Kop', 'default' => ''],
                         'links' => [
                             'type'      => 'repeater',
                             'label'     => 'Links',
@@ -485,7 +487,6 @@ function dom_content_schema() {
                                 'url'   => ['type' => 'url', 'label' => 'Link'],
                             ],
                             'default' => [
-                                ['tekst' => 'Ons verhaal', 'url' => '/over-ons'],
                                 ['tekst' => 'De Klokjesman', 'url' => 'https://deklokjesman.com'],
                             ],
                         ],
