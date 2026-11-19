@@ -33,8 +33,8 @@
   // Beheer: De Outfitman > Footer.
   $ft_trust = dom_c_rows('footer.trust.items', [
       ['icoon' => 'shield', 'tekst' => 'Veilig betalen'],
-      ['icoon' => 'return', 'tekst' => 'Gratis retour'],
       ['icoon' => 'truck',  'tekst' => 'Snelle levering'],
+      ['icoon' => 'whatsapp', 'tekst' => '24/7 bereikbaar'],
   ]);
   $ft_ster = '<svg width="13" height="13" viewBox="0 0 20 20"><polygon points="10,1 12.6,7.4 19.5,7.6 14,11.8 15.8,18.8 10,14.8 4.2,18.8 6,11.8 0.5,7.6 7.4,7.4" fill="currentColor"/></svg>';
   ?>
@@ -54,8 +54,28 @@
     </div>
   </div>
 
-  <!-- 4-column grid -->
+  <!-- Kolommen -->
   <div class="ft-top wrap">
+
+    <?php
+    /**
+     * De collecties. Die stonden nergens in de footer, terwijl het de snelste
+     * weg naar de winkel is. Zelfde lijst en volgorde als het menu.
+     */
+    $ft_cats = function_exists('dom_ordered_categories') ? dom_ordered_categories() : [];
+    if ($ft_cats) :
+    ?>
+      <div class="ft-col ft-col--shop">
+        <h5><?php esc_html_e('Collecties', 'dom-theme'); ?></h5>
+        <ul>
+          <?php foreach ($ft_cats as $ft_cat) : ?>
+            <li><a href="<?php echo esc_url(dom_term_url($ft_cat)); ?>"><?php echo esc_html($ft_cat->name); ?></a></li>
+          <?php endforeach; ?>
+          <li><a href="<?php echo esc_url(dom_shop_url()); ?>"><b><?php esc_html_e('Alle producten', 'dom-theme'); ?></b></a></li>
+        </ul>
+      </div>
+    <?php endif; ?>
+
     <?php
     foreach (['kolom_1' => 'Klantenservice', 'kolom_2' => 'Over ons'] as $kolom => $standaard_kop) :
         $links = dom_c_rows('footer.' . $kolom . '.links', []);
@@ -70,23 +90,15 @@
           </ul>
         <?php endif; ?>
 
-        <?php if ($kolom === 'kolom_2') :
-          $insta  = dom_c('footer.kolom_2.instagram', 'https://instagram.com/deoutfitman');
-          $tiktok = dom_c('footer.kolom_2.tiktok', 'https://tiktok.com/@deoutfitman');
-          if ($insta || $tiktok) : ?>
+        <?php
+        $tiktok = dom_c('footer.kolom_2.tiktok', 'https://tiktok.com/@deoutfitman');
+        if ($kolom === 'kolom_2' && $tiktok) : ?>
           <div class="socs">
-            <?php if ($insta) : ?>
-              <a href="<?php echo esc_url($insta); ?>" target="_blank" rel="noopener" class="soc" aria-label="Instagram">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
-              </a>
-            <?php endif; ?>
-            <?php if ($tiktok) : ?>
-              <a href="<?php echo esc_url($tiktok); ?>" target="_blank" rel="noopener" class="soc" aria-label="TikTok">
-                <svg width="15" height="15" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.14a8.16 8.16 0 004.76 1.52v-3.4a4.85 4.85 0 01-1-.57z" fill="currentColor"/></svg>
-              </a>
-            <?php endif; ?>
+            <a href="<?php echo esc_url($tiktok); ?>" target="_blank" rel="noopener" class="soc" aria-label="TikTok">
+              <svg width="15" height="15" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.14a8.16 8.16 0 004.76 1.52v-3.4a4.85 4.85 0 01-1-.57z" fill="currentColor"/></svg>
+            </a>
           </div>
-        <?php endif; endif; ?>
+        <?php endif; ?>
       </div>
     <?php endforeach; ?>
   </div>

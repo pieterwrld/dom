@@ -57,8 +57,6 @@ if ($product->is_type('variable')) {
              loading="lazy" draggable="false">
       <?php endif; ?>
     </div>
-    <span class="sheen"></span>
-
     <!-- Badges -->
     <div class="pbadges">
       <?php if ($sale_pct) : ?>
@@ -73,8 +71,7 @@ if ($product->is_type('variable')) {
     </div>
 
     <?php if (count($all_images) > 1) : ?>
-      <button class="parrow l" data-d="-1" aria-label="Vorige"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <button class="parrow r" data-d="1" aria-label="Volgende"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <?php // Geen pijlen: de streepjes eronder laten al zien hoeveel foto's er zijn. ?>
       <div class="slidebars">
         <?php foreach ($all_images as $k => $img_id) : ?>
           <i<?php echo $k === 0 ? ' class="on"' : ''; ?>></i>

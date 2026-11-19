@@ -146,13 +146,6 @@
 .ptrack{position:absolute;inset:0;display:flex;touch-action:pan-y;cursor:grab}
 .ptrack.drag{cursor:grabbing}
 .ptrack>img{position:relative;inset:auto;flex:0 0 100%;width:100%;height:100%;object-fit:cover}
-.parrow{position:absolute;top:50%;z-index:3;width:28px;height:28px;background:rgba(255,255,255,.92);
-  backdrop-filter:blur(8px);display:grid;place-items:center;transform:translateY(-50%) scale(.85);
-  opacity:0;transition:all .28s}
-.pmedia:hover .parrow{opacity:1;transform:translateY(-50%) scale(1)}
-.parrow.l{left:7px}.parrow.r{right:7px}
-.parrow svg{width:11px;height:11px;stroke:var(--ink);stroke-width:2.2;fill:none;stroke-linecap:round}
-.parrow:disabled{opacity:0!important}
 
 .loadw{display:grid;place-items:center;gap:13px;padding:clamp(30px,4.4vw,56px) 0}
 .loadw .pbar{width:min(240px,66%);height:2px;background:var(--line);overflow:hidden}
@@ -160,3 +153,13 @@
 .loadw .pc{font-family:var(--mono);font-size:11px;color:var(--muted)}
 .empty{padding:clamp(44px,7vw,90px) 0;text-align:center}
 .empty h3{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:26px}
+
+/* Doorladen bij het scrollen.
+   Zonder JavaScript blijft het een gewone knop naar de volgende pagina; met
+   JavaScript verdwijnt die en komt er een laadindicatie voor in de plaats. */
+.loadw.js .btn{display:none}
+.loadw.js.bezig::after{content:"";width:22px;height:22px;border:2px solid var(--line);
+  border-top-color:var(--bf);border-radius:50%;animation:loadwTol .7s linear infinite}
+.loadw.klaar .pbar,.loadw.klaar::after{display:none}
+@keyframes loadwTol{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.loadw.js.bezig::after{animation-duration:2s}}

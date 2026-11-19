@@ -104,12 +104,6 @@
         ?>
     </div>
 
-    <div class="menu-f">
-        <a href="<?php echo esc_url(home_url('/contact')); ?>">Contact</a>
-        <a href="<?php echo esc_url(home_url('/faq')); ?>">Veelgestelde vragen</a>
-        <a href="<?php echo esc_url(function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : home_url('/')); ?>">Mijn account</a>
-        <a href="<?php echo esc_url(home_url('/retourneren')); ?>">Retourneren</a>
-    </div>
 </nav>
 
 <!-- Search overlay -->

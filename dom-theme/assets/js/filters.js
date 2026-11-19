@@ -125,7 +125,7 @@
     });
   });
 
-  /* ============ PRODUCT CARD CAROUSEL ============ */
+  /* ============ FOTOSLIDER OP DE KAART ============ */
   var grid = $('#grid');
   if (!grid) return;
 
@@ -138,22 +138,28 @@
     track.style.transition = 'transform .6s cubic-bezier(.16,1,.3,1)';
     track.style.transform = 'translate3d(' + (-idx * 100) + '%,0,0)';
     $$('.slidebars i', media).forEach(function (d, k) { d.classList.toggle('on', k === idx); });
-    var l = $('.parrow.l', media), r = $('.parrow.r', media);
-    if (l) l.disabled = idx === 0;
-    if (r) r.disabled = idx === imgs.length - 1;
   }
 
+  /**
+   * Na een veeg mag de tik die eraan vastzit niet als klik tellen, anders
+   * opent het product zodra je de volgende foto wilt zien.
+   *
+   * Dat werkte eerder met een eenmalige klikvanger op de kaart. Bleef een veeg
+   * zonder klik, dan bleef die vanger staan en at hij de eerstvolgende
+   * bedoelde klik op: vandaar dat je twee keer moest tikken voordat je op het
+   * product kwam. Nu is het een tijdstempel die vanzelf verloopt.
+   */
+  var blokkeerKlikTot = 0;
+
   grid.addEventListener('click', function (e) {
-    var ar = e.target.closest('.parrow');
-    if (ar) {
+    if (Date.now() < blokkeerKlikTot) {
       e.preventDefault();
       e.stopPropagation();
-      var m = ar.closest('.pmedia');
-      setIdx(m, (m._i || 0) + parseInt(ar.dataset.d, 10));
     }
-  });
+  }, true);
 
   var act = null, x0 = 0, dx = 0, w = 0;
+
   grid.addEventListener('pointerdown', function (e) {
     var t = e.target.closest('.ptrack');
     if (!t) return;
@@ -162,27 +168,106 @@
     t.classList.add('drag'); t.style.transition = 'none';
     t.closest('.pmedia').classList.add('touched');
   });
+
   window.addEventListener('pointermove', function (e) {
     if (!act) return;
     dx = e.clientX - x0;
     var m = act.closest('.pmedia');
     act.style.transform = 'translate3d(' + (-(m._i || 0) * w + dx) + 'px,0,0)';
   });
+
   window.addEventListener('pointerup', function () {
     if (!act) return;
     var m = act.closest('.pmedia');
     act.classList.remove('drag');
     act = null;
-    setIdx(m, (m._i || 0) + (Math.abs(dx) > 34 ? (dx < 0 ? 1 : -1) : 0));
-    if (Math.abs(dx) > 6) {
-      m.closest('.pcard').addEventListener('click', function (ev) {
-        ev.preventDefault(); ev.stopPropagation();
-      }, { capture: true, once: true });
+    // Een vinger staat bij een gewone tik zelden helemaal stil. Onder de 12px
+    // is het een tik, daarboven een veeg.
+    var veeg = Math.abs(dx) > 12;
+    setIdx(m, (m._i || 0) + (veeg ? (dx < 0 ? 1 : -1) : 0));
+    if (veeg) {
+      blokkeerKlikTot = Date.now() + 350;
     }
     dx = 0;
   });
 
-  /* ============ REVEAL NEW CARDS ============ */
+  /* ============ DOORLADEN BIJ HET SCROLLEN ============
+     De knop blijft in de pagina staan voor bezoekers zonder JavaScript. Met
+     JavaScript verbergen we hem en komt de volgende pagina er vanzelf achter,
+     zodra het einde van de lijst in zicht komt. */
+  (function () {
+    var loadw = document.querySelector('.loadw');
+    if (!loadw) return;
+
+    var knop = loadw.querySelector('a');
+    if (!knop || !('IntersectionObserver' in window) || !window.fetch) return;
+
+    loadw.classList.add('js');
+
+    var bezig = false;
+    var volgende = knop.getAttribute('href');
+    var waker;
+
+    function verwerk(html) {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+
+      Array.prototype.forEach.call(doc.querySelectorAll('#grid > *'), function (kaart) {
+        var el = document.importNode(kaart, true);
+        grid.appendChild(el);
+        if (window.DOM && window.DOM.reveal && el.hasAttribute && el.hasAttribute('data-rv')) {
+          window.DOM.reveal(el);
+        }
+      });
+
+      var teller = doc.querySelector('.loadw .pc');
+      var eigenTeller = loadw.querySelector('.pc');
+      if (teller && eigenTeller) { eigenTeller.textContent = teller.textContent; }
+
+      var balk = doc.querySelector('.loadw .pbar i');
+      var eigenBalk = loadw.querySelector('.pbar i');
+      if (balk && eigenBalk) { eigenBalk.style.width = balk.style.width; }
+
+      var volgendeKnop = doc.querySelector('.loadw a');
+      volgende = volgendeKnop ? volgendeKnop.getAttribute('href') : null;
+
+      if (!volgende) {
+        waker.disconnect();
+        loadw.classList.add('klaar');
+      } else {
+        knop.setAttribute('href', volgende);
+      }
+    }
+
+    function laad() {
+      if (bezig || !volgende) { return; }
+      bezig = true;
+      loadw.classList.add('bezig');
+      fetch(volgende, { credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.text() : Promise.reject(new Error(r.status)); })
+        .then(verwerk)
+        .catch(function () {
+          // Lukt het niet, dan komt de knop terug: beter een knop dan een
+          // halve lijst zonder uitweg.
+          loadw.classList.remove('js');
+          waker.disconnect();
+          volgende = knop.getAttribute('href');
+        })
+        .then(function () {
+          bezig = false;
+          loadw.classList.remove('bezig');
+        });
+    }
+
+    waker = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { laad(); } });
+    }, { rootMargin: '600px 0px' });
+
+    waker.observe(loadw);
+
+    knop.addEventListener('click', function (e) { e.preventDefault(); laad(); });
+  })();
+
+  /* ============ NIEUWE KAARTEN LATEN VERSCHIJNEN ============ */
   if (window.DOM && window.DOM.reveal) {
     $$('.pcard[data-rv]', grid).forEach(function (el) {
       window.DOM.reveal(el);

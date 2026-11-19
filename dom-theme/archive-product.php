@@ -19,27 +19,12 @@ if ($is_category && !is_wp_error($current_cat)) {
     $page_copy  = $current_cat->description ?: '';
 }
 
-$cat_order = [
-    'jassen', 'jeans', 'sneakers', 't-shirts', 'sweaters-hoodies',
-    'brillen', 'tassen', 'trainingspakken', 'slippers', 'zwembroeken', 'petten', 'sale',
-];
-$cats = get_terms([
-    'taxonomy'   => 'product_cat',
-    'hide_empty' => false,
-    'exclude'    => [get_option('default_product_cat')],
-]);
-if (is_wp_error($cats)) $cats = [];
-$cats = array_filter($cats, fn($c) => $c->slug !== 'bestsellers');
-
-$cat_map = [];
-foreach ($cats as $c) $cat_map[$c->slug] = $c;
-$ordered_cats = [];
-foreach ($cat_order as $slug) {
-    if (isset($cat_map[$slug])) $ordered_cats[] = $cat_map[$slug];
-}
-foreach ($cats as $c) {
-    if (!in_array($c->slug, $cat_order)) $ordered_cats[] = $c;
-}
+/**
+ * De snelkeuzeblokken volgen dezelfde lijst als het menu en het collectieraster.
+ * Die laat Heren, Nieuwste collectie en Truien & Vesten weg: de eerste is de
+ * overkoepelende categorie en de andere twee overlappen met wat er al staat.
+ */
+$ordered_cats = function_exists('dom_ordered_categories') ? dom_ordered_categories() : [];
 
 // Banner per categorie. Beheer: De Outfitman > Categorieën.
 $cat_banner_img = '';

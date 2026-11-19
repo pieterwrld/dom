@@ -60,14 +60,6 @@ $dom_cover_shop = dom_shop_url();
       <div class="eyebrow"><i></i><span class="lbl"><?php echo esc_html(dom_c('home.ugc.eyebrow', __('Community', 'dom-theme'))); ?></span></div>
       <h2 class="split"><?php echo esc_html(dom_c('home.ugc.titel', __('Gedragen door', 'dom-theme'))); ?></h2>
       <p class="tx"><?php echo esc_html(dom_c('home.ugc.tekst', __('Ontdek De Outfitman door de ogen van onze creators.', 'dom-theme'))); ?></p>
-      <div class="cover-soc">
-        <a href="https://www.tiktok.com/@deoutfitman" target="_blank" rel="noopener" aria-label="TikTok">
-          <svg viewBox="0 0 24 24"><path d="M16 3c.4 2.3 1.9 3.9 4 4.2v3c-1.5.1-2.9-.3-4.1-1.1v6.2c0 3.6-2.9 6.2-6.2 5.6-2.5-.5-4.4-2.7-4.4-5.3 0-3.3 3-5.9 6.3-5.3v3.1c-1.4-.5-2.8.5-2.8 2 0 1.2 1 2.2 2.2 2.2s2.2-1 2.2-2.2V3z"/></svg>
-        </a>
-        <a href="https://www.instagram.com/deoutfitman/" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg viewBox="0 0 24 24"><path d="M12 7.5A4.5 4.5 0 1 0 16.5 12 4.5 4.5 0 0 0 12 7.5zm0 7.4A2.9 2.9 0 1 1 14.9 12 2.9 2.9 0 0 1 12 14.9zM17 3H7a4 4 0 0 0-4 4v10a4 4 0 0 0 4 4h10a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4zm2.4 14a2.4 2.4 0 0 1-2.4 2.4H7A2.4 2.4 0 0 1 4.6 17V7A2.4 2.4 0 0 1 7 4.6h10A2.4 2.4 0 0 1 19.4 7zm-2-10.3a1 1 0 1 1-1-1 1 1 0 0 1 1 1z"/></svg>
-        </a>
-      </div>
     </div>
   </div>
 
@@ -109,36 +101,101 @@ $dom_cover_shop = dom_shop_url();
   </div>
   <div class="cvdots" id="cvDots"></div>
 </section>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   if (window.DOM && DOM.buildCover) DOM.buildCover('#cover');
 
-  // Alleen de kaart die vooraan staat speelt af.
   var host = document.getElementById('cover');
-  if (!host) return;
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var sectie = document.getElementById('wornby');
+  if (!host || !sectie) return;
 
-  function sync() {
-    host.querySelectorAll('.cv').forEach(function (card) {
-      var v = card.querySelector('video');
-      if (!v) return;
-      if (card.classList.contains('act') && !reduce) {
-        var p = v.play();
+  var kaarten = Array.prototype.slice.call(host.querySelectorAll('.cv'));
+  if (!kaarten.length) return;
+
+  var rustig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /**
+   * Eén plek bepaalt wat er speelt en wat er te horen is.
+   *
+   * Eerder zette elke gebeurtenis zijn eigen stukje aan en uit. Daardoor bleef
+   * een clip doorspelen als je naar de volgende ging, hoorde je er soms twee
+   * tegelijk, en liep de stand van de knop niet gelijk met het geluid. Nu
+   * wordt na elke gebeurtenis dezelfde functie gedraaid die alle kaarten
+   * langsloopt en ze in de juiste stand zet.
+   *
+   * geluidOp houdt bij welke kaart geluid mág hebben. Dat wordt alleen gezet
+   * door op de luidspreker te klikken, en het verdwijnt zodra je verder
+   * schuift of de sectie uit beeld scrollt.
+   */
+  var geluidOp = null;
+  var inBeeld = false;
+
+  function actieveKaart() {
+    for (var i = 0; i < kaarten.length; i++) {
+      if (kaarten[i].classList.contains('act')) return kaarten[i];
+    }
+    return null;
+  }
+
+  function pasAan() {
+    var actief = actieveKaart();
+
+    // Geluid hoort bij één kaart, en alleen bij de kaart die vooraan staat.
+    if (geluidOp && (geluidOp !== actief || !inBeeld)) {
+      geluidOp = null;
+    }
+
+    kaarten.forEach(function (kaart) {
+      var video = kaart.querySelector('video');
+      if (!video) return;
+
+      var magGeluid = (kaart === geluidOp);
+      var magSpelen = (kaart === actief) && inBeeld && !rustig;
+
+      if (video.muted !== !magGeluid) video.muted = !magGeluid;
+
+      kaart.classList.toggle('snd-on', magGeluid);
+      var knop = kaart.querySelector('.cv-snd');
+      if (knop) {
+        knop.setAttribute('aria-pressed', magGeluid ? 'true' : 'false');
+        knop.setAttribute('aria-label', magGeluid ? 'Geluid uitzetten' : 'Geluid aanzetten');
+      }
+
+      if (magSpelen) {
+        var p = video.play();
         if (p && p.catch) p.catch(function () {});
-      } else {
-        v.pause();
+      } else if (!video.paused) {
+        video.pause();
       }
     });
   }
 
-  sync();
-  new MutationObserver(sync).observe(host, {
+  // De kaart die vooraan staat verandert: buildCover wisselt de klasse 'act'.
+  new MutationObserver(pasAan).observe(host, {
     subtree: true, attributes: true, attributeFilter: ['class']
   });
 
-  /* Geluid per clip. Browsers laten video alleen automatisch starten als hij
-     gedempt is, dus alles begint zonder geluid en de bezoeker zet het zelf aan.
-     Eén clip tegelijk: zet je er een aan, dan gaan de andere uit. */
+  // Uit beeld gescrold: alles stil, en het geluid gaat uit.
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        inBeeld = e.isIntersecting && e.intersectionRatio > 0.25;
+      });
+      pasAan();
+    }, { threshold: [0, 0.25, 0.5] }).observe(sectie);
+  } else {
+    inBeeld = true;
+  }
+
+  // Tabblad naar de achtergrond: ook stil.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { geluidOp = null; }
+    pasAan();
+  });
+
+  /* Browsers starten video alleen vanzelf als hij gedempt is, dus alles begint
+     zonder geluid en de bezoeker zet het zelf aan. */
   host.addEventListener('click', function (e) {
     var knop = e.target.closest('.cv-snd');
     if (!knop) return;
@@ -146,29 +203,12 @@ document.addEventListener('DOMContentLoaded', function () {
     e.stopPropagation();
 
     var kaart = knop.closest('.cv');
-    var video = kaart && kaart.querySelector('video');
-    if (!video) return;
+    if (!kaart || kaart !== actieveKaart()) return;
 
-    var aan = video.muted;
-
-    host.querySelectorAll('.cv').forEach(function (andere) {
-      var v = andere.querySelector('video');
-      var k = andere.querySelector('.cv-snd');
-      if (!v || !k) return;
-      v.muted = true;
-      k.setAttribute('aria-pressed', 'false');
-      k.setAttribute('aria-label', 'Geluid aanzetten');
-      andere.classList.remove('snd-on');
-    });
-
-    if (aan) {
-      video.muted = false;
-      knop.setAttribute('aria-pressed', 'true');
-      knop.setAttribute('aria-label', 'Geluid uitzetten');
-      kaart.classList.add('snd-on');
-      var p = video.play();
-      if (p && p.catch) p.catch(function () {});
-    }
+    geluidOp = (geluidOp === kaart) ? null : kaart;
+    pasAan();
   });
+
+  pasAan();
 });
 </script>
