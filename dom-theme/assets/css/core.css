@@ -321,15 +321,19 @@ input,select{font:inherit}
 .ctile .cbody{position:absolute;left:0;right:0;bottom:0;padding:clamp(8px,1.3vw,20px);color:#fff;z-index:2}
 .ctile .cname{font-family:var(--disp);font-weight:800;text-transform:uppercase;line-height:.92;
   font-size:clamp(12px,1.5vw,23px);transition:transform .5s var(--e)}
-.ctile .cmeta{font-family:var(--mono);font-size:clamp(8px,.7vw,10px);opacity:.6;margin-top:3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ctile .cgo{display:none}
+/* Een zichtbare knop in plaats van de vanaf-prijs: zonder knop was niet te
+   zien dat de tegel ergens heen gaat. Hij staat er altijd, ook op een telefoon
+   waar er geen muis is om mee te hoveren. */
+.ctile .cgo{display:inline-flex;align-items:center;gap:6px;margin-top:7px;
+  height:clamp(24px,2.4vw,30px);padding:0 clamp(8px,1vw,13px);
+  background:#fff;color:var(--ink);font-family:var(--disp);font-weight:800;
+  font-size:clamp(9px,.95vw,12px);letter-spacing:.08em;text-transform:uppercase;
+  transition:background .3s var(--e),color .3s var(--e)}
+.ctile .cgo .arw{transition:transform .4s var(--e)}
+.ctile:hover .cgo{background:var(--bf);color:#fff}
+.ctile:hover .cgo .arw{transform:translateX(3px)}
 @media(min-width:861px){
-  .ctile .cgo{display:flex;align-items:center;gap:6px;font-family:var(--disp);font-size:12px;
-    font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-top:5px;opacity:.7;
-    transform:translateY(4px);transition:opacity .45s,transform .5s var(--e)}
   .ctile:hover .cname{transform:translateY(-2px)}
-  .ctile:hover .cgo{opacity:1;transform:none}
 }
 .ctile .cline{position:absolute;left:0;right:0;bottom:0;height:2px;z-index:3;transform:scaleX(0);
   transform-origin:left;transition:transform .6s var(--e);
@@ -591,12 +595,11 @@ input,select{font:inherit}
 @keyframes sterIn{to{opacity:1;transform:none}}
 
 /* ── De telefoon ── */
-.rview{display:flex;align-items:center;justify-content:center;gap:clamp(10px,2.4vw,30px);
-  margin-top:clamp(26px,3.6vw,42px)}
-.rstage{display:grid;flex:0 0 auto;width:clamp(248px,76vw,310px)}
-.rslide{grid-area:1/1;margin:0;opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .45s var(--e);touch-action:pan-y}
-.rslide.on{opacity:1;visibility:visible;pointer-events:auto}
+/* Twee telefoons naast elkaar; het spoor schuift één kaart per stap op. */
+.rview{--rgap:clamp(10px,2.6vw,26px);margin-top:clamp(26px,3.6vw,42px)}
+.rwrap{overflow:hidden;max-width:660px;margin:0 auto}
+.rtrack{display:flex;gap:var(--rgap);transition:transform .7s var(--e);will-change:transform}
+.rslide{flex:0 0 calc((100% - var(--rgap))/2);margin:0;touch-action:pan-y}
 
 .rphone{position:relative;padding:clamp(7px,2.2vw,10px);background:#0A0A0A;border-radius:clamp(34px,9vw,46px);
   box-shadow:inset 0 0 0 1.4px #3A3A3C,0 1px 0 rgba(255,255,255,.1) inset,
@@ -636,15 +639,18 @@ input,select{font:inherit}
 .wab-ic svg:last-child{fill:#fff}
 
 /* ── Pijlen, bolletjes, keurmerk ── */
-.rnav{width:44px;height:44px;flex:0 0 auto;border-radius:50%;border:1px solid var(--line);
+/* Pijlen en bolletjes onder de slider, zodat de pijlen op elke breedte te
+   zien zijn zonder ruimte van de telefoons af te snoepen. */
+.rctl{display:flex;align-items:center;justify-content:center;gap:clamp(10px,2vw,18px);
+  margin-top:clamp(16px,2.2vw,24px)}
+.rnav{width:40px;height:40px;flex:0 0 auto;border-radius:50%;border:1px solid var(--line);
   background:#fff;display:grid;place-items:center;cursor:pointer;transition:all .3s var(--e)}
-.rnav svg{width:17px;height:17px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;
+.rnav svg{width:16px;height:16px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;
   stroke-linejoin:round}
 .rnav:hover{background:var(--bf);border-color:var(--bf)}
 .rnav:hover svg{stroke:#fff}
-@media(max-width:760px){.rnav{display:none}}
 
-.rdots{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin-top:clamp(16px,2.2vw,24px)}
+.rdots{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;max-width:260px}
 .rdot{width:7px;height:7px;padding:0;border:0;border-radius:50%;background:var(--line);cursor:pointer;
   transition:all .35s var(--e)}
 .rdot.on{width:22px;border-radius:4px;background:var(--bf)}
@@ -663,7 +669,7 @@ input,select{font:inherit}
 @media(prefers-reduced-motion:reduce){
   .rstats.js .rstat-sterren span{opacity:1;transform:none}
   .rstats.js.zichtbaar .rstat-sterren span{animation:none}
-  .rslide{transition:none}
+  .rtrack{transition:none}
 }
 
 /* ============================================================

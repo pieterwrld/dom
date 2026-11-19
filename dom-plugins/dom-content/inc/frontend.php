@@ -83,11 +83,21 @@ function dom_c_reviews() {
         if (!$id) {
             continue;
         }
-        $url = wp_get_attachment_image_url($id, 'large');
+        /**
+         * Het volledige bestand, niet het formaat 'large'.
+         *
+         * Een screenshot is 946 × 2048; 'large' maakt daar 473 × 1024 van, en
+         * dat werd op een scherm met dubbele pixeldichtheid opgeblazen tot
+         * boven zijn eigen resolutie. Vandaar dat de gesprekken er korrelig
+         * uitzagen. Het id gaat mee zodat de sjabloon WordPress zelf een
+         * srcset laat opbouwen.
+         */
+        $url = wp_get_attachment_image_url($id, 'full');
         if (!$url) {
             continue;
         }
         $uit[] = [
+            'id'   => $id,
             'url'  => $url,
             'naam' => (string) ($rij['naam'] ?? ''),
         ];

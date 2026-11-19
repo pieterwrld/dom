@@ -11,12 +11,6 @@ if (!$kk_image && function_exists('dom_setting_image_url')) {
     $kk_image = dom_setting_image_url('klokjesman_image');
 }
 
-$kk_stats = dom_c_rows('home.klokjesman.stats', [
-    ['waarde' => '24/7', 'label' => 'WhatsApp'],
-    ['waarde' => '1–2',  'label' => 'Dagen levering'],
-    ['waarde' => '14',   'label' => 'Dagen retour'],
-]);
-
 $kk_link = dom_c('home.klokjesman.link', 'https://deklokjesman.com/');
 ?>
 <div class="kk" data-rv="up">
@@ -34,14 +28,6 @@ $kk_link = dom_c('home.klokjesman.link', 'https://deklokjesman.com/');
       <?php echo esc_html(dom_c('home.klokjesman.titel_voor', 'De')); ?>
       <span class="silver"><?php echo esc_html(dom_c('home.klokjesman.titel_accent', 'Klokjes')); ?></span><?php echo esc_html(dom_c('home.klokjesman.titel_na', 'man')); ?>
     </h3>
-    <p class="tx" style="--d:260ms"><?php echo esc_html(dom_c('home.klokjesman.tekst', 'De beste kwaliteit horloges voor de scherpste prijzen. Zelfde service, zelfde garantie, zelfde WhatsApp.')); ?></p>
     <a href="<?php echo esc_url($kk_link); ?>" class="btn btn-bf" style="width:max-content" target="_blank" rel="noopener"><?php echo esc_html(dom_c('home.klokjesman.knop', 'Bekijk horloges')); ?> <span class="arw">&rarr;</span></a>
-    <?php if ($kk_stats) : ?>
-      <div class="kk-stats">
-        <?php foreach ($kk_stats as $stat) : ?>
-          <div><b><?php echo esc_html($stat['waarde'] ?? ''); ?></b><span><?php echo esc_html($stat['label'] ?? ''); ?></span></div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
   </div>
 </div>

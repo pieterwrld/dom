@@ -74,56 +74,75 @@ $stat_score    = 4.9;
       </div>
     </div>
 
-    <!-- Eén review tegelijk -->
+    <!-- Twee telefoons naast elkaar, het spoor schuift automatisch door -->
     <div class="rview" id="rview">
-      <button class="rnav rnav-l" type="button" aria-label="<?php esc_attr_e('Vorige review', 'dom-theme'); ?>">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-      </button>
+      <div class="rwrap">
+        <div class="rtrack" id="rtrack">
+          <?php foreach ($reviews as $i => $r) :
+            $img = $r['url'] ?? '';
+            if (!$img) {
+                continue;
+            }
+            $att_id   = (int) ($r['id'] ?? 0);
+            $afzender = trim((string) ($r['naam'] ?? '')) ?: 'De Outfitman';
+          ?>
+            <figure class="rslide">
+              <div class="rphone">
+                <div class="rphone-screen">
+                  <?php
+                  $alt   = __('WhatsApp-gesprek met een klant', 'dom-theme');
+                  $attrs = [
+                      'alt'      => $alt,
+                      'loading'  => $i < 2 ? 'eager' : 'lazy',
+                      'decoding' => 'async',
+                      'sizes'    => '(max-width:760px) 44vw, 330px',
+                  ];
+                  if ($att_id) {
+                      // WordPress zet hier zelf een srcset bij, zodat een
+                      // telefoon niet het hele bestand van 946px hoeft te laden.
+                      echo wp_get_attachment_image($att_id, 'full', false, $attrs);
+                  } else {
+                      printf(
+                          '<img src="%s" alt="%s" width="946" height="2048" loading="%s" decoding="async">',
+                          esc_url($img),
+                          esc_attr($alt),
+                          esc_attr($attrs['loading'])
+                      );
+                  }
+                  ?>
 
-      <div class="rstage" id="rstage">
-        <?php foreach ($reviews as $i => $r) :
-          $img = $r['url'] ?? '';
-          if (!$img) {
-              continue;
-          }
-          $afzender = trim((string) ($r['naam'] ?? '')) ?: 'De Outfitman';
-        ?>
-          <figure class="rslide<?php echo 0 === $i ? ' on' : ''; ?>"<?php echo 0 === $i ? '' : ' aria-hidden="true"'; ?>>
-            <div class="rphone">
-              <div class="rphone-screen">
-                <img src="<?php echo esc_url($img); ?>"
-                     alt="<?php esc_attr_e('WhatsApp-gesprek met een klant', 'dom-theme'); ?>"
-                     width="946" height="2048"
-                     loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async">
+                  <!-- Onze kopbalk, precies over die van WhatsApp heen -->
+                  <div class="wabar">
+                    <span class="wab-terug">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+                      <i>1</i>
+                    </span>
+                    <span class="wab-av">DO</span>
+                    <span class="wab-nm"><?php echo esc_html($afzender); ?></span>
+                    <span class="wab-ic">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6.5" width="13" height="11" rx="2.6"/><path d="M15 11l6-3.4v8.8L15 13z"/></svg>
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5l2.6.6 1 3.6-2 1.5a12 12 0 0 0 6 6l1.5-2 3.6 1 .6 2.6c-.2 1-1 1.7-2 1.7A15.4 15.4 0 0 1 4.9 5.5c0-1 .7-1.8 1.7-2z"/></svg>
+                    </span>
+                  </div>
 
-                <!-- Onze kopbalk, precies over die van WhatsApp heen -->
-                <div class="wabar">
-                  <span class="wab-terug">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-                    <i>1</i>
-                  </span>
-                  <span class="wab-av">DO</span>
-                  <span class="wab-nm"><?php echo esc_html($afzender); ?></span>
-                  <span class="wab-ic">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6.5" width="13" height="11" rx="2.6"/><path d="M15 11l6-3.4v8.8L15 13z"/></svg>
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5l2.6.6 1 3.6-2 1.5a12 12 0 0 0 6 6l1.5-2 3.6 1 .6 2.6c-.2 1-1 1.7-2 1.7A15.4 15.4 0 0 1 4.9 5.5c0-1 .7-1.8 1.7-2z"/></svg>
-                  </span>
+                  <span class="rphone-island" aria-hidden="true"></span>
                 </div>
-
-                <!-- Dynamic Island -->
-                <span class="rphone-island" aria-hidden="true"></span>
               </div>
-            </div>
-          </figure>
-        <?php endforeach; ?>
+            </figure>
+          <?php endforeach; ?>
+        </div>
       </div>
 
-      <button class="rnav rnav-r" type="button" aria-label="<?php esc_attr_e('Volgende review', 'dom-theme'); ?>">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-      </button>
+      <div class="rctl">
+        <button class="rnav rnav-l" type="button" aria-label="<?php esc_attr_e('Vorige review', 'dom-theme'); ?>">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <div class="rdots" id="rdots" role="tablist" aria-label="<?php esc_attr_e('Kies een review', 'dom-theme'); ?>"></div>
+        <button class="rnav rnav-r" type="button" aria-label="<?php esc_attr_e('Volgende review', 'dom-theme'); ?>">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
     </div>
-
-    <div class="rdots" id="rdots" role="tablist" aria-label="<?php esc_attr_e('Kies een review', 'dom-theme'); ?>"></div>
 
     <div class="rverify">
       <div class="stars" aria-label="<?php esc_attr_e('5 van de 5 sterren', 'dom-theme'); ?>"><?php echo str_repeat($ster, 5); // phpcs:ignore ?></div>
@@ -210,50 +229,102 @@ $stat_score    = 4.9;
     }
   }
 
-  /* ── Eén review tegelijk ───────────────────────────────── */
-  var stage = document.getElementById('rstage');
+  /* ── De slider ─────────────────────────────────────────
+     Twee telefoons tegelijk in beeld, het spoor schuift één kaart per stap
+     door en begint na de laatste weer vooraan. Hij loopt vanzelf, maar staat
+     stil zolang de bezoeker er met de muis op staat of zelf veegt. */
+  var track = document.getElementById('rtrack');
   var view  = document.getElementById('rview');
-  if (!stage || !view) return;
+  if (!track || !view) return;
 
-  var slides = Array.prototype.slice.call(stage.querySelectorAll('.rslide'));
+  var slides = Array.prototype.slice.call(track.querySelectorAll('.rslide'));
   if (!slides.length) return;
 
   var dotsEl = document.getElementById('rdots');
-  var nu = 0;
+  var nu = 0, timer = null;
 
-  slides.forEach(function (_, i) {
-    var d = document.createElement('button');
-    d.type = 'button';
-    d.className = 'rdot' + (i === 0 ? ' on' : '');
-    d.setAttribute('role', 'tab');
-    d.setAttribute('aria-label', 'Review ' + (i + 1));
-    d.addEventListener('click', function () { toon(i); });
-    if (dotsEl) dotsEl.appendChild(d);
-  });
+  // Hoeveel kaarten er naast elkaar passen, zodat de laatste stap niet half leeg is.
+  function perBeeld() {
+    var breed = track.getBoundingClientRect().width;
+    var kaart = slides[0].getBoundingClientRect().width;
+    return kaart > 0 ? Math.max(1, Math.round(breed / kaart)) : 1;
+  }
+  function maxIndex() {
+    return Math.max(0, slides.length - perBeeld());
+  }
 
-  var dots = dotsEl ? Array.prototype.slice.call(dotsEl.children) : [];
-
-  function toon(i) {
-    nu = (i + slides.length) % slides.length;
-    slides.forEach(function (s, k) {
-      var aan = k === nu;
-      s.classList.toggle('on', aan);
-      if (aan) { s.removeAttribute('aria-hidden'); } else { s.setAttribute('aria-hidden', 'true'); }
-    });
+  function verschuif() {
+    var gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
+    var kaart = slides[0].getBoundingClientRect().width;
+    track.style.transform = 'translate3d(' + (-nu * (kaart + gap)) + 'px,0,0)';
     dots.forEach(function (d, k) { d.classList.toggle('on', k === nu); });
   }
 
-  view.querySelector('.rnav-l').addEventListener('click', function () { toon(nu - 1); });
-  view.querySelector('.rnav-r').addEventListener('click', function () { toon(nu + 1); });
+  function toon(i) {
+    var max = maxIndex();
+    nu = i > max ? 0 : (i < 0 ? max : i);
+    verschuif();
+  }
+
+  var dots = [];
+  function bouwDots() {
+    if (!dotsEl) return;
+    var aantal = maxIndex() + 1;
+    if (dots.length === aantal) return;
+    dotsEl.innerHTML = '';
+    dots = [];
+    for (var i = 0; i < aantal; i++) {
+      (function (k) {
+        var d = document.createElement('button');
+        d.type = 'button';
+        d.className = 'rdot' + (k === nu ? ' on' : '');
+        d.setAttribute('role', 'tab');
+        d.setAttribute('aria-label', 'Review ' + (k + 1));
+        d.addEventListener('click', function () { toon(k); herstart(); });
+        dotsEl.appendChild(d);
+        dots.push(d);
+      })(i);
+    }
+  }
+
+  function speel() {
+    if (rustig || slides.length <= perBeeld()) return;
+    stop();
+    timer = setInterval(function () { toon(nu + 1); }, 4500);
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  function herstart() { stop(); speel(); }
+
+  bouwDots();
+  verschuif();
+  speel();
+
+  view.querySelector('.rnav-l').addEventListener('click', function () { toon(nu - 1); herstart(); });
+  view.querySelector('.rnav-r').addEventListener('click', function () { toon(nu + 1); herstart(); });
+
+  view.addEventListener('mouseenter', stop);
+  view.addEventListener('mouseleave', speel);
 
   // Vegen op een telefoon.
   var x0 = null;
-  stage.addEventListener('pointerdown', function (e) { x0 = e.clientX; });
-  stage.addEventListener('pointerup', function (e) {
+  track.addEventListener('pointerdown', function (e) { x0 = e.clientX; stop(); });
+  track.addEventListener('pointerup', function (e) {
     if (x0 === null) return;
     var dx = e.clientX - x0;
     x0 = null;
     if (Math.abs(dx) > 40) toon(nu + (dx < 0 ? 1 : -1));
+    speel();
   });
+
+  var vertraag;
+  window.addEventListener('resize', function () {
+    clearTimeout(vertraag);
+    vertraag = setTimeout(function () {
+      bouwDots();
+      if (nu > maxIndex()) nu = maxIndex();
+      verschuif();
+    }, 150);
+  });
+
 })();
 </script>

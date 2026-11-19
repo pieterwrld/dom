@@ -51,8 +51,7 @@ if (!$acc_data) {
   </div>
   <div class="acc-in">
     <div>
-      <span class="tagred"><?php echo esc_html(dom_c('home.accessoires.label', 'Accessoires')); ?></span>
-      <h2 style="margin-top:8px" class="split"><?php echo esc_html(dom_c('home.accessoires.titel', 'Maak je look compleet')); ?></h2>
+      <h2 class="split"><?php echo esc_html(dom_c('home.accessoires.titel', 'Maak je look compleet')); ?></h2>
     </div>
     <div class="acc-btns">
       <?php foreach ($acc_data as $a) : ?>

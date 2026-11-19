@@ -183,7 +183,6 @@ function dom_content_schema() {
                     'titel'  => 'Accessoireblok',
                     'uitleg' => 'De band met bril, pet en tas. De foto\'s komen van de categorieën zelf, die stel je in op het tabblad Categorieën.',
                     'velden' => [
-                        'label'  => ['type' => 'text', 'label' => 'Label', 'default' => 'Accessoires'],
                         'titel'  => ['type' => 'text', 'label' => 'Kop', 'default' => 'Maak je look compleet'],
                         'items'  => [
                             'type'      => 'repeater',
@@ -209,28 +208,8 @@ function dom_content_schema() {
                         'titel_voor'  => ['type' => 'text', 'label' => 'Kop, deel 1', 'default' => 'De'],
                         'titel_accent'=> ['type' => 'text', 'label' => 'Kop, deel 2 (zilver)', 'default' => 'Klokjes'],
                         'titel_na'    => ['type' => 'text', 'label' => 'Kop, deel 3', 'default' => 'man'],
-                        'tekst' => [
-                            'type'    => 'textarea',
-                            'label'   => 'Tekst',
-                            'default' => 'De beste kwaliteit horloges voor de scherpste prijzen. Zelfde service, zelfde garantie, zelfde WhatsApp.',
-                        ],
                         'knop' => ['type' => 'text', 'label' => 'Tekst op de knop', 'default' => 'Bekijk horloges'],
                         'link' => ['type' => 'url', 'label' => 'Link', 'default' => 'https://deklokjesman.com/'],
-                        'stats' => [
-                            'type'      => 'repeater',
-                            'label'     => 'Cijfers onderaan',
-                            'knop'      => 'Cijfer toevoegen',
-                            'rij_label' => 'label',
-                            'velden'    => [
-                                'waarde' => ['type' => 'text', 'label' => 'Getal'],
-                                'label'  => ['type' => 'text', 'label' => 'Onderschrift'],
-                            ],
-                            'default' => [
-                                ['waarde' => '24/7', 'label' => 'WhatsApp'],
-                                ['waarde' => '1–2',  'label' => 'Dagen levering'],
-                                ['waarde' => '14',   'label' => 'Dagen retour'],
-                            ],
-                        ],
                     ],
                 ],
 

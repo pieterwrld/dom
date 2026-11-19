@@ -66,36 +66,6 @@ $shop_url = dom_shop_url();
     $is_sale  = in_array($cat->slug, $sale_slugs, true);
     $badge    = $dom_category_badge($cat->slug);
 
-    /**
-     * De laagste prijs in deze categorie.
-     *
-     * Sorteren op het veld _price werkt hier niet: bij een product met maten
-     * staat de prijs op de variaties en is dat veld op het hoofdproduct vaak
-     * leeg. Daarom halen we een handvol producten op en rekenen we het zelf uit.
-     */
-    $min_price = '';
-    $kandidaten = get_posts([
-        'post_type'      => 'product',
-        'post_status'    => 'publish',
-        'posts_per_page' => 24,
-        'tax_query'      => [['taxonomy' => 'product_cat', 'field' => 'slug', 'terms' => $cat->slug]],
-        'fields'         => 'ids',
-        'no_found_rows'  => true,
-    ]);
-    $laagste = 0.0;
-    foreach ($kandidaten as $kandidaat_id) {
-        $kandidaat = function_exists('wc_get_product') ? wc_get_product($kandidaat_id) : null;
-        if (!$kandidaat) {
-            continue;
-        }
-        $kp = dom_prices($kandidaat);
-        if ($kp['geldig'] && ($laagste === 0.0 || $kp['nu'] < $laagste)) {
-            $laagste = $kp['nu'];
-        }
-    }
-    if ($laagste > 0) {
-        $min_price = 'vanaf &euro;' . number_format($laagste, 0, ',', '.');
-    }
   ?>
     <a href="<?php echo esc_url($link); ?>"
        class="ctile<?php echo $is_sale ? ' saletile' : ''; ?>"
@@ -115,8 +85,7 @@ $shop_url = dom_shop_url();
       <span class="cline"></span>
       <div class="cbody">
         <div class="cname"><?php echo esc_html($cat->name); ?></div>
-        <?php if ($min_price) : ?><div class="cmeta"><?php echo $min_price; ?></div><?php endif; ?>
-        <div class="cgo">Shop nu <span class="arw">&rarr;</span></div>
+        <span class="cgo"><?php esc_html_e('Bekijk', 'dom-theme'); ?> <span class="arw">&rarr;</span></span>
       </div>
     </a>
   <?php endforeach; ?>
