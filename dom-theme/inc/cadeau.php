@@ -107,7 +107,10 @@ function dom_cadeau_bijwerken() {
     }
 
     if ($verdiend && !$in_wagen) {
-        WC()->cart->add_to_cart($cadeau_id, 1, 0, [], ['dom_cadeau' => true]);
+        WC()->cart->add_to_cart($cadeau_id, 1, 0, [], [
+            'dom_cadeau'      => true,
+            'dom_cadeau_maat' => '',
+        ]);
     } elseif (!$verdiend && $in_wagen) {
         WC()->cart->remove_cart_item($in_wagen);
     }
@@ -159,6 +162,201 @@ add_filter('woocommerce_cart_item_name', function ($naam, $item) {
     }
     return $naam . ' <span class="dom-gratis">' . esc_html__('Cadeau', 'dom-theme') . '</span>';
 }, 10, 2);
+
+/* ===================================================================
+ *  De maat van het cadeau
+ * =================================================================== */
+
+/**
+ * Uit welke maten de klant mag kiezen.
+ *
+ * De lijst staat op het cadeauproduct zelf, als gewoon productkenmerk
+ * Kledingmaat. Zo is hij in de beheeromgeving aan te passen zonder dat hier
+ * iets hoeft te veranderen. Staat er niets, dan vallen we terug op S t/m XXL.
+ */
+function dom_cadeau_maten() {
+    static $maten = null;
+    if ($maten !== null) {
+        return $maten;
+    }
+
+    $maten   = [];
+    $id      = dom_cadeau_product_id();
+    $product = $id && function_exists('wc_get_product') ? wc_get_product($id) : null;
+
+    if ($product) {
+        $ruw = $product->get_attribute('pa_kledingmaat');
+        if (!$ruw) {
+            $ruw = $product->get_attribute('Kledingmaat');
+        }
+        foreach (explode(',', (string) $ruw) as $maat) {
+            $maat = trim($maat);
+            if ($maat !== '') {
+                $maten[] = $maat;
+            }
+        }
+    }
+
+    if (!$maten) {
+        $maten = ['S', 'M', 'L', 'XL', 'XXL'];
+    }
+
+    // WooCommerce geeft de termen alfabetisch terug (L, M, S, XL), wat op een
+    // maatbalk raar leest. Daarom zelf op maat sorteren.
+    $volgorde = ['XS' => 1, 'S' => 2, 'M' => 3, 'L' => 4, 'XL' => 5, 'XXL' => 6, '3XL' => 7, 'XXXL' => 7];
+    usort($maten, function ($a, $b) use ($volgorde) {
+        $pa = $volgorde[strtoupper($a)] ?? 99;
+        $pb = $volgorde[strtoupper($b)] ?? 99;
+        return $pa === $pb ? strcmp($a, $b) : $pa - $pb;
+    });
+
+    return $maten;
+}
+
+/** De maat die nu bij het cadeau in de wagen staat, of '' als er geen is. */
+function dom_cadeau_gekozen_maat() {
+    if (!function_exists('WC') || !WC()->cart) {
+        return '';
+    }
+    foreach (WC()->cart->get_cart() as $item) {
+        if (dom_is_cadeau_regel($item)) {
+            return trim((string) ($item['dom_cadeau_maat'] ?? ''));
+        }
+    }
+    return '';
+}
+
+/**
+ * De gekozen maat op de cadeauregel zetten.
+ *
+ * Alleen een maat uit de lijst wordt geaccepteerd; wat de bezoeker verder
+ * meestuurt, belandt niet in de order.
+ */
+function dom_cadeau_maat_zetten($maat) {
+    if (!function_exists('WC') || !WC()->cart) {
+        return false;
+    }
+
+    $gekozen = '';
+    foreach (dom_cadeau_maten() as $toegestaan) {
+        if (strcasecmp($toegestaan, (string) $maat) === 0) {
+            $gekozen = $toegestaan;
+            break;
+        }
+    }
+    if ($gekozen === '') {
+        return false;
+    }
+
+    $geraakt = false;
+    foreach (WC()->cart->get_cart() as $sleutel => $item) {
+        if (dom_is_cadeau_regel($item)) {
+            WC()->cart->cart_contents[$sleutel]['dom_cadeau_maat'] = $gekozen;
+            $geraakt = true;
+        }
+    }
+
+    if ($geraakt) {
+        WC()->cart->set_session();
+    }
+
+    return $geraakt;
+}
+
+/** De maatkiezer, gebruikt in de lade en in de ordersamenvatting. */
+function dom_cadeau_maatkiezer_html($extra_klasse = '') {
+    $maten = dom_cadeau_maten();
+    if (!$maten) {
+        return '';
+    }
+
+    $gekozen = dom_cadeau_gekozen_maat();
+    $klassen = 'cdmaat' . ($extra_klasse ? ' ' . $extra_klasse : '') . ($gekozen === '' ? ' leeg' : '');
+
+    $uit  = '<div class="' . esc_attr($klassen) . '">';
+    $uit .= '<span class="cdmaat-k">'
+         . ($gekozen === ''
+             ? esc_html__('Kies maat', 'dom-theme')
+             : esc_html__('Maat', 'dom-theme'))
+         . '</span>';
+    $uit .= '<span class="cdmaat-r">';
+    foreach ($maten as $maat) {
+        $aan  = strcasecmp($maat, $gekozen) === 0;
+        $uit .= '<button type="button" class="cdmaat-b' . ($aan ? ' on' : '') . '"'
+             . ' data-cadeau-maat="' . esc_attr($maat) . '"'
+             . ' aria-pressed="' . ($aan ? 'true' : 'false') . '"'
+             . ' aria-label="' . esc_attr(sprintf(__('Maat %s kiezen', 'dom-theme'), $maat)) . '">'
+             . esc_html($maat) . '</button>';
+    }
+    $uit .= '</span></div>';
+
+    return $uit;
+}
+
+/** De maat kiezen vanuit de lade of de checkout. */
+function dom_ajax_cadeau_maat() {
+    check_ajax_referer('dom-cart-nonce', 'nonce');
+
+    $maat = isset($_POST['maat']) ? sanitize_text_field(wp_unslash($_POST['maat'])) : '';
+    if (!dom_cadeau_maat_zetten($maat)) {
+        wp_send_json_error(['message' => __('Die maat kan niet gekozen worden.', 'dom-theme')]);
+    }
+
+    WC()->cart->calculate_totals();
+
+    wp_send_json_success([
+        'maat'      => dom_cadeau_gekozen_maat(),
+        'fragments' => apply_filters('woocommerce_add_to_cart_fragments', []),
+    ]);
+}
+add_action('wp_ajax_dom_cadeau_maat', 'dom_ajax_cadeau_maat');
+add_action('wp_ajax_nopriv_dom_cadeau_maat', 'dom_ajax_cadeau_maat');
+
+/**
+ * De maat meenemen in de wagen, op de checkout en in de order.
+ *
+ * woocommerce_get_item_data zet de regel onder de productnaam in de
+ * ordersamenvatting; de tweede haak schrijft hem als orderregel weg, zodat de
+ * maat ook in de bestelmail en in de beheeromgeving staat.
+ */
+add_filter('woocommerce_get_item_data', function ($data, $item) {
+    if (!dom_is_cadeau_regel($item)) {
+        return $data;
+    }
+    // Op de checkout staat de kiezer er al onder; dan is deze regel dubbelop.
+    if (function_exists('is_checkout') && is_checkout()) {
+        return $data;
+    }
+    $maat = trim((string) ($item['dom_cadeau_maat'] ?? ''));
+    $data[] = [
+        'key'   => __('Maat', 'dom-theme'),
+        'value' => $maat !== '' ? $maat : __('nog te kiezen', 'dom-theme'),
+    ];
+    return $data;
+}, 10, 2);
+
+add_action('woocommerce_checkout_create_order_line_item', function ($regel, $sleutel, $waarden) {
+    if (!dom_is_cadeau_regel($waarden)) {
+        return;
+    }
+    $maat = trim((string) ($waarden['dom_cadeau_maat'] ?? ''));
+    $regel->add_meta_data(
+        __('Maat', 'dom-theme'),
+        $maat !== '' ? $maat : __('nog te kiezen', 'dom-theme'),
+        true
+    );
+}, 10, 3);
+
+/** Op de checkout staat de kiezer onder de naam van het cadeau. */
+add_filter('woocommerce_cart_item_name', function ($naam, $item) {
+    if (!dom_is_cadeau_regel($item)) {
+        return $naam;
+    }
+    if (!function_exists('is_checkout') || !is_checkout()) {
+        return $naam;
+    }
+    return $naam . dom_cadeau_maatkiezer_html('cdmaat-co');
+}, 20, 2);
 
 /* ===================================================================
  *  Verzending

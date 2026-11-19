@@ -142,6 +142,13 @@ $eur = function ($v) {
             ?>
             <?php if ($is_cadeau) : ?>
               <div class="cadeau-regel"><?php esc_html_e('Cadeau van ons', 'dom-theme'); ?></div>
+              <?php
+              // Bij het cadeau hoort een maat. Zolang die er niet is staat er
+              // "Kies maat"; de keuze gaat mee naar de checkout en de order.
+              if (function_exists('dom_cadeau_maatkiezer_html')) {
+                  echo dom_cadeau_maatkiezer_html(); // phpcs:ignore WordPress.Security.EscapeOutput
+              }
+              ?>
             <?php else : ?>
               <div class="qty">
                 <button data-a="-" data-key="<?php echo esc_attr($cart_item_key); ?>" aria-label="Minder">&minus;</button>

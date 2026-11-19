@@ -835,6 +835,25 @@ body.cart-open .ovl{opacity:1;pointer-events:auto}
 /* Het cadeau in de wagen: duidelijk dat het niets kost. */
 .cadeau-regel{margin-top:4px;font-family:var(--disp);font-size:10.5px;font-weight:800;
   letter-spacing:.07em;text-transform:uppercase;color:var(--bf)}
+/* Maatkeuze bij het cadeau: in de lade onder de regel, op de checkout onder
+   de productnaam. Zolang er niets gekozen is knippert het label rood, zodat
+   het opvalt dat hier nog iets moet gebeuren. */
+.cdmaat{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:5px}
+.cdmaat-k{font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted)}
+.cdmaat.leeg .cdmaat-k{color:var(--bf);animation:cdmaatLet 1.6s ease-in-out infinite}
+@keyframes cdmaatLet{0%,100%{opacity:1}50%{opacity:.45}}
+.cdmaat-r{display:flex;flex-wrap:wrap;gap:4px}
+.cdmaat-b{min-width:26px;padding:3px 5px;border:1px solid var(--line);background:#fff;
+  font-family:var(--disp);font-size:10px;font-weight:800;letter-spacing:.04em;color:var(--ink);
+  line-height:1.1;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.cdmaat-b:hover{border-color:var(--ink)}
+.cdmaat-b.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.cdmaat.leeg .cdmaat-b{border-color:rgba(208,20,44,.35)}
+.cdmaat.bezig{opacity:.55;pointer-events:none}
+.cdmaat-co{margin-top:6px}
+.cdmaat-co .cdmaat-b{min-width:30px;padding:4px 7px;font-size:11px}
+
 .dom-gratis{display:inline-block;margin-left:6px;padding:1px 6px;background:var(--bf);color:#fff;
   font-family:var(--disp);font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
   vertical-align:middle}

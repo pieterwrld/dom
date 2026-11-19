@@ -69,6 +69,50 @@
     });
   }
 
+  /* ============ MAAT VAN HET CADEAU ============
+     De knoppen staan zowel in de lade als in de ordersamenvatting op de
+     checkout. De keuze gaat direct aan (anders voelt het traag), daarna haalt
+     de server de regel op; op de checkout laten we WooCommerce de samenvatting
+     zelf verversen, zodat de maat ook daar klopt. */
+  document.addEventListener('click', function (e) {
+    var mb = e.target.closest('[data-cadeau-maat]');
+    if (!mb) return;
+    e.preventDefault();
+
+    var wrap = mb.closest('.cdmaat');
+    if (wrap) {
+      wrap.querySelectorAll('.cdmaat-b').forEach(function (b) {
+        b.classList.toggle('on', b === mb);
+        b.setAttribute('aria-pressed', b === mb ? 'true' : 'false');
+      });
+      wrap.classList.remove('leeg');
+      wrap.classList.add('bezig');
+      var kop = wrap.querySelector('.cdmaat-k');
+      if (kop) kop.textContent = 'Maat';
+    }
+
+    var fd = new FormData();
+    fd.append('action', 'dom_cadeau_maat');
+    fd.append('nonce', domCart.nonce);
+    fd.append('maat', mb.dataset.cadeauMaat);
+
+    fetch(domCart.ajaxUrl, { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (wrap) wrap.classList.remove('bezig');
+        if (!res || !res.success) return;
+        var opCheckout = document.body.classList.contains('woocommerce-checkout');
+        if (opCheckout && typeof jQuery !== 'undefined') {
+          jQuery(document.body).trigger('update_checkout');
+        } else if (res.data && res.data.fragments) {
+          applyFragments(res.data.fragments);
+        }
+      })
+      .catch(function () {
+        if (wrap) wrap.classList.remove('bezig');
+      });
+  });
+
   /* Quantity +/- and remove — delegated */
   document.addEventListener('click', function (e) {
     var qb = e.target.closest('.qty button[data-a]');
